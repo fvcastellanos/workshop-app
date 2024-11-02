@@ -1,4 +1,4 @@
-package net.cavitos.workshop.views;
+package net.cavitos.workshop.views.brands;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -29,10 +29,16 @@ public class CarBrandView extends VerticalLayout {
     private static final Logger LOGGER = LoggerFactory.getLogger(CarBrandView.class);
 
     private final CarBrandService carBrandService;
+    private final AddModal addModal;
 
-    public CarBrandView(final CarBrandService carBrandService) {
+    private TextField searchText;
+    private Select<Status> searchStatus;
+
+    public CarBrandView(final CarBrandService carBrandService,
+                        final AddModal addModal) {
 
         this.carBrandService = carBrandService;
+        this.addModal = addModal;
 
         final var h3 = new H3();
         h3.setText("Búsqueda");
@@ -40,8 +46,8 @@ public class CarBrandView extends VerticalLayout {
 
         final var grid = buildGrid();
 
-        final var searchText = buildTextSearchField("80%");
-        final var searchStatus = buildStatusSelect("20%");
+        this.searchText = buildTextSearchField("80%");
+        this.searchStatus = buildStatusSelect("20%");
 
         final var searchBody = new HorizontalLayout();
         searchBody.setWidth("100%");
@@ -78,6 +84,8 @@ public class CarBrandView extends VerticalLayout {
             performSearch(searchText.getValue(), status.getValue(), grid);
         });
 
+        btnAdd.addClickListener(event -> addModal.openDialogForNew());
+
         searchFooter.add(btnSearch);
         searchFooter.add(btnAdd);
 
@@ -92,6 +100,7 @@ public class CarBrandView extends VerticalLayout {
         add(searchBox);
         add(grid);
 
+        addModal.addOnSaveEvent(entity -> performSearch(searchText.getValue(), searchStatus.getValue().getValue(), grid));
         performSearch("", 1, grid);
     }
 
@@ -115,6 +124,7 @@ public class CarBrandView extends VerticalLayout {
         final var textField = new TextField();
         textField.setLabel("Texto");
         textField.setWidth(width);
+        textField.setAutofocus(true);
 
         return textField;
     }
@@ -137,6 +147,7 @@ public class CarBrandView extends VerticalLayout {
             editImage.getStyle().set("cursor", "pointer");
             editImage.addClickListener(event -> {
                 LOGGER.info("Edit: {}", carBrandEntity.getName());
+                addModal.openDialogForEdit(carBrandEntity);
             });
 
             final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Editar");

@@ -1,7 +1,6 @@
 package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.exception.BusinessException;
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
 import net.cavitos.workshop.domain.model.web.CarBrand;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
@@ -102,12 +101,9 @@ public class CarBrandService {
             throw new BusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Car Brand not found");
         }
 
-        final var active = ActiveStatus.valueOf(carBrand.getActive())
-                        .value();
-
         carBrandEntity.setName(carBrand.getName().toUpperCase());
         carBrandEntity.setDescription(carBrand.getDescription());
-        carBrandEntity.setActive(active);
+        carBrandEntity.setActive(carBrand.getActive());
         carBrandRepository.save(carBrandEntity);
 
         return carBrandEntity;
