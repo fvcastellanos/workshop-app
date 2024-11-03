@@ -1,6 +1,5 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
 import net.cavitos.workshop.domain.model.web.CarLine;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.entity.CarLineEntity;
@@ -135,10 +134,7 @@ public class CarLineService {
 
         findCarBrandEntity(carBrandId);
 
-        final var active = ActiveStatus.valueOf(carLine.getActive())
-                        .value();
-
-        carLineEntity.setActive(active);
+        carLineEntity.setActive(carLine.getActive());
         carLineEntity.setName(carLine.getName());
         carLineEntity.setDescription(carLine.getDescription());
 

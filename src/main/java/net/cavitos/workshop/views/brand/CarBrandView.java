@@ -1,6 +1,7 @@
-package net.cavitos.workshop.views.brands;
+package net.cavitos.workshop.views.brand;
 
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -17,6 +18,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.service.CarBrandService;
+import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
 import net.cavitos.workshop.views.model.Status;
 import org.slf4j.Logger;
@@ -24,15 +26,15 @@ import org.slf4j.LoggerFactory;
 
 @PageTitle("Marcas de Vehículos")
 @Route(value = "car-brands", layout = MainLayout.class)
-public class CarBrandView extends VerticalLayout {
+public class CarBrandView extends CRUDLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarBrandView.class);
 
     private final CarBrandService carBrandService;
     private final AddModal addModal;
 
-    private TextField searchText;
-    private Select<Status> searchStatus;
+    private final TextField searchText;
+    private final Select<Status> searchStatus;
 
     public CarBrandView(final CarBrandService carBrandService,
                         final AddModal addModal) {
@@ -155,7 +157,8 @@ public class CarBrandView extends VerticalLayout {
             viewImage.setHeight("20px");
             viewImage.getStyle().set("cursor", "pointer");
             viewImage.addClickListener(event -> {
-                LOGGER.info("View: {}", carBrandEntity.getId());
+                LOGGER.info("Models for Brand: {}", carBrandEntity.getName());
+                UI.getCurrent().navigate("car-models/%s".formatted(carBrandEntity.getId()));
             });
 
             layout.add(editImage, viewImage);
@@ -184,8 +187,7 @@ public class CarBrandView extends VerticalLayout {
 
     private void performSearch(final String text, final int active, Grid<CarBrandEntity> grid) {
 
-        final var result = carBrandService.getAllByTenant("resta", active, text, 0, 20);
-
+        final var result = carBrandService.getAllByTenant("resta", active, text, DEFAULT_PAGE, DEFAULT_SIZE);
         grid.setItems(result.getContent());
     }
 }

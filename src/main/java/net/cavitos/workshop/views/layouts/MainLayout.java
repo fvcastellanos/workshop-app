@@ -73,12 +73,12 @@ public class MainLayout  extends AppLayout {
     private List<SideNavItem> buildMenuEntries() {
 
         return List.of(
-                createNavigationItem("Inicio", "", "line-awesome/svg/home.svg"),
-                createNavigationItemWithSubItems("Catálogos", null, "line-awesome/svg/home.svg",
-                        createNavigationItem("Marcas de Vehiculos", "car-brands", "line-awesome/svg/home.svg"),
-                        createNavigationItem("Contactos", "contacts", "line-awesome/svg/home.svg"),
-                        createNavigationItem("Productos", "products", "line-awesome/svg/home.svg"),
-                        createNavigationItem("Categorías de Productos", "product-categories", "line-awesome/svg/home.svg"),
+                createNavigationItem("Inicio", "", "img/icons/home-1-svgrepo-com.svg"),
+                createNavigationItemWithSubItems("Catálogos", null, "img/icons/list-svgrepo-com.svg",
+                        createNavigationItem("Marcas de Vehiculos", "car-brands", "img/icons/car-svgrepo-com.svg"),
+                        createNavigationItem("Contactos", "contacts", "img/icons/contacts-svgrepo-com.svg"),
+                        createNavigationItem("Productos", "products", "img/icons/products-svgrepo-com.svg"),
+                        createNavigationItem("Categorías de Productos", "product-categories", "img/icons/category-solid-svgrepo-com.svg"),
                         createNavigationItem("Tipos de Movimientos", "inventory-movement-types", "line-awesome/svg/home.svg")
                 ),
                 createNavigationItem("Ordenes", "work-orders", "line-awesome/svg/home.svg"),

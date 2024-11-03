@@ -1,11 +1,16 @@
 package net.cavitos.workshop.views.factory;
 
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import net.cavitos.workshop.views.model.Status;
 
 public final class ComponentFactory {
@@ -51,4 +56,45 @@ public final class ComponentFactory {
         return button;
     }
 
+    public static VerticalLayout buildSearchBox() {
+
+        final var searchBox = new VerticalLayout();
+        searchBox.setClassName("border");
+        searchBox.setWidthFull();
+        searchBox.setWidth("100%");
+        searchBox.getStyle().set("flex-grow", "1");
+
+        return searchBox;
+    }
+
+    public static HorizontalLayout buildSearchBody() {
+
+        final var searchBody = new HorizontalLayout();
+        searchBody.setWidth("100%");
+        searchBody.setHeightFull();
+        searchBody.addClassName(LumoUtility.Gap.MEDIUM);
+        searchBody.getStyle().set("flex-grow", "1");
+
+        return searchBody;
+    }
+
+    public static HorizontalLayout buildSearchFooter() {
+
+        final var searchFooter = new HorizontalLayout();
+        searchFooter.setWidthFull();
+        searchFooter.addClassName(LumoUtility.Gap.MEDIUM);
+        searchFooter.setWidth("100%");
+        searchFooter.getStyle().set("flex-grow", "1");
+
+        return searchFooter;
+    }
+
+    public static H3 buildSearchTitle(final String title) {
+
+        final var searchTitle = new H3();
+        searchTitle.setText(title);
+        searchTitle.setWidth("max-content");
+
+        return searchTitle;
+    }
 }

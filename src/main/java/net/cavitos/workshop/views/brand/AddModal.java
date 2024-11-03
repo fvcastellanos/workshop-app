@@ -1,6 +1,5 @@
-package net.cavitos.workshop.views.brands;
+package net.cavitos.workshop.views.brand;
 
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -12,6 +11,7 @@ import net.cavitos.workshop.factory.BusinessExceptionFactory;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.transformer.CarBrandTransformer;
+import net.cavitos.workshop.views.DialogBase;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+import static java.util.Objects.nonNull;
+
 @Component
-public class AddModal extends Dialog {
+public class AddModal extends DialogBase<CarBrandEntity> {
 
     private final Binder<CarBrand> binder;
     private final CarBrandService carBrandService;
@@ -34,12 +36,12 @@ public class AddModal extends Dialog {
 
     public AddModal(final CarBrandService carBrandService) {
 
+        super();
+
         this.binder = new Binder<>(CarBrand.class);
         this.carBrandService = carBrandService;
         this.isEdit = false;
 
-        this.setCloseOnOutsideClick(false);
-        this.setCloseOnEsc(true);
         this.setWidth("40%");
 
         final var contentLayout = new VerticalLayout();
@@ -83,17 +85,8 @@ public class AddModal extends Dialog {
         add(footerLayout);
     }
 
-    public void openDialogForEdit(final CarBrandEntity carBrandEntity) {
-
-        this.openDialog(true, carBrandEntity);
-    }
-
-    public void openDialogForNew() {
-
-        this.openDialog(false, null);
-    }
-
-    private void openDialog(final boolean isEdit, final CarBrandEntity carBrandEntity) {
+    @Override
+    protected void openDialog(final boolean isEdit, final CarBrandEntity carBrandEntity) {
 
         this.isEdit = isEdit;
         this.setHeaderTitle(isEdit ? "Modificar Marca" : "Agregar Marca");
@@ -104,17 +97,11 @@ public class AddModal extends Dialog {
         statusField.setReadOnly(!isEdit);
 
         if (isEdit) {
-            statusField.setVisible(true);
             this.carBrandEntity = carBrandEntity;
             binder.readBean(CarBrandTransformer.toWeb(carBrandEntity));
         }
 
         this.open();
-    }
-
-    public void addOnSaveEvent(final Consumer<CarBrandEntity> onSaveEvent) {
-
-        this.onSaveEvent = onSaveEvent;
     }
 
     private void saveChanges() {
@@ -131,10 +118,15 @@ public class AddModal extends Dialog {
                 final var entity = isEdit ? carBrandService.update("resta", carBrandEntity.getId(), carBrand)
                         : carBrandService.add("resta", carBrand);
 
-                onSaveEvent.accept(entity);
+                if (nonNull(onSaveEvent)) {
+                    onSaveEvent.accept(entity);
+                }
+
                 this.close();
 
             } catch (Exception exception) {
+
+//                notifi
                 throw BusinessExceptionFactory.createBusinessException("No es posible guardar la marca de vehículo");
             }
         }
