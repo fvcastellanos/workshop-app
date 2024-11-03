@@ -29,8 +29,6 @@ public class AddModal extends DialogBase<CarBrandEntity> {
 
     private final Select<Status> statusField;
 
-    private Consumer<CarBrandEntity> onSaveEvent;
-
     private boolean isEdit;
     private CarBrandEntity carBrandEntity;
 
@@ -125,9 +123,7 @@ public class AddModal extends DialogBase<CarBrandEntity> {
                 this.close();
 
             } catch (Exception exception) {
-
-//                notifi
-                throw BusinessExceptionFactory.createBusinessException("No es posible guardar la marca de vehículo");
+                showErrorNotification(exception.getMessage());
             }
         }
 

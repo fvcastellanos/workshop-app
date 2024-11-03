@@ -16,6 +16,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @PageTitle("Marcas de Vehículos")
+@RolesAllowed({ "ROLE_user" })
 @Route(value = "car-brands", layout = MainLayout.class)
 public class CarBrandView extends CRUDLayout {
 
@@ -35,6 +37,7 @@ public class CarBrandView extends CRUDLayout {
 
     private final TextField searchText;
     private final Select<Status> searchStatus;
+    private final Grid<CarBrandEntity> grid;
 
     public CarBrandView(final CarBrandService carBrandService,
                         final AddModal addModal) {
@@ -46,7 +49,7 @@ public class CarBrandView extends CRUDLayout {
         h3.setText("Búsqueda");
         h3.setWidth("max-content");
 
-        final var grid = buildGrid();
+        this.grid = buildGrid();
 
         this.searchText = buildTextSearchField("80%");
         this.searchStatus = buildStatusSelect("20%");
@@ -81,9 +84,7 @@ public class CarBrandView extends CRUDLayout {
 
         btnSearch.addClickListener(event -> {
             LOGGER.info("Search text: {} - Status: {}", searchText.getValue(), searchStatus.getValue());
-
-            final var status = searchStatus.getValue();
-            performSearch(searchText.getValue(), status.getValue(), grid);
+            performSearch();
         });
 
         btnAdd.addClickListener(event -> addModal.openDialogForNew());
@@ -102,8 +103,8 @@ public class CarBrandView extends CRUDLayout {
         add(searchBox);
         add(grid);
 
-        addModal.addOnSaveEvent(entity -> performSearch(searchText.getValue(), searchStatus.getValue().getValue(), grid));
-        performSearch("", 1, grid);
+        addModal.addOnSaveEvent(entity -> performSearch());
+        performSearch();
     }
 
     protected Select<Status> buildStatusSelect(final String width) {
@@ -185,9 +186,12 @@ public class CarBrandView extends CRUDLayout {
         return grid;
     }
 
-    private void performSearch(final String text, final int active, Grid<CarBrandEntity> grid) {
+    private void performSearch() {
 
-        final var result = carBrandService.getAllByTenant("resta", active, text, DEFAULT_PAGE, DEFAULT_SIZE);
+        final var status = searchStatus.getValue();
+        final var result = carBrandService.getAllByTenant("resta", status.getValue(), searchText.getValue(),
+                DEFAULT_PAGE, DEFAULT_SIZE);
+
         grid.setItems(result.getContent());
     }
 }

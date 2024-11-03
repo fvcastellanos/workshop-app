@@ -79,6 +79,11 @@ public class AddModelDialog extends DialogBase<CarLineEntity> {
         add(footerLayout);
     }
 
+    public void openDialogForNew(final CarBrandEntity carBrandEntity) {
+        this.carBrandEntity = carBrandEntity;
+        this.openDialogForNew();
+    }
+
     @Override
     protected void openDialog(boolean isEdit, CarLineEntity entity) {
 
@@ -121,8 +126,6 @@ public class AddModelDialog extends DialogBase<CarLineEntity> {
 
                 close();
             } catch (Exception exception) {
-
-//            LOGGER.error("Error saving changes", exception);
                 showErrorNotification(exception.getMessage());
             }
         }

@@ -35,7 +35,7 @@ public abstract class DialogBase<T> extends Dialog {
     protected abstract void openDialog(final boolean isEdit, final T entity);
 
     protected void showErrorNotification(String message) {
-        final var notification = new Notification(message, 3000);
+        final var notification = new Notification(message, 5000);
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         notification.setPosition(Notification.Position.MIDDLE);
         notification.open();

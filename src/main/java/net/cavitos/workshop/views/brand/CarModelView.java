@@ -82,7 +82,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
 
         final var btnAdd = new Button("Agregar Modelo", event -> {
 
-            addModelDialog.openDialogForNew();
+            addModelDialog.openDialogForNew(carBrandEntity);
         });
         btnAdd.setWidth("min-content");
         btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

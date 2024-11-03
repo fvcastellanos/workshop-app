@@ -2,27 +2,43 @@ package net.cavitos.workshop.views.layouts;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Header;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.menu.MenuConfiguration;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import net.cavitos.workshop.resource.ImageLoader;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Optional;
 
 @Layout
 public class MainLayout  extends AppLayout {
 
-    private H1 viewTitle;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainLayout.class);
 
-    public MainLayout() {
+    private H1 viewTitle;
+    private final transient AuthenticationContext authenticationContext;
+
+    public MainLayout(final AuthenticationContext authenticationContext) {
+
+        this.authenticationContext = authenticationContext;
 
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
@@ -102,41 +118,73 @@ public class MainLayout  extends AppLayout {
         return nav;
     }
 
+    private Avatar buildAvatar(final DefaultOidcUser user) {
+
+        final var userInfo = user.getUserInfo();
+
+        final var avatar = new Avatar(userInfo.getFullName());
+        avatar.setThemeName("xsmall");
+        avatar.getElement().setAttribute("tabindex", "-1");
+
+        try {
+            final var image = ImageLoader.loadImageFromUrl(userInfo.getPicture());
+            final var resource = new StreamResource("profile-pic",
+                    () -> new ByteArrayInputStream(image));
+            avatar.setImageResource(resource);
+
+        } catch (Exception exception) {
+            LOGGER.error("Error loading image from url", exception);
+        }
+
+        return avatar;
+    }
+
+
     private Footer createFooter() {
         Footer layout = new Footer();
 
-//        Optional<User> maybeUser = authenticatedUser.get();
-//        if (maybeUser.isPresent()) {
-//            User user = maybeUser.get();
-//
-//            Avatar avatar = new Avatar(user.getName());
-//            StreamResource resource = new StreamResource("profile-pic",
-//                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-//            avatar.setImageResource(resource);
-//            avatar.setThemeName("xsmall");
-//            avatar.getElement().setAttribute("tabindex", "-1");
-//
-//            MenuBar userMenu = new MenuBar();
-//            userMenu.setThemeName("tertiary-inline contrast");
-//
-//            MenuItem userName = userMenu.addItem("");
-//            Div div = new Div();
-//            div.add(avatar);
-//            div.add(user.getName());
-//            div.add(new Icon("lumo", "dropdown"));
-//            div.getElement().getStyle().set("display", "flex");
-//            div.getElement().getStyle().set("align-items", "center");
-//            div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
-//            userName.add(div);
-//            userName.getSubMenu().addItem("Sign out", e -> {
-//                authenticatedUser.logout();
-//            });
-//
-//            layout.add(userMenu);
-//        } else {
-//            Anchor loginLink = new Anchor("login", "Sign in");
-//            layout.add(loginLink);
-//        }
+
+        final var authenticatedUserHolder = authenticationContext.getAuthenticatedUser(DefaultOidcUser.class);
+        if (authenticatedUserHolder.isPresent()) {
+            var user = authenticatedUserHolder.get();
+
+            var userInfo = user.getUserInfo();
+
+            final var avatar = buildAvatar(user);
+
+            MenuBar userMenu = new MenuBar();
+            userMenu.setThemeName("tertiary-inline contrast");
+
+            final var userName = userMenu.addItem("");
+
+            Div div = new Div();
+            div.add(avatar);
+            div.add(userInfo.getFullName());
+            div.add(new Icon("lumo", "dropdown"));
+            div.getElement().getStyle().set("display", "flex");
+            div.getElement().getStyle().set("align-items", "center");
+            div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
+            userName.add(div);
+
+            userName.getSubMenu().addItem("Profile", event -> {
+
+                LOGGER.info("Show profile of user={}", userInfo.getNickName());
+                // show profile
+            });
+
+            userName.getSubMenu().addItem("Sign out", e -> {
+
+                LOGGER.info("User={} signed out", userInfo.getNickName());
+//                authenticatedUserHolder.logout();
+            });
+
+
+
+            layout.add(userMenu);
+        } else {
+            Anchor loginLink = new Anchor("login", "Sign in");
+            layout.add(loginLink);
+        }
 
         return layout;
     }
