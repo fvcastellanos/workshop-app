@@ -17,6 +17,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.entity.CarLineEntity;
 import net.cavitos.workshop.service.CarBrandService;
@@ -35,6 +36,7 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTit
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildStatusSelect;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildTextSearchField;
 
+@RolesAllowed({ "ROLE_user" })
 @PageTitle("Modelos de Vehículos")
 @Route(value = "car-models", layout = MainLayout.class)
 public class CarModelView extends CRUDLayout implements HasUrlParameter<String> {

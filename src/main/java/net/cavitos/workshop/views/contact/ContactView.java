@@ -10,6 +10,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarLineEntity;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.views.factory.ComponentFactory;
@@ -25,6 +26,7 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildStatusSel
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildTextSearchField;
 
 @PageTitle("Contactos")
+@RolesAllowed({ "ROLE_user" })
 @Route(value = "contacts", layout = MainLayout.class)
 public class ContactView extends CRUDLayout {
 

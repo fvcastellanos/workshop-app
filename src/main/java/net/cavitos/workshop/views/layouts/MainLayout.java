@@ -1,10 +1,15 @@
 package net.cavitos.workshop.views.layouts;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
-import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Footer;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -20,21 +25,19 @@ import net.cavitos.workshop.resource.ImageLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.Optional;
 
 @Layout
 public class MainLayout  extends AppLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainLayout.class);
 
-    private H1 viewTitle;
     private final transient AuthenticationContext authenticationContext;
+
+    private H1 viewTitle;
 
     public MainLayout(final AuthenticationContext authenticationContext) {
 
@@ -174,11 +177,8 @@ public class MainLayout  extends AppLayout {
 
             userName.getSubMenu().addItem("Sign out", e -> {
 
-                LOGGER.info("User={} signed out", userInfo.getNickName());
-//                authenticatedUserHolder.logout();
+                UI.getCurrent().getPage().setLocation("/logout");
             });
-
-
 
             layout.add(userMenu);
         } else {
