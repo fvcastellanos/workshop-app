@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 public abstract class DialogBase<T> extends Dialog {
 
     protected boolean isEdit;
+    protected String tenant;
     protected Consumer<T> onSaveEvent;
 
     protected DialogBase() {
@@ -22,17 +23,17 @@ public abstract class DialogBase<T> extends Dialog {
         this.onSaveEvent = onSaveEvent;
     }
 
-    public void openDialogForEdit(final T entity) {
+    public void openDialogForEdit(final String tenant, final T entity) {
 
-        openDialog(true, entity);
+        openDialog(true, tenant, entity);
     }
 
-    public void openDialogForNew() {
+    public void openDialogForNew(final String tenant) {
 
-        openDialog(false, null);
+        openDialog(false, tenant, null);
     }
 
-    protected abstract void openDialog(final boolean isEdit, final T entity);
+    protected abstract void openDialog(final boolean isEdit, final String tenant, final T entity);
 
     protected void showErrorNotification(String message) {
         final var notification = new Notification(message, 5000);

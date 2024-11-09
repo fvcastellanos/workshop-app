@@ -14,9 +14,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
-import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.entity.ContactEntity;
+import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.service.ContactService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
@@ -41,13 +43,19 @@ public class ContactView extends CRUDLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContactView.class);
 
+    private final ContactService contactService;
+
     private TextField searchText;
     private Select<Status> searchStatus;
     private Select<TypeOption> searchType;
-    private final Grid<ContactEntity> grid;
+    private Grid<ContactEntity> grid;
 
-    public ContactView() {
-        super();
+    public ContactView(final AuthenticationContext authenticationContext,
+                       final DatabaseUserService userDatabaseService,
+                       final ContactService contactService) {
+
+        super(authenticationContext, userDatabaseService);
+        this.contactService = contactService;
 
         this.grid = buildGrid();
 
@@ -81,6 +89,8 @@ public class ContactView extends CRUDLayout {
         add(buildSearchTitle("Búsqueda"));
         add(searchBox);
         add(grid);
+
+        performSearch();
     }
 
     private VerticalLayout buildSearchBody() {
@@ -126,19 +136,9 @@ public class ContactView extends CRUDLayout {
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", contactEntity.getName());
-//                        addModal.openDialogForEdit(carBrandEntity);
                     });
 
-                    final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Editar");
-                    viewImage.setWidth("20px");
-                    viewImage.setHeight("20px");
-                    viewImage.getStyle().set("cursor", "pointer");
-                    viewImage.addClickListener(event -> {
-                        LOGGER.info("Models for Brand: {}", contactEntity.getName());
-                        UI.getCurrent().navigate("car-models/%s".formatted(contactEntity.getId()));
-                    });
-
-                    layout.add(editImage, viewImage);
+                    layout.add(editImage);
 
                     return layout;
                 })).setHeader("#")
@@ -146,15 +146,29 @@ public class ContactView extends CRUDLayout {
                 .setResizable(false)
                 .setWidth("10%");
 
+        grid.addColumn("code")
+                .setHeader("Código")
+                .setSortable(true)
+                .setResizable(true)
+                .setWidth("20%");
+
         grid.addColumn("name")
                 .setHeader("Nombre")
                 .setSortable(true)
                 .setResizable(true)
-                .setWidth("70%");
+                .setWidth("40%");
 
-        grid.addColumn(new ComponentRenderer<>(carBrandEntity -> {
+        grid.addColumn(new ComponentRenderer<>(contactEntity -> {
 
-                    final var active = carBrandEntity.getActive() == 1 ? "Activo" : "Inactivo";
+            final var type = contactEntity.getType().equals("C") ? "Cliente" : "Proveedor";
+            return new Text(type);
+        })).setHeader("Tipo")
+                .setSortable(true)
+                .setWidth("20%");
+
+        grid.addColumn(new ComponentRenderer<>(contactEntity -> {
+
+                    final var active = contactEntity.getActive() == 1 ? "Activo" : "Inactivo";
                     return new Text(active);
                 })).setHeader("Activo")
                 .setSortable(true);
@@ -162,9 +176,17 @@ public class ContactView extends CRUDLayout {
         return grid;
     }
 
-
     private void performSearch() {
 
         LOGGER.info("Search text: {} - Status: {} - Type: {}", searchText.getValue(), searchStatus.getValue(), searchType.getValue());
+
+        final var tenant = getUserTenant();
+        final var type = searchType.getValue();
+        final var status = searchStatus.getValue();
+
+        final var result = contactService.search(tenant, type.getValue(), status.getValue(), searchText.getValue(),
+                DEFAULT_PAGE, DEFAULT_SIZE);
+
+        grid.setItems(result.getContent());
     }
 }

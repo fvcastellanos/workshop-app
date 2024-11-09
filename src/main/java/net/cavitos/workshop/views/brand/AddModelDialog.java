@@ -79,16 +79,17 @@ public class AddModelDialog extends DialogBase<CarLineEntity> {
         add(footerLayout);
     }
 
-    public void openDialogForNew(final CarBrandEntity carBrandEntity) {
+    public void openDialogForNew(final String tenant, final CarBrandEntity carBrandEntity) {
         this.carBrandEntity = carBrandEntity;
-        this.openDialogForNew();
+        this.openDialogForNew(tenant);
     }
 
     @Override
-    protected void openDialog(boolean isEdit, CarLineEntity entity) {
+    protected void openDialog(boolean isEdit, final String tenant, CarLineEntity entity) {
 
         this.isEdit = isEdit;
         this.setHeaderTitle(isEdit ? "Modificar Modelo" : "Agregar Modelo");
+        this.tenant = tenant;
 
         binder.refreshFields();
 
@@ -117,8 +118,8 @@ public class AddModelDialog extends DialogBase<CarLineEntity> {
 
                 final var carBrandId = carBrandEntity.getId();
 
-                final var entity = isEdit ? carLineService.update("resta", carBrandId, carLineEntity.getId(), carLine)
-                        : carLineService.add("resta", carBrandId, carLine);
+                final var entity = isEdit ? carLineService.update(tenant, carBrandId, carLineEntity.getId(), carLine)
+                        : carLineService.add(tenant, carBrandId, carLine);
 
                 if (nonNull(onSaveEvent)) {
                     onSaveEvent.accept(entity);

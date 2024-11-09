@@ -17,9 +17,11 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.entity.CarLineEntity;
+import net.cavitos.workshop.security.service.DatabaseUserService;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.service.CarLineService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
@@ -43,23 +45,24 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarModelView.class);
 
-    private final CarBrandService carBrandService;
-    private final CarLineService carLineService;
-    private final AddModelDialog addModelDialog;
-
-    private CarBrandEntity carBrandEntity;
-    private CarLineEntity carLineEntity;
-
-
     private final H3 searchTitle;
     private final TextField searchText;
     private final Select<Status> searchStatus;
     private final Grid<CarLineEntity> grid;
 
-    public CarModelView(final CarLineService carLineService,
+    private final CarBrandService carBrandService;
+    private final CarLineService carLineService;
+    private final AddModelDialog addModelDialog;
+
+    private CarBrandEntity carBrandEntity;
+
+    public CarModelView(final AuthenticationContext authenticationContext,
+                        final DatabaseUserService userDatabaseService,
                         final CarBrandService carBrandService,
+                        final CarLineService carLineService,
                         final AddModelDialog addModelDialog) {
 
+        super(authenticationContext, userDatabaseService);
         this.carBrandService = carBrandService;
         this.carLineService = carLineService;
         this.addModelDialog = addModelDialog;
@@ -84,7 +87,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
 
         final var btnAdd = new Button("Agregar Modelo", event -> {
 
-            addModelDialog.openDialogForNew(carBrandEntity);
+            addModelDialog.openDialogForNew(tenant, carBrandEntity);
         });
         btnAdd.setWidth("min-content");
         btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -126,7 +129,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
     private void performSearch() {
 
         final var status = searchStatus.getValue();
-        final var result = carLineService.findAll("resta", carBrandEntity.getId(), status.getValue(),
+        final var result = carLineService.findAll(tenant, carBrandEntity.getId(), status.getValue(),
                 searchText.getValue(), DEFAULT_PAGE, DEFAULT_SIZE);
 
         grid.setItems(result.getContent());
@@ -150,7 +153,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", carLineEntity.getName());
-                        addModelDialog.openDialogForEdit(carLineEntity);
+                        addModelDialog.openDialogForEdit(tenant, carLineEntity);
                     });
 
                     layout.add(editImage);

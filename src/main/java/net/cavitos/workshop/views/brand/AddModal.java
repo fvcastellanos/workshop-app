@@ -26,7 +26,6 @@ public class AddModal extends DialogBase<CarBrandEntity> {
 
     private final Select<Status> statusField;
 
-    private boolean isEdit;
     private CarBrandEntity carBrandEntity;
 
     public AddModal(final CarBrandService carBrandService) {
@@ -81,10 +80,11 @@ public class AddModal extends DialogBase<CarBrandEntity> {
     }
 
     @Override
-    protected void openDialog(final boolean isEdit, final CarBrandEntity carBrandEntity) {
+    protected void openDialog(final boolean isEdit, final String tenant, final CarBrandEntity carBrandEntity) {
 
         this.isEdit = isEdit;
         this.setHeaderTitle(isEdit ? "Modificar Marca" : "Agregar Marca");
+        this.tenant = tenant;
 
         binder.refreshFields();
 
@@ -110,8 +110,8 @@ public class AddModal extends DialogBase<CarBrandEntity> {
                 final var carBrand = new CarBrand();
                 binder.writeBeanIfValid(carBrand);
 
-                final var entity = isEdit ? carBrandService.update("resta", carBrandEntity.getId(), carBrand)
-                        : carBrandService.add("resta", carBrand);
+                final var entity = isEdit ? carBrandService.update(tenant, carBrandEntity.getId(), carBrand)
+                        : carBrandService.add(tenant, carBrand);
 
                 if (nonNull(onSaveEvent)) {
                     onSaveEvent.accept(entity);

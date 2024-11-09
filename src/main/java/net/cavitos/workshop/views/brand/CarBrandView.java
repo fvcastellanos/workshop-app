@@ -15,9 +15,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
+import net.cavitos.workshop.security.service.DatabaseUserService;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
@@ -32,16 +34,19 @@ public class CarBrandView extends CRUDLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarBrandView.class);
 
-    private final CarBrandService carBrandService;
-    private final AddModal addModal;
-
     private final TextField searchText;
     private final Select<Status> searchStatus;
     private final Grid<CarBrandEntity> grid;
 
-    public CarBrandView(final CarBrandService carBrandService,
+    private final CarBrandService carBrandService;
+    private final AddModal addModal;
+
+    public CarBrandView(final AuthenticationContext authenticationContext,
+                        final DatabaseUserService databaseUserService,
+                        final CarBrandService carBrandService,
                         final AddModal addModal) {
 
+        super(authenticationContext, databaseUserService);
         this.carBrandService = carBrandService;
         this.addModal = addModal;
 
@@ -87,7 +92,7 @@ public class CarBrandView extends CRUDLayout {
             performSearch();
         });
 
-        btnAdd.addClickListener(event -> addModal.openDialogForNew());
+        btnAdd.addClickListener(event -> addModal.openDialogForNew(tenant));
 
         searchFooter.add(btnSearch);
         searchFooter.add(btnAdd);
@@ -150,7 +155,7 @@ public class CarBrandView extends CRUDLayout {
             editImage.getStyle().set("cursor", "pointer");
             editImage.addClickListener(event -> {
                 LOGGER.info("Edit: {}", carBrandEntity.getName());
-                addModal.openDialogForEdit(carBrandEntity);
+                addModal.openDialogForEdit(tenant, carBrandEntity);
             });
 
             final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Editar");
@@ -189,7 +194,7 @@ public class CarBrandView extends CRUDLayout {
     private void performSearch() {
 
         final var status = searchStatus.getValue();
-        final var result = carBrandService.getAllByTenant("resta", status.getValue(), searchText.getValue(),
+        final var result = carBrandService.getAllByTenant(tenant, status.getValue(), searchText.getValue(),
                 DEFAULT_PAGE, DEFAULT_SIZE);
 
         grid.setItems(result.getContent());
