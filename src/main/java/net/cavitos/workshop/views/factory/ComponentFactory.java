@@ -1,7 +1,6 @@
 package net.cavitos.workshop.views.factory;
 
 import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,6 +11,10 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import net.cavitos.workshop.views.model.Status;
+import net.cavitos.workshop.views.model.TypeOption;
+import org.apache.commons.collections4.ListUtils;
+
+import java.util.List;
 
 public final class ComponentFactory {
 
@@ -39,6 +42,26 @@ public final class ComponentFactory {
         select.setItemLabelGenerator(Status::getLabel);
         select.setItems(active, inactive);
         select.setValue(defaultStatus);
+
+        return select;
+    }
+
+    public static Select<TypeOption> buildTypeSelect(final String width,
+                                                     final String label,
+                                                     final List<TypeOption> options,
+                                                     final String selectedValue) {
+
+        final var defaultOption = ListUtils.emptyIfNull(options).stream()
+                .filter(option -> option.getValue().equalsIgnoreCase(selectedValue))
+                .findFirst()
+                .orElse(new TypeOption("", "Seleccione una opción"));
+
+        final var select = new Select<TypeOption>();
+        select.setLabel(label);
+        select.setWidth(width);
+        select.setItemLabelGenerator(TypeOption::getLabel);
+        select.setItems(options);
+        select.setValue(defaultOption);
 
         return select;
     }

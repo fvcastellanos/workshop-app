@@ -7,7 +7,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import net.cavitos.workshop.domain.model.web.CarBrand;
-import net.cavitos.workshop.factory.BusinessExceptionFactory;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.transformer.CarBrandTransformer;
@@ -16,8 +15,6 @@ import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
 import org.springframework.stereotype.Component;
-
-import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
 
