@@ -12,9 +12,6 @@ public final class ContactTransformer {
 
     public static Contact toWeb(final ContactEntity contactEntity) {
 
-        final var active = ActiveStatus.of(contactEntity.getActive())
-                .name();
-
         final var type = ContactType.of(contactEntity.getType())
                 .name();
 
@@ -25,7 +22,7 @@ public final class ContactTransformer {
         provider.setDescription(contactEntity.getDescription());
         provider.setContact(contactEntity.getContact());
         provider.setTaxId(contactEntity.getTaxId());
-        provider.setActive(active);
+        provider.setActive(contactEntity.getActive());
 
         return provider;
     }

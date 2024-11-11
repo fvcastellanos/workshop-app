@@ -111,16 +111,13 @@ public class ContactService {
             code = calculateCode(contact.getType());
         }
 
-        final var active = ActiveStatus.valueOf(contact.getActive())
-                        .value();
-
         contactEntity.setName(contact.getName());
         contactEntity.setType(buildContactTypeFrom(contact.getType()));
         contactEntity.setCode(code);
         contactEntity.setDescription(contact.getDescription());
         contactEntity.setContact(contact.getContact());
         contactEntity.setTaxId(contact.getTaxId());
-        contactEntity.setActive(active);
+        contactEntity.setActive(contact.getActive());
         contactEntity.setUpdated(Instant.now());
 
         contactRepository.save(contactEntity);

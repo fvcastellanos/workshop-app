@@ -36,6 +36,5 @@ public class Contact {
     @Size(max = 50)
     private String taxId;
 
-    @ValueOfEnum(enumType = ActiveStatus.class, message = "Invalid type, allowed values: ACTIVE|INACTIVE")
-    private String active;
+    private int active;
 }

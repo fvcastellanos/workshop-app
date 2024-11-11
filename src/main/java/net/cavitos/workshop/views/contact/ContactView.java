@@ -50,13 +50,17 @@ public class ContactView extends CRUDLayout {
     private Select<TypeOption> searchType;
     private Grid<ContactEntity> grid;
 
+    private final AddContactModal addContactModal;
+
     public ContactView(final AuthenticationContext authenticationContext,
                        final DatabaseUserService userDatabaseService,
-                       final ContactService contactService) {
+                       final ContactService contactService,
+                       final AddContactModal addModelDialog) {
 
         super(authenticationContext, userDatabaseService);
         this.contactService = contactService;
 
+        this.addContactModal = addModelDialog;
         this.grid = buildGrid();
 
         final var btnSearch = new Button("Buscar", event -> {
@@ -68,7 +72,7 @@ public class ContactView extends CRUDLayout {
 
         final var btnAdd = new Button("Agregar Contacto", event -> {
 
-//            addModelDialog.openDialogForNew();
+            addModelDialog.openDialogForNew(getUserTenant());
         });
         btnAdd.setWidth("min-content");
         btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -83,7 +87,6 @@ public class ContactView extends CRUDLayout {
 
         final var searchBox = ComponentFactory.buildSearchBox();
         searchBox.add(buildSearchBody());
-//        searchBox.add(searchBody);
         searchBox.add(searchFooter);
 
         add(buildSearchTitle("Búsqueda"));
@@ -136,6 +139,7 @@ public class ContactView extends CRUDLayout {
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", contactEntity.getName());
+                        addContactModal.openDialogForEdit(getUserTenant(), contactEntity);
                     });
 
                     layout.add(editImage);
