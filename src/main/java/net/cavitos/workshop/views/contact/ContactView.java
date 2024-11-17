@@ -71,9 +71,9 @@ public class ContactView extends CRUDLayout {
         btnSearch.setWidth("min-content");
 
         final var btnAdd = new Button("Agregar Contacto", event -> {
-
             addModelDialog.openDialogForNew(getUserTenant());
         });
+
         btnAdd.setWidth("min-content");
         btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -92,6 +92,8 @@ public class ContactView extends CRUDLayout {
         add(buildSearchTitle("Búsqueda"));
         add(searchBox);
         add(grid);
+
+        addModelDialog.addOnSaveEvent(entity -> performSearch());
 
         performSearch();
     }

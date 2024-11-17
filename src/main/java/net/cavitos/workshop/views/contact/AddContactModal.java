@@ -156,7 +156,7 @@ public class AddContactModal extends DialogBase<ContactEntity> {
                 final var contact = new Contact();
                 binder.writeBeanIfValid(contact);
 
-                final var entity = isEdit ? contactService.update(tenant, contactEntity.getCode(), contact) :
+                final var entity = isEdit ? contactService.update(tenant, contactEntity.getId(), contact) :
                         contactService.add(tenant, contact);
 
                 if (nonNull(onSaveEvent)) {
