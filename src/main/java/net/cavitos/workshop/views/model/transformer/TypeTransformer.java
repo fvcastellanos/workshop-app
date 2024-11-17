@@ -14,8 +14,7 @@ public final class TypeTransformer {
 
     public static TypeOption toView(final String value) {
 
-//        return new ;
-
-        return null;
+        return value.equalsIgnoreCase("C") ? new TypeOption("Cliente", "C") :
+                new TypeOption("Proveedor", "P");
     }
 }

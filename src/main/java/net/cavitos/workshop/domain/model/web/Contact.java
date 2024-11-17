@@ -6,9 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
-import net.cavitos.workshop.domain.model.type.ContactType;
-import net.cavitos.workshop.domain.model.validator.ValueOfEnum;
 
 @Getter
 @Setter
@@ -20,7 +17,6 @@ public class Contact {
     private String code;
 
     @NotEmpty
-    @ValueOfEnum(enumType = ContactType.class, message = "Invalid type, allowed values: CUSTOMER|PROVIDER")
     private String type;
 
     @NotEmpty

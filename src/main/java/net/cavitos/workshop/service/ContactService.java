@@ -1,7 +1,5 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
-import net.cavitos.workshop.domain.model.type.ContactType;
 import net.cavitos.workshop.domain.model.web.Contact;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
@@ -73,7 +71,7 @@ public class ContactService {
         final var providerEntity = ContactEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .code(calculateCode(contact.getType()))
-                .type(buildContactTypeFrom(contact.getType()))
+                .type(contact.getType())
                 .name(contact.getName())
                 .description(contact.getDescription())
                 .taxId(contact.getTaxId())
@@ -102,8 +100,7 @@ public class ContactService {
             throw createBusinessException(HttpStatus.NOT_FOUND, "Contact not found");
         }
 
-        final var type = ContactType.valueOf(contact.getType())
-                .value();
+        final var type = contact.getType();
 
         var code = contactEntity.getCode();
         if (!type.equalsIgnoreCase(contactEntity.getType())) {
@@ -112,7 +109,7 @@ public class ContactService {
         }
 
         contactEntity.setName(contact.getName());
-        contactEntity.setType(buildContactTypeFrom(contact.getType()));
+        contactEntity.setType(contact.getType());
         contactEntity.setCode(code);
         contactEntity.setDescription(contact.getDescription());
         contactEntity.setContact(contact.getContact());
@@ -140,19 +137,11 @@ public class ContactService {
         }
     }
 
-    private String buildContactTypeFrom(String value) {
-
-        return ContactType.valueOf(value)
-                .value();
-    }
-
     private String calculateCode(final String type) {
 
-        final var contactType = ContactType.valueOf(type);
-
-        return switch (contactType) {
-            case CUSTOMER -> sequenceProvider.calculateNext(SequenceType.CUSTOMER);
-            case PROVIDER -> sequenceProvider.calculateNext(SequenceType.PROVIDER);
+        return switch (type) {
+            case "C" -> sequenceProvider.calculateNext(SequenceType.CUSTOMER);
+            case "P" -> sequenceProvider.calculateNext(SequenceType.PROVIDER);
             default -> sequenceProvider.calculateNext(SequenceType.UNKNOWN);
         };
     }

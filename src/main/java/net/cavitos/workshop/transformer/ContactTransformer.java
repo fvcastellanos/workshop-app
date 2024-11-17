@@ -1,7 +1,5 @@
 package net.cavitos.workshop.transformer;
 
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
-import net.cavitos.workshop.domain.model.type.ContactType;
 import net.cavitos.workshop.domain.model.web.Contact;
 import net.cavitos.workshop.model.entity.ContactEntity;
 
@@ -12,18 +10,15 @@ public final class ContactTransformer {
 
     public static Contact toWeb(final ContactEntity contactEntity) {
 
-        final var type = ContactType.of(contactEntity.getType())
-                .name();
+        final var contact = new Contact();
+        contact.setCode(contactEntity.getCode());
+        contact.setType(contactEntity.getType());
+        contact.setName(contactEntity.getName());
+        contact.setDescription(contactEntity.getDescription());
+        contact.setContact(contactEntity.getContact());
+        contact.setTaxId(contactEntity.getTaxId());
+        contact.setActive(contactEntity.getActive());
 
-        final var provider = new Contact();
-        provider.setCode(contactEntity.getCode());
-        provider.setType(type);
-        provider.setName(contactEntity.getName());
-        provider.setDescription(contactEntity.getDescription());
-        provider.setContact(contactEntity.getContact());
-        provider.setTaxId(contactEntity.getTaxId());
-        provider.setActive(contactEntity.getActive());
-
-        return provider;
+        return contact;
     }
 }
