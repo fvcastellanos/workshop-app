@@ -1,7 +1,6 @@
-package net.cavitos.workshop.views.contact;
+package net.cavitos.workshop.views.product;
 
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -16,52 +15,66 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
-import net.cavitos.workshop.model.entity.ContactEntity;
+import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.security.service.DatabaseUserService;
-import net.cavitos.workshop.service.ContactService;
+import net.cavitos.workshop.service.ProductCategoryService;
+import net.cavitos.workshop.service.ProductService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
 import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.TypeOption;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchFooter;
-import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTitle;
-import static net.cavitos.workshop.views.factory.ComponentFactory.buildStatusSelect;
-import static net.cavitos.workshop.views.factory.ComponentFactory.buildTextSearchField;
-import static net.cavitos.workshop.views.factory.ComponentFactory.buildTypeSelect;
+import static java.util.Objects.nonNull;
+import static net.cavitos.workshop.views.factory.ComponentFactory.*;
 
-@PageTitle("Contactos")
+@PageTitle("Productos")
 @RolesAllowed({ "ROLE_user" })
-@Route(value = "contacts", layout = MainLayout.class)
-public class ContactView extends CRUDLayout {
+@Route(value = "products", layout = MainLayout.class)
+public class ProductView extends CRUDLayout {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContactView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductView.class);
 
-    private final ContactService contactService;
+    private final Grid<ProductEntity> grid;
 
-    private final Grid<ContactEntity> grid;
     private TextField searchText;
     private Select<Status> searchStatus;
     private Select<TypeOption> searchType;
+    private Select<TypeOption> categoryType;
 
-    private final AddContactModal addContactModal;
+    private final List<TypeOption> productCategories;
 
-    public ContactView(final AuthenticationContext authenticationContext,
-                       final DatabaseUserService userDatabaseService,
-                       final ContactService contactService,
-                       final AddContactModal addModelDialog) {
+    private final ProductService productService;
+    private final ProductCategoryService productCategoryService;
 
-        super(authenticationContext, userDatabaseService);
-        this.contactService = contactService;
+    public ProductView(final AuthenticationContext authenticationContext,
+                       final DatabaseUserService databaseUserService,
+                       final ProductService productService,
+                       final ProductCategoryService productCategoryService) {
 
-        this.addContactModal = addModelDialog;
+        super(authenticationContext, databaseUserService);
+
+        this.productService = productService;
+        this.productCategoryService = productCategoryService;
+        this.productCategories = loadProductCategories();
+
         this.grid = buildGrid();
+
+        add(buildSearchTitle("Búsqueda"));
+        add(buildSearchBox());
+        add(grid);
+
+        performSearch();
+    }
+
+    private VerticalLayout buildSearchBox() {
 
         final var btnSearch = new Button("Buscar", event -> {
 
@@ -71,15 +84,11 @@ public class ContactView extends CRUDLayout {
         btnSearch.setWidth("min-content");
 
         final var btnAdd = new Button("Agregar Contacto", event -> {
-            addModelDialog.openDialogForNew(getUserTenant());
+//            addModelDialog.openDialogForNew(getUserTenant());
         });
 
         btnAdd.setWidth("min-content");
         btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        final var searchBody = buildSearchBody();
-        searchBody.add(searchText);
-        searchBody.add(searchStatus);
 
         final var searchFooter = buildSearchFooter();
         searchFooter.add(btnSearch);
@@ -89,48 +98,51 @@ public class ContactView extends CRUDLayout {
         searchBox.add(buildSearchBody());
         searchBox.add(searchFooter);
 
-        add(buildSearchTitle("Búsqueda"));
-        add(searchBox);
-        add(grid);
-
-        addModelDialog.addOnSaveEvent(entity -> performSearch());
-
-        performSearch();
+        return searchBox;
     }
 
     private VerticalLayout buildSearchBody() {
 
-        searchText = buildTextSearchField("100%");
-
-        searchStatus = buildStatusSelect("20%", StatusTransformer.toView(1));
-        searchStatus.setWidth("50%");
-
         final var contactTypes = List.of(
                 new TypeOption("Todos", "%"),
-                new TypeOption("Cliente", "C"),
-                new TypeOption("Proveedor", "P")
+                new TypeOption("Producto", "P"),
+                new TypeOption("Servicio", "S")
         );
 
-        searchType = buildTypeSelect("50%", "Tipo de Contacto", contactTypes, "%");
+        final var categories = new ArrayList<TypeOption>();
+        categories.addFirst(new TypeOption("Todas", "%"));
+        categories.addAll(productCategories);
+
+        searchText = buildTextSearchField("100%");
+        searchStatus = buildStatusSelect("50%", StatusTransformer.toView(1));
+        searchType = buildTypeSelect("50%", "Tipo", contactTypes, "%");
+        categoryType = buildTypeSelect("50%", "Categorías", categories, "%");
 
         final var row1 = ComponentFactory.buildSearchBody();
         row1.add(searchText);
 
         final var row2 = ComponentFactory.buildSearchBody();
         row2.add(searchType);
-        row2.add(searchStatus);
+        row2.add(categoryType);
 
-        return  new VerticalLayout(row1, row2);
+        final var row3 = ComponentFactory.buildSearchBody();
+        row3.add(searchStatus);
+
+        return new VerticalLayout(
+                row1,
+                row2,
+                row3
+        );
     }
 
-    protected Grid<ContactEntity> buildGrid() {
+    private Grid<ProductEntity> buildGrid() {
 
-        final var grid = new Grid<>(ContactEntity.class, false);
+        final var grid = new Grid<>(ProductEntity.class, false);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("100%");
         grid.getStyle().set("flex-grow", "0");
 
-        grid.addColumn(new ComponentRenderer<>(contactEntity -> {
+        grid.addColumn(new ComponentRenderer<>(productEntity -> {
                     final var layout = new HorizontalLayout();
                     layout.setWidthFull();
                     layout.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -140,8 +152,9 @@ public class ContactView extends CRUDLayout {
                     editImage.setHeight("20px");
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
-                        LOGGER.info("Edit: {}", contactEntity.getName());
-                        addContactModal.openDialogForEdit(getUserTenant(), contactEntity);
+                        LOGGER.info("Edit: {}", productEntity.getName());
+
+//                        addContactModal.openDialogForEdit(getUserTenant(), productEntity);
                     });
 
                     layout.add(editImage);
@@ -156,21 +169,32 @@ public class ContactView extends CRUDLayout {
                 .setHeader("Código")
                 .setSortable(true)
                 .setResizable(true)
-                .setWidth("20%");
+                .setWidth("10%");
 
         grid.addColumn("name")
                 .setHeader("Nombre")
                 .setSortable(true)
                 .setResizable(true)
-                .setWidth("40%");
+                .setWidth("30%");
 
-        grid.addColumn(new ComponentRenderer<>(contactEntity -> {
+        grid.addColumn(new ComponentRenderer<>(productEntity -> {
 
-            final var type = contactEntity.getType().equals("C") ? "Cliente" : "Proveedor";
-            return new Text(type);
-        })).setHeader("Tipo")
+                    final var category = productEntity.getProductCategoryEntity();
+
+                    return nonNull(category) ? new Text(category.getName())
+                            : new Text(StringUtils.EMPTY);
+
+                })).setHeader("Categoría")
                 .setSortable(true)
-                .setWidth("20%");
+                .setWidth("10%");
+
+        grid.addColumn(new ComponentRenderer<>(productEntity -> {
+
+                    final var type = productEntity.getType().equals("P") ? "Producto" : "Servicio";
+                    return new Text(type);
+                })).setHeader("Tipo")
+                .setSortable(true)
+                .setWidth("10%");
 
         grid.addColumn(new ComponentRenderer<>(contactEntity -> {
 
@@ -184,15 +208,26 @@ public class ContactView extends CRUDLayout {
 
     private void performSearch() {
 
-        LOGGER.info("Search text: {} - Status: {} - Type: {}", searchText.getValue(), searchStatus.getValue(), searchType.getValue());
+        LOGGER.info("Search products for text: {} - Status: {} - Type: {}", searchText.getValue(),
+                searchStatus.getValue(), searchType.getValue());
 
         final var tenant = getUserTenant();
         final var type = searchType.getValue();
         final var status = searchStatus.getValue();
+        final var category = categoryType.getValue();
 
-        final var result = contactService.search(tenant, type.getValue(), status.getValue(), searchText.getValue(),
+        final var result = productService.search(tenant, type.getValue(), category.getValue(), searchText.getValue(), status.getValue(),
                 DEFAULT_PAGE, DEFAULT_SIZE);
 
         grid.setItems(result.getContent());
     }
+
+    private List<TypeOption> loadProductCategories() {
+
+        return productCategoryService.getProductCategories(tenant, 1)
+                .stream()
+                .map(category -> new TypeOption(category.getName(), category.getId()))
+                .toList();
+    }
+
 }
