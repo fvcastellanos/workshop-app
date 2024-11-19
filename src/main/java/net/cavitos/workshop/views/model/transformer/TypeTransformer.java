@@ -1,5 +1,6 @@
 package net.cavitos.workshop.views.model.transformer;
 
+import net.cavitos.workshop.domain.model.web.common.CommonProductCategory;
 import net.cavitos.workshop.views.model.TypeOption;
 
 public final class TypeTransformer {
@@ -12,9 +13,15 @@ public final class TypeTransformer {
         return typeOption.getValue();
     }
 
-    public static TypeOption toView(final String value) {
+    public static TypeOption toClientView(final String value) {
 
         return value.equalsIgnoreCase("C") ? new TypeOption("Cliente", "C") :
                 new TypeOption("Proveedor", "P");
+    }
+
+    public static TypeOption toProductView(final String value) {
+
+            return value.equalsIgnoreCase("P") ? new TypeOption("Producto", "P") :
+                    new TypeOption("Servicio", "S");
     }
 }

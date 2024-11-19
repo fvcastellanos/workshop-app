@@ -18,26 +18,11 @@ import net.cavitos.workshop.domain.model.web.common.CommonProductCategory;
 @EqualsAndHashCode
 public class Product {
 
-    @Size(max = 50)
     private String code;
-
-    @NotEmpty
-    @ValueOfEnum(enumType = ProductType.class, message = "Invalid type, allowed values: PRODUCT|SERVICE")
     private String type;
-
-    @NotEmpty
-    @Size(max = 150)
     private String name;
-
-    @Size(max = 300)
     private String description;
-
-    @NotNull
     private double minimalQuantity;
-
-    @ValueOfEnum(enumType = ActiveStatus.class, message = "Invalid type, allowed values: ACTIVE|INACTIVE")
-    private String active;
-
-    @NotNull
+    private int active;
     private CommonProductCategory category;
 }

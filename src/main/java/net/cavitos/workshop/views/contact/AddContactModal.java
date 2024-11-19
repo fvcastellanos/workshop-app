@@ -58,7 +58,7 @@ public class AddContactModal extends DialogBase<ContactEntity> {
         statusField.setValue(StatusTransformer.toView(1)); // Active status
         statusField.setReadOnly(!isEdit);
 
-        typeSelect.setValue(TypeTransformer.toView("C")); // Client type
+        typeSelect.setValue(TypeTransformer.toClientView("C")); // Client type
 
         if (isEdit) {
             contactEntity = entity;
@@ -101,7 +101,7 @@ public class AddContactModal extends DialogBase<ContactEntity> {
 
         binder.forField(typeSelect)
                 .asRequired("El tipo es requerido")
-                .withConverter(TypeTransformer::toDomain, TypeTransformer::toView)
+                .withConverter(TypeTransformer::toDomain, TypeTransformer::toClientView)
                 .bind(Contact::getType, Contact::setType);
 
         binder.forField(nameField)

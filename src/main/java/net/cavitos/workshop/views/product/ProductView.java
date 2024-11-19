@@ -54,10 +54,13 @@ public class ProductView extends CRUDLayout {
     private final ProductService productService;
     private final ProductCategoryService productCategoryService;
 
+    private final AddProductModal addModelDialog;
+
     public ProductView(final AuthenticationContext authenticationContext,
                        final DatabaseUserService databaseUserService,
                        final ProductService productService,
-                       final ProductCategoryService productCategoryService) {
+                       final ProductCategoryService productCategoryService,
+                       final AddProductModal addModelDialog) {
 
         super(authenticationContext, databaseUserService);
 
@@ -67,9 +70,13 @@ public class ProductView extends CRUDLayout {
 
         this.grid = buildGrid();
 
+        this.addModelDialog = addModelDialog;
+
         add(buildSearchTitle("Búsqueda"));
         add(buildSearchBox());
         add(grid);
+
+        addModelDialog.addOnSaveEvent(productEntity -> performSearch());
 
         performSearch();
     }
@@ -83,8 +90,8 @@ public class ProductView extends CRUDLayout {
 
         btnSearch.setWidth("min-content");
 
-        final var btnAdd = new Button("Agregar Contacto", event -> {
-//            addModelDialog.openDialogForNew(getUserTenant());
+        final var btnAdd = new Button("Agregar Producto", event -> {
+            addModelDialog.openDialogForNew(getUserTenant());
         });
 
         btnAdd.setWidth("min-content");
@@ -154,7 +161,7 @@ public class ProductView extends CRUDLayout {
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", productEntity.getName());
 
-//                        addContactModal.openDialogForEdit(getUserTenant(), productEntity);
+                        addModelDialog.openDialogForEdit(getUserTenant(), productEntity);
                     });
 
                     layout.add(editImage);
@@ -229,5 +236,4 @@ public class ProductView extends CRUDLayout {
                 .map(category -> new TypeOption(category.getName(), category.getId()))
                 .toList();
     }
-
 }
