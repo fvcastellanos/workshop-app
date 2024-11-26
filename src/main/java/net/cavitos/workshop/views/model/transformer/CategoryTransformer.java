@@ -17,7 +17,10 @@ public final class CategoryTransformer {
         return productCategory;
     }
 
-//    public static
+    public static TypeOption toView(final CommonProductCategory productCategory) {
+
+        return new TypeOption(productCategory.getName(), productCategory.getId());
+    }
 
 
 

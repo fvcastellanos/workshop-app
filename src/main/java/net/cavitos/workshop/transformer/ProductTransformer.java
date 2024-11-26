@@ -22,8 +22,6 @@ public final class ProductTransformer {
     }
 
     private static Product getProduct(ProductEntity productEntity) {
-        final var active = ActiveStatus.of(productEntity.getActive())
-                .name();
 
         final var type = ProductType.of(productEntity.getType())
                 .name();
@@ -33,7 +31,7 @@ public final class ProductTransformer {
         product.setName(productEntity.getName());
         product.setDescription(productEntity.getDescription());
         product.setType(type);
-        product.setActive(active);
+        product.setActive(productEntity.getActive());
         product.setMinimalQuantity(productEntity.getMinimalQuantity());
 
         final var productCategoryEntity = productEntity.getProductCategoryEntity();

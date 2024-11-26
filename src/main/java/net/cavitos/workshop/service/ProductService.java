@@ -123,10 +123,7 @@ public class ProductService {
             code = calculateCode(product.getType());
         }
 
-        final var active = ActiveStatus.valueOf(product.getActive())
-                        .value();
-
-        entity.setActive(active);
+        entity.setActive(product.getActive());
         entity.setName(product.getName());
         entity.setCode(code);
         entity.setDescription(product.getDescription());

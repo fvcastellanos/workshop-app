@@ -3,11 +3,10 @@ package net.cavitos.workshop.views.product;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import net.cavitos.workshop.domain.model.web.Contact;
 import net.cavitos.workshop.domain.model.web.Product;
 import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.service.ProductCategoryService;
@@ -21,14 +20,20 @@ import net.cavitos.workshop.views.model.transformer.CategoryTransformer;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
 import net.cavitos.workshop.views.model.transformer.TypeTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 @Component
 public class AddProductModal extends DialogBase<ProductEntity> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AddProductModal.class);
 
     private final ProductService productService;
     private final ProductCategoryService productCategoryService;
@@ -97,7 +102,7 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         final var descriptionField = new TextArea("Descripción");
         descriptionField.setWidth("100%");
 
-        final var minStockField = new IntegerField("Cantidad Mínima");
+        final var minStockField = new NumberField("Cantidad Mínima");
         minStockField.setMin(1);
         minStockField.setMax(1000);
         minStockField.setWidth("100%");
@@ -111,9 +116,9 @@ public class AddProductModal extends DialogBase<ProductEntity> {
                 .bind(Product::getType, Product::setType);
 
         binder.forField(categoryType)
-                .asRequired("La categoría es requerida")
+                .withValidator(category -> !category.getValue().equals(StringUtils.EMPTY), "La categoría es requerida")
                 .withConverter(CategoryTransformer::toDomain, CategoryTransformer::toView)
-                .bind(Product::getProductCategory, Product::setProductCategory);
+                .bind(Product::getCategory, Product::setCategory);
 
         binder.forField(nameField)
                 .asRequired("El nombre es requerido")
@@ -121,7 +126,13 @@ public class AddProductModal extends DialogBase<ProductEntity> {
                 .withValidator(name -> name.length() <= 50, "Longitud máxima 50 caracteres")
                 .bind(Product::getName, Product::setName);
 
+        binder.forField(descriptionField)
+                 .withValidator(description -> description.length() <= 300, "Longitud máxima 300 caracteres")
+                 .bind(Product::getDescription, Product::setDescription);
 
+        binder.forField(minStockField)
+                 .withValidator(minStock -> minStock >= 1, "Cantidad mínima 1")
+                 .bind(Product::getMinimalQuantity, Product::setMinimalQuantity);
 
         contentLayout.add(
                 typeSelect,
@@ -133,8 +144,8 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         );
 
         final var footerLayout = new HorizontalLayout(
-                ComponentFactory.buildCloseDialogButton(event -> this.close())
-//                ComponentFactory.buildSaveDialogButton(event -> this.saveChanges())
+                ComponentFactory.buildCloseDialogButton(event -> this.close()),
+                ComponentFactory.buildSaveDialogButton(event -> this.saveChanges())
         );
 
         add(contentLayout);
@@ -152,5 +163,34 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         categories.addFirst(new TypeOption("Seleccione", StringUtils.EMPTY));
 
         return categories;
+    }
+
+    private void saveChanges() {
+
+        final var validationResult = binder.validate();
+
+        if (validationResult.isOk()) {
+
+            try {
+
+                final var product = new Product();
+                binder.writeBeanIfValid(product);
+
+                final var entity = isEdit ? productService.update(tenant, productEntity.getId(), product) :
+                        productService.add(tenant, product);
+
+                if (nonNull(onSaveEvent)) {
+
+                    onSaveEvent.accept(entity);
+                }
+
+                close();
+
+            } catch (final Exception exception) {
+
+                LOGGER.error("Unable to save contact", exception);
+                showErrorNotification(exception.getMessage());
+            }
+        }
     }
 }
