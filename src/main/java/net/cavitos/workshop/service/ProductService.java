@@ -81,7 +81,7 @@ public class ProductService {
 
         var entity = ProductEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
-                .type(buildTypeFor(product.getType()))
+                .type(product.getType())
                 .name(product.getName())
                 .code(sequenceProvider.calculateNext(SequenceType.PRODUCT))
                 .description(product.getDescription())
@@ -114,8 +114,7 @@ public class ProductService {
         final var category = product.getCategory();
         final var categoryEntity = findProductCategory(tenant, category.getId());
 
-        var productType = ProductType.valueOf(product.getType())
-                .value();
+        var productType = product.getType();
 
         var code = entity.getCode();
         if (!productType.equalsIgnoreCase(entity.getType())) {
@@ -127,7 +126,7 @@ public class ProductService {
         entity.setName(product.getName());
         entity.setCode(code);
         entity.setDescription(product.getDescription());
-        entity.setType(buildTypeFor(product.getType()));
+        entity.setType(productType);
         entity.setMinimalQuantity(product.getMinimalQuantity());
         entity.setUpdated(Instant.now());
         entity.setProductCategoryEntity(categoryEntity);
@@ -163,12 +162,6 @@ public class ProductService {
         }
 
         return categoryEntity;
-    }
-
-    private String buildTypeFor(final String value) {
-
-        return ProductType.valueOf(value)
-                .value();
     }
 
     private String calculateCode(final String type) {

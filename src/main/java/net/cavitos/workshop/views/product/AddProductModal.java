@@ -7,6 +7,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import net.cavitos.workshop.domain.model.web.Contact;
 import net.cavitos.workshop.domain.model.web.Product;
 import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.service.ProductCategoryService;
@@ -42,6 +43,8 @@ public class AddProductModal extends DialogBase<ProductEntity> {
     private Select<Status> statusField;
     private Select<TypeOption> typeSelect;
     private Select<TypeOption> categoryType;
+    private NumberField minStockField;
+    private TextField codeField;
 
     private ProductEntity productEntity;
 
@@ -64,13 +67,17 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         this.setHeaderTitle(isEdit ? "Modificar Producto" : "Agregar Producto");
         this.tenant = tenant;
 
+        binder.refreshFields();
+
         statusField.setValue(StatusTransformer.toView(1)); // Active status
         statusField.setReadOnly(!isEdit);
 
         typeSelect.setValue(TypeTransformer.toProductView("P")); // Product type
 
         categoryType.setItems(loadProductCategories());
-        categoryType.setValue(new TypeOption("Seleccione", StringUtils.EMPTY));
+        minStockField.setValue(1.0);
+
+        codeField.setVisible(isEdit);
 
         if (isEdit) {
             productEntity = entity;
@@ -93,7 +100,13 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         ), "P");
         typeSelect.setAutofocus(true);
 
-        categoryType = ComponentFactory.buildTypeSelect("100%", "Categoría", Collections.emptyList(), StringUtils.EMPTY);
+        final var initialItems = Collections.singletonList(new TypeOption("Seleccione", StringUtils.EMPTY));
+        categoryType = ComponentFactory.buildTypeSelect("100%", "Categoría", initialItems, StringUtils.EMPTY);
+
+        codeField = new TextField();
+        codeField.setLabel("Código");
+        codeField.setWidth("100%");
+        codeField.setReadOnly(true);
 
         final var nameField = new TextField();
         nameField.setLabel("Nombre");
@@ -102,7 +115,7 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         final var descriptionField = new TextArea("Descripción");
         descriptionField.setWidth("100%");
 
-        final var minStockField = new NumberField("Cantidad Mínima");
+        minStockField = new NumberField("Cantidad Mínima");
         minStockField.setMin(1);
         minStockField.setMax(1000);
         minStockField.setWidth("100%");
@@ -112,13 +125,16 @@ public class AddProductModal extends DialogBase<ProductEntity> {
         // Bind fields
         binder.forField(typeSelect)
                 .asRequired("El tipo es requerido")
-                .withConverter(TypeTransformer::toDomain, TypeTransformer::toClientView)
+                .withConverter(TypeTransformer::toDomain, TypeTransformer::toProductView)
                 .bind(Product::getType, Product::setType);
 
         binder.forField(categoryType)
-                .withValidator(category -> !category.getValue().equals(StringUtils.EMPTY), "La categoría es requerida")
+                .withValidator(category -> nonNull(category) && !category.getValue().equals(StringUtils.EMPTY), "Seleccione una categoría")
                 .withConverter(CategoryTransformer::toDomain, CategoryTransformer::toView)
                 .bind(Product::getCategory, Product::setCategory);
+
+        binder.forField(codeField)
+                .bind(Product::getCode, Product::setCode);
 
         binder.forField(nameField)
                 .asRequired("El nombre es requerido")
@@ -131,12 +147,18 @@ public class AddProductModal extends DialogBase<ProductEntity> {
                  .bind(Product::getDescription, Product::setDescription);
 
         binder.forField(minStockField)
-                 .withValidator(minStock -> minStock >= 1, "Cantidad mínima 1")
+                 .withValidator(minStock -> nonNull(minStock) && minStock >= 1, "Cantidad mínima 1")
                  .bind(Product::getMinimalQuantity, Product::setMinimalQuantity);
+
+        binder.forField(statusField)
+                .asRequired("El estado es requerido")
+                .withConverter(StatusTransformer::toDomain, StatusTransformer::toView)
+                .bind(Product::getActive, Product::setActive);
 
         contentLayout.add(
                 typeSelect,
                 categoryType,
+                codeField,
                 nameField,
                 descriptionField,
                 minStockField,
@@ -154,15 +176,10 @@ public class AddProductModal extends DialogBase<ProductEntity> {
 
     private List<TypeOption> loadProductCategories() {
 
-        final var productCategories = productCategoryService.getProductCategories(tenant, 1)
+        return productCategoryService.getProductCategories(tenant, 1)
                 .stream()
                 .map(entity -> new TypeOption(entity.getName(), entity.getId()))
                 .toList();
-
-        final var categories = new ArrayList<>(productCategories);
-        categories.addFirst(new TypeOption("Seleccione", StringUtils.EMPTY));
-
-        return categories;
     }
 
     private void saveChanges() {
