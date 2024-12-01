@@ -31,6 +31,7 @@ import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchBody;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchFooter;
@@ -126,21 +127,21 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
         performSearch();
     }
 
-    private void performSearch() {
+    @Override
+    protected Page<CarLineEntity> performSearch() {
 
         final var status = searchStatus.getValue();
         final var result = carLineService.findAll(tenant, carBrandEntity.getId(), status.getValue(),
                 searchText.getValue(), DEFAULT_PAGE, DEFAULT_SIZE);
 
         grid.setItems(result.getContent());
+
+        return result;
     }
 
-    protected Grid<CarLineEntity> buildGrid() {
+    private Grid<CarLineEntity> buildGrid() {
 
-        final var grid = new Grid<>(CarLineEntity.class, false);
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        grid.setWidth("100%");
-        grid.getStyle().set("flex-grow", "0");
+        final var grid = ComponentFactory.buildGrid(CarLineEntity.class);
 
         grid.addColumn(new ComponentRenderer<>(carLineEntity -> {
                     final var layout = new HorizontalLayout();

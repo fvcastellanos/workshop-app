@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,6 +27,7 @@ import net.cavitos.workshop.views.model.transformer.StatusTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,13 +54,13 @@ public class ProductView extends CRUDLayout {
     private final ProductService productService;
     private final ProductCategoryService productCategoryService;
 
-    private final AddProductModal addModelDialog;
+    private final ProductModalView addModelDialog;
 
     public ProductView(final AuthenticationContext authenticationContext,
                        final DatabaseUserService databaseUserService,
                        final ProductService productService,
                        final ProductCategoryService productCategoryService,
-                       final AddProductModal addModelDialog) {
+                       final ProductModalView addModelDialog) {
 
         super(authenticationContext, databaseUserService);
 
@@ -144,10 +144,7 @@ public class ProductView extends CRUDLayout {
 
     private Grid<ProductEntity> buildGrid() {
 
-        final var grid = new Grid<>(ProductEntity.class, false);
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        grid.setWidth("100%");
-        grid.getStyle().set("flex-grow", "0");
+        final var grid = ComponentFactory.buildGrid(ProductEntity.class);
 
         grid.addColumn(new ComponentRenderer<>(productEntity -> {
                     final var layout = new HorizontalLayout();
@@ -213,7 +210,7 @@ public class ProductView extends CRUDLayout {
         return grid;
     }
 
-    private void performSearch() {
+    protected Page<ProductEntity> performSearch() {
 
         LOGGER.info("Search products for text: {} - Status: {} - Type: {}", searchText.getValue(),
                 searchStatus.getValue(), searchType.getValue());
@@ -227,6 +224,8 @@ public class ProductView extends CRUDLayout {
                 DEFAULT_PAGE, DEFAULT_SIZE);
 
         grid.setItems(result.getContent());
+
+        return result;
     }
 
     private List<TypeOption> loadProductCategories() {

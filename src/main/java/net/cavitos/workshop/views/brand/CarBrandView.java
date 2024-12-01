@@ -21,11 +21,13 @@ import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.security.service.DatabaseUserService;
 import net.cavitos.workshop.service.CarBrandService;
+import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
 import net.cavitos.workshop.views.model.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 
 @PageTitle("Marcas de Vehículos")
 @RolesAllowed({ "ROLE_user" })
@@ -137,40 +139,49 @@ public class CarBrandView extends CRUDLayout {
         return textField;
     }
 
-    protected Grid<CarBrandEntity> buildGrid() {
+    @Override
+    protected Page<CarBrandEntity> performSearch() {
 
-        final var grid = new Grid<>(CarBrandEntity.class, false);
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        grid.setWidth("100%");
-        grid.getStyle().set("flex-grow", "0");
+        final var status = searchStatus.getValue();
+        final var result = carBrandService.getAllByTenant(tenant, status.getValue(), searchText.getValue(),
+                DEFAULT_PAGE, DEFAULT_SIZE);
+
+        grid.setItems(result.getContent());
+
+        return result;
+    }
+
+    private Grid<CarBrandEntity> buildGrid() {
+
+        final var grid = ComponentFactory.buildGrid(CarBrandEntity.class);
 
         grid.addColumn(new ComponentRenderer<>(carBrandEntity -> {
-            final var layout = new HorizontalLayout();
-            layout.setWidthFull();
-            layout.setJustifyContentMode(JustifyContentMode.CENTER);
+                    final var layout = new HorizontalLayout();
+                    layout.setWidthFull();
+                    layout.setJustifyContentMode(JustifyContentMode.CENTER);
 
-            final var editImage = new Image("img/icons/edit-3-svgrepo-com.svg", "Editar");
-            editImage.setWidth("20px");
-            editImage.setHeight("20px");
-            editImage.getStyle().set("cursor", "pointer");
-            editImage.addClickListener(event -> {
-                LOGGER.info("Edit: {}", carBrandEntity.getName());
-                addModal.openDialogForEdit(tenant, carBrandEntity);
-            });
+                    final var editImage = new Image("img/icons/edit-3-svgrepo-com.svg", "Editar");
+                    editImage.setWidth("20px");
+                    editImage.setHeight("20px");
+                    editImage.getStyle().set("cursor", "pointer");
+                    editImage.addClickListener(event -> {
+                        LOGGER.info("Edit: {}", carBrandEntity.getName());
+                        addModal.openDialogForEdit(tenant, carBrandEntity);
+                    });
 
-            final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Editar");
-            viewImage.setWidth("20px");
-            viewImage.setHeight("20px");
-            viewImage.getStyle().set("cursor", "pointer");
-            viewImage.addClickListener(event -> {
-                LOGGER.info("Models for Brand: {}", carBrandEntity.getName());
-                UI.getCurrent().navigate("car-models/%s".formatted(carBrandEntity.getId()));
-            });
+                    final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Editar");
+                    viewImage.setWidth("20px");
+                    viewImage.setHeight("20px");
+                    viewImage.getStyle().set("cursor", "pointer");
+                    viewImage.addClickListener(event -> {
+                        LOGGER.info("Models for Brand: {}", carBrandEntity.getName());
+                        UI.getCurrent().navigate("car-models/%s".formatted(carBrandEntity.getId()));
+                    });
 
-            layout.add(editImage, viewImage);
+                    layout.add(editImage, viewImage);
 
-            return layout;
-        })).setHeader("#")
+                    return layout;
+                })).setHeader("#")
                 .setSortable(false)
                 .setResizable(false)
                 .setWidth("10%");
@@ -183,20 +194,11 @@ public class CarBrandView extends CRUDLayout {
 
         grid.addColumn(new ComponentRenderer<>(carBrandEntity -> {
 
-            final var active = carBrandEntity.getActive() == 1 ? "Activo" : "Inactivo";
-            return new Text(active);
-        })).setHeader("Activo")
-            .setSortable(true);
+                    final var active = carBrandEntity.getActive() == 1 ? "Activo" : "Inactivo";
+                    return new Text(active);
+                })).setHeader("Activo")
+                .setSortable(true);
 
         return grid;
-    }
-
-    private void performSearch() {
-
-        final var status = searchStatus.getValue();
-        final var result = carBrandService.getAllByTenant(tenant, status.getValue(), searchText.getValue(),
-                DEFAULT_PAGE, DEFAULT_SIZE);
-
-        grid.setItems(result.getContent());
     }
 }

@@ -92,14 +92,11 @@ public class ProductCategoryService {
             verifyProductCategoryCode(tenant, productCategory.getCode());
         }
 
-        final var active = ActiveStatus.valueOf(productCategory.getActive())
-                        .value();
-
         entity.setName(productCategory.getName());
         entity.setCode(productCategory.getCode());
         entity.setDescription(productCategory.getDescription());
         entity.setUpdated(Instant.now());
-        entity.setActive(active);
+        entity.setActive(productCategory.getActive());
 
         return productCategoryRepository.save(entity);
     }

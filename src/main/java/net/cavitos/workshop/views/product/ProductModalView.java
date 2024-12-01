@@ -7,7 +7,6 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import net.cavitos.workshop.domain.model.web.Contact;
 import net.cavitos.workshop.domain.model.web.Product;
 import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.service.ProductCategoryService;
@@ -25,16 +24,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
 
 @Component
-public class AddProductModal extends DialogBase<ProductEntity> {
+public class ProductModalView extends DialogBase<ProductEntity> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AddProductModal.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductModalView.class);
 
     private final ProductService productService;
     private final ProductCategoryService productCategoryService;
@@ -48,8 +46,8 @@ public class AddProductModal extends DialogBase<ProductEntity> {
 
     private ProductEntity productEntity;
 
-    public AddProductModal(final ProductService productService,
-                           final ProductCategoryService productCategoryService) {
+    public ProductModalView(final ProductService productService,
+                            final ProductCategoryService productCategoryService) {
 
         this.productService = productService;
         this.productCategoryService = productCategoryService;

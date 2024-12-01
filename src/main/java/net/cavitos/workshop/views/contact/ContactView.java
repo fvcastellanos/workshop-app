@@ -27,6 +27,7 @@ import net.cavitos.workshop.views.model.TypeOption;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -123,12 +124,26 @@ public class ContactView extends CRUDLayout {
         return  new VerticalLayout(row1, row2);
     }
 
-    protected Grid<ContactEntity> buildGrid() {
+    @Override
+    protected Page<ContactEntity> performSearch() {
 
-        final var grid = new Grid<>(ContactEntity.class, false);
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        grid.setWidth("100%");
-        grid.getStyle().set("flex-grow", "0");
+        LOGGER.info("Search text: {} - Status: {} - Type: {}", searchText.getValue(), searchStatus.getValue(), searchType.getValue());
+
+        final var tenant = getUserTenant();
+        final var type = searchType.getValue();
+        final var status = searchStatus.getValue();
+
+        final var result = contactService.search(tenant, type.getValue(), status.getValue(), searchText.getValue(),
+                DEFAULT_PAGE, DEFAULT_SIZE);
+
+        grid.setItems(result.getContent());
+
+        return result;
+    }
+
+    private Grid<ContactEntity> buildGrid() {
+
+        final var grid = ComponentFactory.buildGrid(ContactEntity.class);
 
         grid.addColumn(new ComponentRenderer<>(contactEntity -> {
                     final var layout = new HorizontalLayout();
@@ -166,9 +181,9 @@ public class ContactView extends CRUDLayout {
 
         grid.addColumn(new ComponentRenderer<>(contactEntity -> {
 
-            final var type = contactEntity.getType().equals("C") ? "Cliente" : "Proveedor";
-            return new Text(type);
-        })).setHeader("Tipo")
+                    final var type = contactEntity.getType().equals("C") ? "Cliente" : "Proveedor";
+                    return new Text(type);
+                })).setHeader("Tipo")
                 .setSortable(true)
                 .setWidth("20%");
 
@@ -180,19 +195,5 @@ public class ContactView extends CRUDLayout {
                 .setSortable(true);
 
         return grid;
-    }
-
-    private void performSearch() {
-
-        LOGGER.info("Search text: {} - Status: {} - Type: {}", searchText.getValue(), searchStatus.getValue(), searchType.getValue());
-
-        final var tenant = getUserTenant();
-        final var type = searchType.getValue();
-        final var status = searchStatus.getValue();
-
-        final var result = contactService.search(tenant, type.getValue(), status.getValue(), searchText.getValue(),
-                DEFAULT_PAGE, DEFAULT_SIZE);
-
-        grid.setItems(result.getContent());
     }
 }

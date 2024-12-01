@@ -4,6 +4,8 @@ import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -119,5 +121,16 @@ public final class ComponentFactory {
         searchTitle.setWidth("max-content");
 
         return searchTitle;
+    }
+
+    public static <T> Grid<T> buildGrid(Class<T> beanType) {
+
+        final var grid = new Grid<>(beanType, false);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        grid.setWidth("100%");
+        grid.getStyle().set("flex-grow", "0");
+        grid.addClassName("grid-border");
+
+        return grid;
     }
 }
