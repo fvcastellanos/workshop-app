@@ -4,6 +4,8 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Footer;
@@ -19,6 +21,7 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.menu.MenuConfiguration;
+import com.vaadin.flow.server.menu.MenuEntry;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import net.cavitos.workshop.resource.ImageLoader;
@@ -98,16 +101,16 @@ public class MainLayout  extends AppLayout {
                         createNavigationItem("Contactos", "contacts", "img/icons/contacts-svgrepo-com.svg"),
                         createNavigationItem("Productos", "products", "img/icons/products-svgrepo-com.svg"),
                         createNavigationItem("Categorías de Productos", "product-categories", "img/icons/category-solid-svgrepo-com.svg"),
-                        createNavigationItem("Tipos de Movimientos", "inventory-movement-types", "line-awesome/svg/home.svg")
+                        createNavigationItem("Tipos de Movimientos", "inventory-movement-types", "img/icons/movement-focus-round-893-svgrepo-com.svg")
                 ),
-                createNavigationItem("Ordenes", "work-orders", "line-awesome/svg/home.svg"),
-                createNavigationItemWithSubItems("Movimientos", null, "line-awesome/svg/home.svg",
-                        createNavigationItem("Facturas Proveedores", "provider-invoices", "line-awesome/svg/home.svg")
+                createNavigationItem("Ordenes", "work-orders", "img/icons/work-order-type-svgrepo-com.svg"),
+                createNavigationItemWithSubItems("Movimientos", null, "img/icons/movement-arrows-svgrepo-com.svg",
+                        createNavigationItem("Facturas Proveedores", "provider-invoices", "img/icons/invoice-bill-svgrepo-com.svg")
                 ),
-                createNavigationItemWithSubItems("Inventario", null, "line-awesome/svg/home.svg",
-                        createNavigationItem("Inicial", "inventory/initial", "line-awesome/svg/home.svg"),
-                        createNavigationItem("Movimientos", "inventory-adjustments", "line-awesome/svg/home.svg"),
-                        createNavigationItem("Existencias", "inventory-transfers", "line-awesome/svg/home.svg")
+                createNavigationItemWithSubItems("Inventario", null, "img/icons/inventory-logistics-warehouse-svgrepo-com.svg",
+                        createNavigationItem("Inicial", "inventory/initial", "img/icons/entry-point-svgrepo-com.svg"),
+                        createNavigationItem("Movimientos", "inventory-adjustments", "img/icons/arrows-rotate-clockwise-svgrepo-com.svg"),
+                        createNavigationItem("Existencias", "inventory-transfers", "img/icons/inventory-svgrepo-com.svg")
                 )
         );
     }
@@ -155,12 +158,12 @@ public class MainLayout  extends AppLayout {
 
             final var avatar = buildAvatar(user);
 
-            MenuBar userMenu = new MenuBar();
+            final var userMenu = new MenuBar();
             userMenu.setThemeName("tertiary-inline contrast");
 
             final var userName = userMenu.addItem("");
 
-            Div div = new Div();
+            final var div = new Div();
             div.add(avatar);
             div.add(userInfo.getFullName());
             div.add(new Icon("lumo", "dropdown"));
@@ -169,13 +172,13 @@ public class MainLayout  extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
 
-            userName.getSubMenu().addItem("Profile", event -> {
+            userName.getSubMenu().addItem("Perfil", event -> {
 
                 LOGGER.info("Show profile of user={}", userInfo.getNickName());
                 // show profile
             });
 
-            userName.getSubMenu().addItem("Sign out", e -> {
+            userName.getSubMenu().addItem("Cerrar Sesión", e -> {
 
                 UI.getCurrent().getPage().setLocation("/logout");
             });

@@ -24,4 +24,10 @@ public final class TypeTransformer {
             return value.equalsIgnoreCase("P") ? new TypeOption("Producto", "P") :
                     new TypeOption("Servicio", "S");
     }
+
+    public static TypeOption toInventoryMovementTypeView(final String value) {
+
+        return value.equalsIgnoreCase("I") ? new TypeOption("Entrada", "I") :
+                new TypeOption("Salida", "O");
+    }
 }

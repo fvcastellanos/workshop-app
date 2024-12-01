@@ -46,7 +46,7 @@ public class Paginator extends VerticalLayout {
 
         final var previousButton = new Button();
         previousButton.addThemeVariants(ButtonVariant.LUMO_ICON);
-        previousButton.setIcon(new SvgIcon("img/icons/previous-back-svgrepo-com.svg"));
+        previousButton.setIcon(new SvgIcon("img/icons/arrow-left-circle-svgrepo-com.svg"));
         previousButton.addClickListener(event -> {
 
             if (this.pagination.getPage() > 0) {
@@ -58,7 +58,7 @@ public class Paginator extends VerticalLayout {
 
         final var nextButton = new Button();
         nextButton.addThemeVariants(ButtonVariant.LUMO_ICON);
-        nextButton.setIcon(new SvgIcon("img/icons/right-arrow-svgrepo-com.svg"));
+        nextButton.setIcon(new SvgIcon("img/icons/arrow-right-circle-svgrepo-com.svg"));
         nextButton.addClickListener(event -> {
 
             if (this.pagination.getPage() < this.pagination.getTotalPages() - 1) {

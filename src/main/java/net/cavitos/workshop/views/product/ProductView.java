@@ -44,17 +44,17 @@ public class ProductView extends CRUDLayout {
 
     private final Grid<ProductEntity> grid;
 
-    private TextField searchText;
-    private Select<Status> searchStatus;
-    private Select<TypeOption> searchType;
-    private Select<TypeOption> categoryType;
-
     private final List<TypeOption> productCategories;
 
     private final ProductService productService;
     private final ProductCategoryService productCategoryService;
 
     private final ProductModalView addModelDialog;
+
+    private TextField searchText;
+    private Select<Status> searchStatus;
+    private Select<TypeOption> searchType;
+    private Select<TypeOption> categoryType;
 
     public ProductView(final AuthenticationContext authenticationContext,
                        final DatabaseUserService databaseUserService,

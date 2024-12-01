@@ -69,17 +69,11 @@ public class InventoryMovementTypeService {
 
         final var code = sequenceProvider.calculateNext(SequenceType.INVENTORY_MOVEMENT, 2);
 
-        final var active = ActiveStatus.valueOf(inventoryMovementType.getActive())
-                .value();
-
-        final var movementType = InventoryOperationType.valueOf(inventoryMovementType.getType())
-                .type();
-
         final var entity = InventoryMovementTypeEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .code(code)
-                .active(active)
-                .type(movementType)
+                .active(inventoryMovementType.getActive())
+                .type(inventoryMovementType.getType())
                 .name(inventoryMovementType.getName())
                 .description(inventoryMovementType.getDescription())
                 .tenant(tenant)
@@ -113,17 +107,11 @@ public class InventoryMovementTypeService {
                     });
         }
 
-        final var active = ActiveStatus.valueOf(inventoryMovementType.getActive())
-                .value();
-
-        final var movementType = InventoryOperationType.valueOf(inventoryMovementType.getType())
-                .type();
-
         entity.setType(inventoryMovementType.getType());
         entity.setName(inventoryMovementType.getName());
-        entity.setType(movementType);
+        entity.setType(inventoryMovementType.getType());
         entity.setDescription(inventoryMovementType.getDescription());
-        entity.setActive(active);
+        entity.setActive(inventoryMovementType.getActive());
 
         return inventoryMovementTypeRepository.save(entity);
     }

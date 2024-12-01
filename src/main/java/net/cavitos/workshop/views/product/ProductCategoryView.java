@@ -172,5 +172,6 @@ public class ProductCategoryView extends CRUDLayout {
 
         grid.setItems(result.getContent());
 
-        return result;}
+        return result;
+    }
 }
