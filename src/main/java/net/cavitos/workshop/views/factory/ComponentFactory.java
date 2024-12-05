@@ -2,11 +2,13 @@ package net.cavitos.workshop.views.factory;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -79,6 +81,18 @@ public final class ComponentFactory {
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         return button;
+    }
+
+    public static Button buildRedirectButton(String text, String route) {
+
+        final var btnNavigate = new Button(text, buttonClickEvent -> {
+            UI.getCurrent().navigate(route);
+        });
+
+        btnNavigate.setWidth("min-content");
+        btnNavigate.setIcon(new SvgIcon("img/icons/left-arrow-svgrepo-com.svg"));
+
+        return btnNavigate;
     }
 
     public static VerticalLayout buildSearchBox() {

@@ -1,4 +1,4 @@
-package net.cavitos.workshop.views.order;
+package net.cavitos.workshop.views.provider;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -15,9 +15,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
-import net.cavitos.workshop.model.entity.WorkOrderEntity;
+import net.cavitos.workshop.model.entity.ContactEntity;
+import net.cavitos.workshop.model.entity.InvoiceEntity;
 import net.cavitos.workshop.security.service.DatabaseUserService;
-import net.cavitos.workshop.service.WorkOrderService;
+import net.cavitos.workshop.service.InvoiceService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
@@ -34,32 +35,29 @@ import java.util.List;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchFooter;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTitle;
 
-@PageTitle("Ordenes de Trabajo")
+@PageTitle("Facturas de Proveedores")
 @RolesAllowed({ "ROLE_user" })
-@Route(value = "work-orders", layout = MainLayout.class)
-public class WorkOrderView extends CRUDLayout {
+@Route(value = "provider-invoices", layout = MainLayout.class)
+public class ProviderInvoiceView extends CRUDLayout {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkOrderView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProviderInvoiceView.class);
 
+    private final InvoiceService invoiceService;
     private final Clock systemClock;
-    private final WorkOrderService workOrderService;
-    private final Grid<WorkOrderEntity> grid;
-    private final WorkOrderModalView modalView;
 
-    private Select<TypeOption> orderStatus;
+    private final Grid<InvoiceEntity> grid;
+
     private TextField searchText;
+    private Select<TypeOption> invoiceStatus;
 
-    protected WorkOrderView(final AuthenticationContext authenticationContext,
-                            final DatabaseUserService databaseUserService,
-                            final WorkOrderService workOrderService,
-                            final Clock systemClock,
-                            final WorkOrderModalView modalView) {
-
+    protected ProviderInvoiceView(final AuthenticationContext authenticationContext,
+                                  final DatabaseUserService databaseUserService,
+                                  final InvoiceService invoiceService,
+                                  final Clock systemClock) {
         super(authenticationContext, databaseUserService);
 
+        this.invoiceService = invoiceService;
         this.systemClock = systemClock;
-        this.workOrderService = workOrderService;
-        this.modalView = modalView;
 
         grid = buildGrid();
 
@@ -70,20 +68,16 @@ public class WorkOrderView extends CRUDLayout {
                 paginator
         );
 
-        this.modalView.addOnSaveEvent(entity -> search());
-
         search();
     }
 
     @Override
-    protected Page<WorkOrderEntity> performSearch() {
+    protected Page<InvoiceEntity> performSearch() {
 
-        final var text = searchText.getValue();
-        final var status = orderStatus.getValue();
+        final var status = invoiceStatus.getValue();
 
-        LOGGER.info("Searching for work orders with text: {} and status: {}", text, status);
-
-        final var result = workOrderService.search(tenant, text, status.getValue(), pagination.getPage(), pagination.getSize());
+        final var result = invoiceService.search(tenant, "P", status.getValue(), searchText.getValue(),
+                pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 
@@ -98,8 +92,8 @@ public class WorkOrderView extends CRUDLayout {
 
         btnSearch.setWidth("min-content");
 
-        final var btnAdd = new Button("Agregar Orden", event -> {
-            modalView.openDialogForNew(tenant);
+        final var btnAdd = new Button("Agregar Factura", event -> {
+//            modalView.openDialogForNew(tenant);
         });
 
         btnAdd.setWidth("min-content");
@@ -116,28 +110,25 @@ public class WorkOrderView extends CRUDLayout {
 
     private HorizontalLayout buildSearchBody() {
 
-        final var orderStatuses = List.of(
-                new TypeOption("Todas", "%"),
-                new TypeOption("En Proceso", "P"),
-                new TypeOption("Cancelada", "A"),
+        final var statuses = List.of(
+                new TypeOption("Activa", "A"),
                 new TypeOption("Cerrada", "C"),
-                new TypeOption("Entregada", "D")
+                new TypeOption("Cancelada", "D")
         );
 
         searchText = ComponentFactory.buildTextSearchField("70%");
-        orderStatus = ComponentFactory.buildTypeSelect("30%", "Estado", orderStatuses, "%");
+        invoiceStatus = ComponentFactory.buildTypeSelect("30%", "Estado", statuses, "A");
 
         final var searchBody = ComponentFactory.buildSearchBody();
-        searchBody.add(searchText, orderStatus);
+        searchBody.add(searchText, invoiceStatus);
 
         return searchBody;
     }
 
-    private Grid<WorkOrderEntity> buildGrid() {
+    private Grid<InvoiceEntity> buildGrid() {
+        final var grid = ComponentFactory.buildGrid(InvoiceEntity.class);
 
-        final var grid = ComponentFactory.buildGrid(WorkOrderEntity.class);
-
-        grid.addColumn(new ComponentRenderer<>(workOrderEntity -> {
+        grid.addColumn(new ComponentRenderer<>(invoiceEntity -> {
                     final var layout = new HorizontalLayout();
                     layout.setWidthFull();
                     layout.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -147,17 +138,17 @@ public class WorkOrderView extends CRUDLayout {
                     editImage.setHeight("20px");
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
-                        LOGGER.info("Edit: {}", workOrderEntity.getNumber());
-                        modalView.openDialogForEdit(tenant, workOrderEntity);
+                        LOGGER.info("Edit: {}", invoiceEntity.getNumber());
+//                        modalView.openDialogForEdit(tenant, workOrderEntity);
                     });
 
-                    final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Editar");
+                    final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Detalle");
                     viewImage.setWidth("20px");
                     viewImage.setHeight("20px");
                     viewImage.getStyle().set("cursor", "pointer");
                     viewImage.addClickListener(event -> {
-                        LOGGER.info("Details: {}", workOrderEntity.getNumber());
-                        UI.getCurrent().navigate("work-orders-details/%s".formatted(workOrderEntity.getId()));
+                        LOGGER.info("Details: {}", invoiceEntity.getNumber());
+//                        UI.getCurrent().navigate("work-orders-details/%s".formatted(workOrderEntity.getId()));
                     });
 
                     layout.add(editImage, viewImage);
@@ -168,26 +159,18 @@ public class WorkOrderView extends CRUDLayout {
                 .setResizable(false)
                 .setWidth("10%");
 
-        grid.addColumn("number")
-                .setHeader("Número")
+        grid.addColumn(new ComponentRenderer<>(invoiceEntity -> {
+
+                    final var invoiceDate = LocalDate.ofInstant(invoiceEntity.getInvoiceDate(), systemClock.getZone());
+                    return new Text(invoiceDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+
+                })).setHeader("Fecha")
                 .setSortable(true)
                 .setResizable(true)
                 .setWidth("10%");
 
-        grid.addColumn(new ComponentRenderer<>(workOrderEntity -> {
-
-            final var orderDate = LocalDate.ofInstant(workOrderEntity.getOrderDate(), systemClock.getZone());
-            final var text = orderDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-
-            return new Text(text);
-
-        })).setHeader("Fecha")
-            .setSortable(true)
-            .setResizable(true)
-            .setWidth("10%");
-
-        grid.addColumn("plateNumber")
-                .setHeader("No. Placa")
+        grid.addColumn("contactEntity.taxId")
+                .setHeader("NIT")
                 .setSortable(true)
                 .setResizable(true)
                 .setWidth("10%");
@@ -198,13 +181,12 @@ public class WorkOrderView extends CRUDLayout {
                 .setResizable(true)
                 .setWidth("30%");
 
-        grid.addColumn(new ComponentRenderer<>(workOrderEntity -> {
+        grid.addColumn(new ComponentRenderer<>(invoiceEntity -> {
 
-                    final var status = switch (workOrderEntity.getStatus()) {
-                        case "P" -> "En Proceso";
-                        case "A" -> "Cancelada";
+                    final var status = switch (invoiceEntity.getStatus()) {
+                        case "A" -> "Activa";
                         case "C" -> "Cerrada";
-                        default -> "Entregada";
+                        default -> "Cancelada";
                     };
 
                     return new Text(status);
