@@ -43,6 +43,7 @@ public class WorkOrderView extends CRUDLayout {
     private final Clock systemClock;
     private final WorkOrderService workOrderService;
     private final Grid<WorkOrderEntity> grid;
+    private final WorkOrderModalView modalView;
 
     private Select<TypeOption> orderStatus;
     private TextField searchText;
@@ -50,12 +51,14 @@ public class WorkOrderView extends CRUDLayout {
     protected WorkOrderView(final AuthenticationContext authenticationContext,
                             final DatabaseUserService databaseUserService,
                             final WorkOrderService workOrderService,
-                            final Clock systemClock) {
+                            final Clock systemClock,
+                            final WorkOrderModalView modalView) {
 
         super(authenticationContext, databaseUserService);
 
         this.systemClock = systemClock;
         this.workOrderService = workOrderService;
+        this.modalView = modalView;
 
         grid = buildGrid();
 
@@ -65,6 +68,8 @@ public class WorkOrderView extends CRUDLayout {
                 grid,
                 paginator
         );
+
+        this.modalView.addOnSaveEvent(entity -> search());
 
         search();
     }
@@ -92,8 +97,8 @@ public class WorkOrderView extends CRUDLayout {
 
         btnSearch.setWidth("min-content");
 
-        final var btnAdd = new Button("Agregar Movimiento", event -> {
-//            modalView.openDialogForNew(tenant);
+        final var btnAdd = new Button("Agregar Orden", event -> {
+            modalView.openDialogForNew(tenant);
         });
 
         btnAdd.setWidth("min-content");
@@ -142,9 +147,7 @@ public class WorkOrderView extends CRUDLayout {
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", workOrderEntity.getNumber());
-//                        workOrderEntity.getContactEntity().
-//                        workOrderEntity.getP
-//                        modalView.openDialogForEdit(tenant, workOrderEntity);
+                        modalView.openDialogForEdit(tenant, workOrderEntity);
                     });
 
                     layout.add(editImage);

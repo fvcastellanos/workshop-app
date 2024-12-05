@@ -1,6 +1,5 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.status.WorkOrderStatus;
 import net.cavitos.workshop.domain.model.web.WorkOrder;
 import net.cavitos.workshop.model.entity.CarLineEntity;
 import net.cavitos.workshop.model.entity.ContactEntity;
@@ -121,7 +120,7 @@ public class WorkOrderService {
         entity.setGasAmount(workOrder.getGasAmount());
         entity.setOdometerMeasurement(workOrder.getOdometerMeasurement());
         entity.setOdometerValue(workOrder.getOdometerValue());
-        entity.setStatus(buildWorkOrderStatusFrom(workOrder.getStatus()));
+        entity.setStatus(workOrder.getStatus());
         entity.setPlateNumber(workOrder.getPlateNumber());
         entity.setUpdated(Instant.now());
 
@@ -156,11 +155,5 @@ public class WorkOrderService {
         final var contact = workOrder.getContact();
         return contactRepository.findByIdAndTenant(contact.getId(), tenant)
                 .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Contact not found"));
-    }
-
-    private String buildWorkOrderStatusFrom(final String value) {
-
-        return WorkOrderStatus.valueOf(value)
-                .value();
     }
 }

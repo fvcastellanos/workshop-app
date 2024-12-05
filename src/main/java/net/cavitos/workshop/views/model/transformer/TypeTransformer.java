@@ -1,7 +1,8 @@
 package net.cavitos.workshop.views.model.transformer;
 
-import net.cavitos.workshop.domain.model.web.common.CommonProductCategory;
 import net.cavitos.workshop.views.model.TypeOption;
+
+import java.util.List;
 
 public final class TypeTransformer {
 
@@ -11,6 +12,12 @@ public final class TypeTransformer {
     public static String toDomain(final TypeOption typeOption) {
 
         return typeOption.getValue();
+    }
+
+    public static TypeOption toDistanceMeasurementView(final String value) {
+
+        return value.equalsIgnoreCase("K") ? new TypeOption("Kilómetros", "K") :
+                new TypeOption("Millas", "M");
     }
 
     public static TypeOption toClientView(final String value) {
@@ -29,5 +36,15 @@ public final class TypeTransformer {
 
         return value.equalsIgnoreCase("I") ? new TypeOption("Entrada", "I") :
                 new TypeOption("Salida", "O");
+    }
+
+    public static TypeOption toWorkOrderStatusView(final String value) {
+
+        return switch (value) {
+            case "P" -> new TypeOption("En Proceso", "P");
+            case "A" -> new TypeOption("Cancelada", "A");
+            case "C" -> new TypeOption("Cerrada", "C");
+            default -> new TypeOption("Entregada", "D");
+        };
     }
 }
