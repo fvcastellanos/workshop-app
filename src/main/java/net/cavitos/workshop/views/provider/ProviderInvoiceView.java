@@ -46,6 +46,7 @@ public class ProviderInvoiceView extends CRUDLayout {
     private final Clock systemClock;
 
     private final Grid<InvoiceEntity> grid;
+    private final ProviderInvoiceModalView modalView;
 
     private TextField searchText;
     private Select<TypeOption> invoiceStatus;
@@ -53,11 +54,13 @@ public class ProviderInvoiceView extends CRUDLayout {
     protected ProviderInvoiceView(final AuthenticationContext authenticationContext,
                                   final DatabaseUserService databaseUserService,
                                   final InvoiceService invoiceService,
-                                  final Clock systemClock) {
+                                  final Clock systemClock,
+                                  final ProviderInvoiceModalView modalView) {
         super(authenticationContext, databaseUserService);
 
         this.invoiceService = invoiceService;
         this.systemClock = systemClock;
+        this.modalView = modalView;
 
         grid = buildGrid();
 
@@ -67,6 +70,8 @@ public class ProviderInvoiceView extends CRUDLayout {
                 grid,
                 paginator
         );
+
+        modalView.addOnSaveEvent(invoiceEntity -> search());
 
         search();
     }
@@ -93,7 +98,7 @@ public class ProviderInvoiceView extends CRUDLayout {
         btnSearch.setWidth("min-content");
 
         final var btnAdd = new Button("Agregar Factura", event -> {
-//            modalView.openDialogForNew(tenant);
+            modalView.openDialogForNew(tenant);
         });
 
         btnAdd.setWidth("min-content");
@@ -112,8 +117,8 @@ public class ProviderInvoiceView extends CRUDLayout {
 
         final var statuses = List.of(
                 new TypeOption("Activa", "A"),
-                new TypeOption("Cerrada", "C"),
-                new TypeOption("Cancelada", "D")
+                new TypeOption("Cancelada", "C"),
+                new TypeOption("Anulada", "D")
         );
 
         searchText = ComponentFactory.buildTextSearchField("70%");
@@ -139,7 +144,7 @@ public class ProviderInvoiceView extends CRUDLayout {
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", invoiceEntity.getNumber());
-//                        modalView.openDialogForEdit(tenant, workOrderEntity);
+                        modalView.openDialogForEdit(tenant, invoiceEntity);
                     });
 
                     final var viewImage = new Image("img/icons/view-grid-svgrepo-com.svg", "Detalle");
@@ -157,6 +162,12 @@ public class ProviderInvoiceView extends CRUDLayout {
                 })).setHeader("#")
                 .setSortable(false)
                 .setResizable(false)
+                .setWidth("10%");
+
+        grid.addColumn("number")
+                .setHeader("Número")
+                .setSortable(true)
+                .setResizable(true)
                 .setWidth("10%");
 
         grid.addColumn(new ComponentRenderer<>(invoiceEntity -> {

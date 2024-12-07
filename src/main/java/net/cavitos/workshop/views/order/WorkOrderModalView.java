@@ -153,15 +153,9 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
         notes = new TextArea("Notas");
         notes.setWidth("100%");
 
-        carModel = new ComboBox<>("Modelo");
-        carModel.setWidth("100%");
-        carModel.setPrefixComponent(VaadinIcon.SEARCH.create());
-        carModel.setItemLabelGenerator(CommonCarLine::getName);
+        carModel = ComponentFactory.buildComboBox("Modelo", "100%", CommonCarLine::getName);
 
-        contact = new ComboBox<>("Contacto");
-        contact.setWidth("100%");
-        contact.setPrefixComponent(VaadinIcon.SEARCH.create());
-        contact.setItemLabelGenerator(CommonContact::getName);
+        contact = ComponentFactory.buildComboBox("Contacto", "100%", CommonContact::getName);
 
         final var contentLayout = new VerticalLayout(
                 workOrderNumber,

@@ -47,4 +47,19 @@ public final class TypeTransformer {
             default -> new TypeOption("Entregada", "D");
         };
     }
+
+    public static TypeOption toInvoiceView(final String value) {
+
+        return switch (value) {
+            case "A" -> new TypeOption("Activa", "A");
+            case "C" -> new TypeOption("Cancelada", "C");
+            default -> new TypeOption("Anulada", "D");
+        };
+    }
+
+    public static TypeOption toInvoiceType(final String value) {
+
+        return value.equalsIgnoreCase("P") ? new TypeOption("Proveedor", "P") :
+                new TypeOption("Cliente", "C");
+    }
 }

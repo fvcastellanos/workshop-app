@@ -1,7 +1,5 @@
 package net.cavitos.workshop.transformer;
 
-import net.cavitos.workshop.domain.model.status.InvoiceStatus;
-import net.cavitos.workshop.domain.model.type.InvoiceType;
 import net.cavitos.workshop.domain.model.web.Invoice;
 import net.cavitos.workshop.domain.model.web.common.CommonContact;
 import net.cavitos.workshop.model.entity.ContactEntity;
@@ -17,15 +15,11 @@ public final class InvoiceTransformer {
 
     public static Invoice toWeb(final InvoiceEntity entity) {
 
-        final var status = InvoiceStatus.of(entity.getStatus());
-        final var type = InvoiceType.of(entity.getType())
-                .name();
-
         final var invoice = new Invoice();
-        invoice.setType(type);
+        invoice.setType(entity.getType());
         invoice.setSuffix(entity.getSuffix());
         invoice.setNumber(entity.getNumber());
-        invoice.setStatus(status.name());
+        invoice.setStatus(entity.getStatus());
         invoice.setImageUrl(entity.getImageUrl());
         invoice.setInvoiceDate(buildStringFromInstant(entity.getInvoiceDate()));
         invoice.setEffectiveDate(buildStringFromInstant(entity.getEffectiveDate()));
