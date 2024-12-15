@@ -15,7 +15,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
-import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
 import net.cavitos.workshop.security.service.DatabaseUserService;
 import net.cavitos.workshop.service.InvoiceService;
@@ -153,7 +152,7 @@ public class ProviderInvoiceView extends CRUDLayout {
                     viewImage.getStyle().set("cursor", "pointer");
                     viewImage.addClickListener(event -> {
                         LOGGER.info("Details: {}", invoiceEntity.getNumber());
-//                        UI.getCurrent().navigate("work-orders-details/%s".formatted(workOrderEntity.getId()));
+                        UI.getCurrent().navigate("provider-invoices-details/%s".formatted(invoiceEntity.getId()));
                     });
 
                     layout.add(editImage, viewImage);

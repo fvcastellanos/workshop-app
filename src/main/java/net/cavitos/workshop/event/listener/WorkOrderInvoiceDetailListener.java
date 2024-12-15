@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static java.util.Objects.nonNull;
 import static net.cavitos.workshop.factory.DateTimeFactory.getUTCNow;
 
 @Component
@@ -64,31 +65,37 @@ public class WorkOrderInvoiceDetailListener {
         final var productEntity = invoiceDetailEntity.getProductEntity();
         final var tenant = invoiceDetailEntity.getTenant();
 
-        LOGGER.info("Adding a new work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
+        if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
+            LOGGER.info("Adding a new work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
 
-        final var detailHolder = workOrderDetailRepository.findByWorkOrderEntityAndProductEntityAndTenant(workOrderEntity,
-                productEntity, tenant);
+            final var detailHolder = workOrderDetailRepository.findByWorkOrderEntityAndProductEntityAndTenant(workOrderEntity,
+                    productEntity, tenant);
 
-        if (detailHolder.isPresent()) {
+            if (detailHolder.isPresent()) {
 
-            LOGGER.error("Work order detail already found for work_order_number={} and tenant={}",
-                    workOrderEntity.getNumber(), tenant);
+                LOGGER.error("Work order detail already found for work_order_number={} and tenant={}",
+                        workOrderEntity.getNumber(), tenant);
+
+                return;
+            }
+
+            final var detail = WorkOrderDetailEntity.builder()
+                    .id(TimeBasedGenerator.generateTimeBasedId())
+                    .invoiceDetailEntity(invoiceDetailEntity)
+                    .productEntity(productEntity)
+                    .workOrderEntity(workOrderEntity)
+                    .quantity(invoiceDetailEntity.getQuantity())
+                    .unitPrice(invoiceDetailEntity.getUnitPrice())
+                    .tenant(tenant)
+                    .created(getUTCNow())
+                    .build();
+
+            workOrderDetailRepository.save(detail);
 
             return;
         }
 
-        final var detail = WorkOrderDetailEntity.builder()
-                .id(TimeBasedGenerator.generateTimeBasedId())
-                .invoiceDetailEntity(invoiceDetailEntity)
-                .productEntity(productEntity)
-                .workOrderEntity(workOrderEntity)
-                .quantity(invoiceDetailEntity.getQuantity())
-                .unitPrice(invoiceDetailEntity.getUnitPrice())
-                .tenant(tenant)
-                .created(getUTCNow())
-                .build();
-
-        workOrderDetailRepository.save(detail);
+        LOGGER.info("No work order found for invoice_detail_id={} and tenant={}", invoiceDetailEntity.getId(), tenant);
     }
 
     @Transactional
@@ -98,10 +105,10 @@ public class WorkOrderInvoiceDetailListener {
         final var productEntity = invoiceDetailEntity.getProductEntity();
         final var tenant = invoiceDetailEntity.getTenant();
 
-        LOGGER.info("Update work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
-
         workOrderDetailRepository.findByWorkOrderEntityAndProductEntityAndTenant(workOrderEntity, productEntity, tenant)
                 .ifPresent(detail -> {
+
+                    LOGGER.info("Update work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
 
                     detail.setWorkOrderEntity(workOrderEntity);
                     detail.setProductEntity(productEntity);

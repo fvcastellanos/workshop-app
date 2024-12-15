@@ -49,8 +49,22 @@ public class InvoiceDetailEntity {
     @Column(name = "discount_amount")
     private double discountAmount;
 
+    @Transient
+    private double discountPercentage;
+
+    @Transient
+    private double total;
+
     @NotEmpty
     private String tenant;
 
     private Instant created;
+
+    public double getDiscountPercentage() {
+        return discountAmount / (quantity * unitPrice);
+    }
+
+    public double getTotal() {
+        return (quantity * unitPrice) - discountAmount;
+    }
 }
