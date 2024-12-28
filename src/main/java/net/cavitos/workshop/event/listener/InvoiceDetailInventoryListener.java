@@ -2,6 +2,7 @@ package net.cavitos.workshop.event.listener;
 
 import net.cavitos.workshop.event.model.InvoiceDetailEvent;
 import net.cavitos.workshop.factory.BusinessExceptionFactory;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InventoryEntity;
 import net.cavitos.workshop.model.entity.InventoryMovementTypeEntity;
 import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static net.cavitos.workshop.factory.DateTimeFactory.getUTCNow;
 
 @Component
@@ -32,15 +34,22 @@ public class InvoiceDetailInventoryListener {
 
     private final InventoryMovementTypeRepository inventoryMovementTypeRepository;
 
-    private final String inventoryMovementCode;
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
 
-    public InvoiceDetailInventoryListener(@Value("${invoice.detail.inventory.movement-type.code}") final String inventoryMovementCode,
+    private final String inventoryMovementInputTypeCode;
+    private final String inventoryMovementOutputTypeCode;
+
+    public InvoiceDetailInventoryListener(@Value("${invoice.detail.inventory.input-type-code}") final String inventoryMovementInputTypeCode,
+                                          @Value("${invoice.detail.inventory.output-type-code}") final String inventoryMovementOutputTypeCode,
                                           final InventoryRepository inventoryRepository,
-                                          final InventoryMovementTypeRepository inventoryMovementTypeRepository) {
+                                          final InventoryMovementTypeRepository inventoryMovementTypeRepository,
+                                          final ZonedDateTimeFactory zonedDateTimeFactory) {
 
         this.inventoryRepository = inventoryRepository;
         this.inventoryMovementTypeRepository = inventoryMovementTypeRepository;
-        this.inventoryMovementCode = inventoryMovementCode;
+        this.inventoryMovementInputTypeCode = inventoryMovementInputTypeCode;
+        this.inventoryMovementOutputTypeCode = inventoryMovementOutputTypeCode;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
     @EventListener(InvoiceDetailEvent.class)
@@ -91,7 +100,7 @@ public class InvoiceDetailInventoryListener {
             final var operationDate = invoiceDetailEntity.getInvoiceEntity()
                     .getInvoiceDate();
 
-            final var movementTypeEntity = findBuyLocalMovementType(tenant);
+            final var movementInputTypeEntity = findBuyLocalMovementType(tenant);
 
             final var movement = InventoryEntity.builder()
                     .id(TimeBasedGenerator.generateTimeBasedId())
@@ -100,15 +109,41 @@ public class InvoiceDetailInventoryListener {
                     .quantity(invoiceDetailEntity.getQuantity())
                     .unitPrice(unitPrice)
                     .total(total)
-                    .inventoryMovementTypeEntity(movementTypeEntity)
+                    .inventoryMovementTypeEntity(movementInputTypeEntity)
                     .operationDate(operationDate)
                     .tenant(tenant)
                     .description(MOVEMENT_DESCRIPTION)
-                    .created(getUTCNow())
-                    .updated(getUTCNow())
+                    .created(zonedDateTimeFactory.getSystemNow())
+                    .updated(zonedDateTimeFactory.getSystemNow())
                     .build();
 
             inventoryRepository.save(movement);
+
+            if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
+
+                LOGGER.info("Add a output inventory movement for work_order_number={} and tenant={}",
+                        invoiceDetailEntity.getWorkOrderEntity().getNumber(), tenant);
+
+                final var movementOutputTypeEntity = findLocalSellMovementType(tenant);
+
+                final var outputMovement = InventoryEntity.builder()
+                        .id(TimeBasedGenerator.generateTimeBasedId())
+                        .invoiceDetailEntity(invoiceDetailEntity)
+                        .productEntity(productEntity)
+                        .quantity(invoiceDetailEntity.getQuantity())
+                        .unitPrice(unitPrice)
+                        .total(total)
+                        .inventoryMovementTypeEntity(movementOutputTypeEntity)
+                        .operationDate(operationDate)
+                        .tenant(tenant)
+                        .description(MOVEMENT_DESCRIPTION)
+                        .created(zonedDateTimeFactory.getSystemNow())
+                        .updated(zonedDateTimeFactory.getSystemNow())
+                        .build();
+
+                inventoryRepository.save(outputMovement);
+            }
+
             return;
         }
 
@@ -121,18 +156,29 @@ public class InvoiceDetailInventoryListener {
 
         final var tenant = invoiceDetailEntity.getTenant();
         final var productEntity = invoiceDetailEntity.getProductEntity();
-        final var movementTypeEntity = findBuyLocalMovementType(tenant);
+        final var inputMovementTypeEntity = findBuyLocalMovementType(tenant);
+        final var outputMovementTypeEntity = findLocalSellMovementType(tenant);
 
         LOGGER.info("Deleting inventory movement for tenant={} and invoice_detail_id={}", tenant, invoiceDetailEntity.getId());
 
         if (INVENTORY_PRODUCT_TYPE.equalsIgnoreCase(productEntity.getType())) {
 
-            findInventoryMovement(productEntity, invoiceDetailEntity, movementTypeEntity,tenant)
+            findInventoryMovement(productEntity, invoiceDetailEntity, inputMovementTypeEntity, tenant)
                     .ifPresent(inventoryEntity -> {
 
-                        LOGGER.info("Deleting inventory_id={} for tenant={}", inventoryEntity.getId(), tenant);
-                        inventoryRepository.delete(inventoryEntity);
+                        LOGGER.info("Deleting input movement for inventory_id={} for tenant={}", inventoryEntity.getId(), tenant);
+//                        inventoryRepository.delete(inventoryEntity);
                     });
+
+            if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
+
+                findInventoryMovement(productEntity, invoiceDetailEntity, outputMovementTypeEntity, tenant)
+                        .ifPresent(inventoryEntity ->  {
+
+                            LOGGER.info("Deleting output movement for inventory_id={} for tenant={}", inventoryEntity.getId(), tenant);
+//                            inventoryRepository.delete(inventoryEntity);
+                        });
+            }
 
             return;
         }
@@ -161,8 +207,14 @@ public class InvoiceDetailInventoryListener {
 
     private InventoryMovementTypeEntity findBuyLocalMovementType(final String tenant) {
 
-        return inventoryMovementTypeRepository.findByCodeAndTenant(inventoryMovementCode, tenant)
+        return inventoryMovementTypeRepository.findByCodeAndTenant(inventoryMovementInputTypeCode, tenant)
                 .orElseThrow(() -> BusinessExceptionFactory.createBusinessException("Buy Local Inventory Movement Type not found"));
+    }
+
+    private InventoryMovementTypeEntity findLocalSellMovementType(final String tenant) {
+
+        return inventoryMovementTypeRepository.findByCodeAndTenant(inventoryMovementOutputTypeCode, tenant)
+                .orElseThrow(() -> BusinessExceptionFactory.createBusinessException("Output Inventory Movement Type not found"));
     }
 
 }

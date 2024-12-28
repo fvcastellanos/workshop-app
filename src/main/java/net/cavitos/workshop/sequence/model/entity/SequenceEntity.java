@@ -5,7 +5,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 
 import java.time.Instant;
 
@@ -30,6 +37,13 @@ public class SequenceEntity {
     @NotEmpty
     @Size(max = 30)
     private String value;
+
+    @Size(max = 300)
+    private String description;
+
+    @NotEmpty
+    @Size(max = 50)
+    private String tenant;
 
     private Instant updated;
 }

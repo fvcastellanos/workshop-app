@@ -78,12 +78,13 @@ public class ProductService {
 
         verifyExistingCodeAndTypeForTenant(tenant, product);
         final var categoryEntity = findProductCategory(tenant, product.getCategory().getId());
+        final var code = sequenceProvider.calculateNext(SequenceType.PRODUCT, tenant);
 
         var entity = ProductEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .type(product.getType())
                 .name(product.getName())
-                .code(sequenceProvider.calculateNext(SequenceType.PRODUCT))
+                .code(code)
                 .description(product.getDescription())
                 .minimalQuantity(product.getMinimalQuantity())
                 .tenant(tenant)
@@ -119,7 +120,7 @@ public class ProductService {
         var code = entity.getCode();
         if (!productType.equalsIgnoreCase(entity.getType())) {
 
-            code = calculateCode(product.getType());
+            code = calculateCode(product.getType(), tenant);
         }
 
         entity.setActive(product.getActive());
@@ -164,13 +165,13 @@ public class ProductService {
         return categoryEntity;
     }
 
-    private String calculateCode(final String type) {
+    private String calculateCode(final String type, final String tenant) {
 
         final var productType = ProductType.valueOf(type);
 
         return switch (productType) {
-            case PRODUCT -> sequenceProvider.calculateNext(SequenceType.PRODUCT);
-            case SERVICE -> sequenceProvider.calculateNext(SequenceType.SERVICE);
+            case PRODUCT -> sequenceProvider.calculateNext(SequenceType.PRODUCT, tenant);
+            case SERVICE -> sequenceProvider.calculateNext(SequenceType.SERVICE, tenant);
         };
     }
 

@@ -70,7 +70,7 @@ public class ContactService {
 
         final var providerEntity = ContactEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
-                .code(calculateCode(contact.getType()))
+                .code(calculateCode(contact.getType(), tenant))
                 .type(contact.getType())
                 .name(contact.getName())
                 .description(contact.getDescription())
@@ -105,7 +105,7 @@ public class ContactService {
         var code = contactEntity.getCode();
         if (!type.equalsIgnoreCase(contactEntity.getType())) {
 
-            code = calculateCode(contact.getType());
+            code = calculateCode(contact.getType(), tenant);
         }
 
         contactEntity.setName(contact.getName());
@@ -137,12 +137,12 @@ public class ContactService {
         }
     }
 
-    private String calculateCode(final String type) {
+    private String calculateCode(final String type, final String tenant) {
 
         return switch (type) {
-            case "C" -> sequenceProvider.calculateNext(SequenceType.CUSTOMER);
-            case "P" -> sequenceProvider.calculateNext(SequenceType.PROVIDER);
-            default -> sequenceProvider.calculateNext(SequenceType.UNKNOWN);
+            case "C" -> sequenceProvider.calculateNext(SequenceType.CUSTOMER, tenant);
+            case "P" -> sequenceProvider.calculateNext(SequenceType.PROVIDER, tenant);
+            default -> sequenceProvider.calculateNext(SequenceType.UNKNOWN, tenant);
         };
     }
 }
