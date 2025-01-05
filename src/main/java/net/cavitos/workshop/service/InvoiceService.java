@@ -4,15 +4,19 @@ import net.cavitos.workshop.domain.model.web.Invoice;
 import net.cavitos.workshop.domain.model.web.common.CommonContact;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
+import net.cavitos.workshop.model.entity.ProductStockEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ContactRepository;
 import net.cavitos.workshop.model.repository.InvoiceRepository;
+import net.cavitos.workshop.model.repository.ProductStockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
 import static net.cavitos.workshop.factory.DateTimeFactory.buildInstantFrom;
@@ -25,12 +29,15 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final ContactRepository contactRepository;
+    private final ProductStockRepository productStockRepository;
 
     public InvoiceService(final InvoiceRepository invoiceRepository,
-                          final ContactRepository contactRepository) {
+                          final ContactRepository contactRepository,
+                          final ProductStockRepository productStockRepository) {
 
         this.invoiceRepository = invoiceRepository;
         this.contactRepository = contactRepository;
+        this.productStockRepository = productStockRepository;
     }
 
     public Page<InvoiceEntity> search(final String tenant,
@@ -121,6 +128,11 @@ public class InvoiceService {
         invoiceRepository.save(entity);
 
         return entity;
+    }
+
+    public List<ProductStockEntity> getProductStock(final String tenant) {
+
+        return productStockRepository.getProductStock(tenant);
     }
 
     // ------------------------------------------------------------------------------------------------------
