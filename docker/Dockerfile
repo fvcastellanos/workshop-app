@@ -24,4 +24,4 @@ USER workshop
 
 EXPOSE 8080
 
-CMD ["java", "-Xms64M", "-Xmx128M", "-jar", "workshop-api.jar"]
+CMD ["java", "-Xms128M", "-Xmx128M", "-jar", "workshop-api.jar"]
