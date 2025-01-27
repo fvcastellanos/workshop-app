@@ -1,6 +1,6 @@
 name: workshop-app
 services:
-  - name: web-application
+  - name: web-applicationhow
     git:
       repo_clone_url: https://github.com/fvcastellanos/workshop-app.git
       branch: feature/WE-29
