@@ -1,8 +1,8 @@
 name: workshop-app
 services:
-  - name: web
+  - name: web-application
     git:
-      repo_clone_url: https://github.com/fvcastellanos/workshop-app
+      repo_clone_url: https://github.com/fvcastellanos/workshop-app.git
       branch: feature/WE-29
     dockerfile_path: docker/Dockerfile
     run_command: java -Xms128M -Xmx128M -jar workshop-api.jar
