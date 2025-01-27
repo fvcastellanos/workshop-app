@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests && \
+    ls -la target
 
 FROM azul/zulu-openjdk:21-jre-latest AS runner
 
