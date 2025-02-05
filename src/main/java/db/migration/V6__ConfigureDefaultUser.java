@@ -22,7 +22,7 @@ public class V6__ConfigureDefaultUser extends FlywayMigration {
         jdbcTemplate.execute(sql);
 
         final var userSql = """
-                    insert into user
+                    insert into application_user
                     (id, user_id, provider, tenant_id, active)
                     values
                     ('%s', '62b2694a90d15627e3efee9e', 'auth0', '%s', 1)

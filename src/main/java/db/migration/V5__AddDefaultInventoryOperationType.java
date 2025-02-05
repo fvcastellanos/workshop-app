@@ -37,7 +37,7 @@ public class V5__AddDefaultInventoryOperationType extends FlywayMigration {
         jdbcTemplate.execute(sql);
 
         jdbcTemplate.execute("""
-                    insert into `sequence`
+                    insert into sequence
                     (prefix, value, tenant)
                     values
                     ('MI', '10', 'tenant')

@@ -1,7 +1,7 @@
 package net.cavitos.workshop.security.service;
 
 import net.cavitos.workshop.domain.exception.AuthenticationException;
-import net.cavitos.workshop.model.repository.UserRepository;
+import net.cavitos.workshop.model.repository.ApplicationUserRepository;
 import net.cavitos.workshop.security.domain.UserProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,11 +11,11 @@ public class DatabaseUserService implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseUserService.class);
 
-    private final UserRepository userRepository;
+    private final ApplicationUserRepository applicationUserRepository;
 
-    public DatabaseUserService(final UserRepository userRepository) {
+    public DatabaseUserService(final ApplicationUserRepository applicationUserRepository) {
 
-        this.userRepository = userRepository;
+        this.applicationUserRepository = applicationUserRepository;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DatabaseUserService implements UserService {
 
         final var userIdentities = StringUtils.split(username, '|');
 
-        final var userHolder = userRepository.findByUserIdAndProvider(userIdentities[1], userIdentities[0]);
+        final var userHolder = applicationUserRepository.findByUserIdAndProvider(userIdentities[1], userIdentities[0]);
 
         if (userHolder.isEmpty()) {
 
