@@ -3,63 +3,1359 @@
 CAUTION: Do not modify this file unless you know what you are doing.
  Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="4"
-	 last-position="0,0" last-zoom="1"
+<dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="20"
+	 last-position="0,1124" last-zoom="1" scene-rect="0,0,2536.44,2362.12"
 	 default-schema="public" default-owner="postgres"
 	 layers="Default layer"
 	 active-layers="0"
 	 layer-name-colors="#000000"
 	 layer-rect-colors="#b4b4b4"
 	 show-layer-names="false" show-layer-rects="false">
-<role name="workshop"
+<role name="odoo"
  createdb="true"
- login="true">
+ login="true"
+ password="********">
 </role>
 
-<database name="workshop" is-template="false" allow-conns="true">
+<role name="workshop"
+ createdb="true"
+ login="true"
+ password="********">
+</role>
+
+<database name="workshop" encoding="UTF8" lc-collate="en_US.utf8" lc-ctype="en_US.utf8" is-template="false" allow-conns="true">
 	<role name="workshop"/>
+	<tablespace name="pg_default"/>
 </database>
 
-<schema name="public" layers="0" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
+<schema name="public" layers="0" rect-visible="true" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
 </schema>
 
-<table name="car_brand" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
-	<schema name="public"/>
+<schema name="workshop" layers="0" rect-visible="true" fill-color="#718967" name-color="#000000">
 	<role name="workshop"/>
-	<position x="100" y="180"/>
-	<column name="id" not-null="true">
-		<type name="uuid" length="0"/>
+</schema>
+
+<table name="flyway_schema_history" layers="0" collapse-mode="2" max-obj-count="12" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="60" y="60"/>
+	<column name="installed_rank" not-null="true">
+		<type name="integer" length="0"/>
 	</column>
-	<column name="name" not-null="true">
-		<type name="varchar" length="100"/>
+	<column name="version">
+		<type name="character varying" length="50"/>
 	</column>
-	<column name="description">
-		<type name="varchar" length="300"/>
+	<column name="description" not-null="true">
+		<type name="character varying" length="200"/>
 	</column>
-	<column name="active" default-value="true">
+	<column name="type" not-null="true">
+		<type name="character varying" length="20"/>
+	</column>
+	<column name="script" not-null="true">
+		<type name="character varying" length="1000"/>
+	</column>
+	<column name="checksum">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="installed_by" not-null="true">
+		<type name="character varying" length="100"/>
+	</column>
+	<column name="installed_on" not-null="true" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="execution_time" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="success" not-null="true">
 		<type name="boolean" length="0"/>
 	</column>
-	<constraint name="pk_car_brand" type="pk-constr" table="public.car_brand">
+	<constraint name="flyway_schema_history_pk" type="pk-constr" table="workshop.flyway_schema_history">
+		<columns names="installed_rank" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="flyway_schema_history_s_idx" table="workshop.flyway_schema_history"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="success"/>
+		</idxelement>
+</index>
+
+<table name="car_brand" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="460" y="80"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="100"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="car_brand_pkey" type="pk-constr" table="workshop.car_brand">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="car_brand_name_tenant_key" type="uq-constr" table="workshop.car_brand">
+		<columns names="name,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_car_brand_created" table="workshop.car_brand"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_car_brand_active" table="workshop.car_brand"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<index name="idx_car_brand_tenant" table="workshop.car_brand"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<table name="car_line" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="940" y="80"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="car_brand_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="100"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="car_line_pkey" type="pk-constr" table="workshop.car_line">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="car_line_name_tenant_key" type="uq-constr" table="workshop.car_line">
+		<columns names="name,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_car_line_created" table="workshop.car_line"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_car_line_active" table="workshop.car_line"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<index name="idx_car_line_tenant" table="workshop.car_line"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<table name="contact" layers="0" collapse-mode="2" max-obj-count="13" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1340" y="60"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="type" not-null="true" default-value="'C'::bpchar">
+		<type name="character" length="1"/>
+	</column>
+	<column name="code" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="contact" default-value="NULL">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="tax_id" default-value="NULL">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="contact_pkey" type="pk-constr" table="workshop.contact">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="contact_code_tenant_key" type="uq-constr" table="workshop.contact">
+		<columns names="code,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_contact_created" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_contact_tax_id" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tax_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_contact_updated" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="updated"/>
+		</idxelement>
+</index>
+
+<index name="idx_contact_tenant" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_contact_active" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<index name="idx_contat_type" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="type"/>
+		</idxelement>
+</index>
+
+<index name="idx_contact_name" table="workshop.contact"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="name"/>
+		</idxelement>
+</index>
+
+<table name="discount_type" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1740" y="60"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="discount_type_pkey" type="pk-constr" table="workshop.discount_type">
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
 </table>
 
-<table name="car_model" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
-	<schema name="public"/>
+<index name="idx_discount_type_created" table="workshop.discount_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_discount_type_updated" table="workshop.discount_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="updated"/>
+		</idxelement>
+</index>
+
+<index name="idx_discount_type_tenantid" table="workshop.discount_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_discount_type_active" table="workshop.discount_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<table name="operation_type" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
+	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="120" y="420"/>
+	<position x="60" y="840"/>
 	<column name="id" not-null="true">
-		<type name="uuid" length="0"/>
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="type" not-null="true" default-value="'I'::bpchar">
+		<type name="character" length="1"/>
 	</column>
 	<column name="name" not-null="true">
-		<type name="varchar" length="100"/>
+		<type name="character varying" length="150"/>
 	</column>
-	<column name="description">
-		<type name="varchar" length="300"/>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
 	</column>
-	<column name="active" not-null="true" default-value="true">
-		<type name="boolean" length="0"/>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
 	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="code" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="operation_type_pkey" type="pk-constr" table="workshop.operation_type">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
 </table>
+
+<index name="idx_operation_type_created" table="workshop.operation_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_operation_type_updated" table="workshop.operation_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="updated"/>
+		</idxelement>
+</index>
+
+<index name="idx_operation_type_tenant_id" table="workshop.operation_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_operation_type_active" table="workshop.operation_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<index name="idx_operation_type_type" table="workshop.operation_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="type"/>
+		</idxelement>
+</index>
+
+<index name="operation_type_code_idx" table="workshop.operation_type"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="code"/>
+		</idxelement>
+</index>
+
+<table name="product_category" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="160" y="380"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="code" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="product_category_pkey" type="pk-constr" table="workshop.product_category">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_product_category_code" table="workshop.product_category"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="code"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_category_tenant" table="workshop.product_category"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_category_active" table="workshop.product_category"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<table name="product" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="680" y="520"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="product_category_id" default-value="NULL">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="type" not-null="true" default-value="'P'::bpchar">
+		<type name="character" length="1"/>
+	</column>
+	<column name="code" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="minimal_quantity" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="sale_price" not-null="true">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="product_pkey" type="pk-constr" table="workshop.product">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="product_code_tenant_key" type="uq-constr" table="workshop.product">
+		<columns names="code,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_product_created" table="workshop.product"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_updated" table="workshop.product"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="updated"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_tenant" table="workshop.product"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_active" table="workshop.product"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="active"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_type" table="workshop.product"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="type"/>
+		</idxelement>
+</index>
+
+<table name="inventory" layers="0" collapse-mode="2" max-obj-count="15" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1360" y="620"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="product_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="invoice_detail_id" default-value="NULL">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="quantity" not-null="true" default-value="1">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="unit_price" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="discount_amount" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="total" not-null="true">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="200"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="operation_date" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="operation_type_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="inventory_pkey" type="pk-constr" table="workshop.inventory">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="inventory_product_id_invoice_detail_id_tenant_operation_typ_key" type="uq-constr" table="workshop.inventory">
+		<columns names="product_id,invoice_detail_id,tenant,operation_type_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_inventory_created" table="workshop.inventory"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_inventory_updated" table="workshop.inventory"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="updated"/>
+		</idxelement>
+</index>
+
+<index name="idx_inventory_tenant_id" table="workshop.inventory"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_inventory_product_id" table="workshop.inventory"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="product_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_inventory_operation_date" table="workshop.inventory"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="operation_date"/>
+		</idxelement>
+</index>
+
+<index name="idx_inventory_operation_type_id" table="workshop.inventory"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="operation_type_id"/>
+		</idxelement>
+</index>
+
+<table name="invoice" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="2020" y="620"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="contact_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="type" not-null="true" default-value="'P'">
+		<type name="character varying" length="45"/>
+	</column>
+	<column name="suffix" default-value="NULL">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="number" not-null="true">
+		<type name="character varying" length="100"/>
+	</column>
+	<column name="image_url" default-value="NULL">
+		<type name="character varying" length="250"/>
+	</column>
+	<column name="invoice_date" not-null="true">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="effective_date">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="status" not-null="true" default-value="'A'::bpchar">
+		<type name="character" length="1"/>
+	</column>
+	<constraint name="invoice_pkey" type="pk-constr" table="workshop.invoice">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="invoice_suffix_number_tenant_type_contact_id_key" type="uq-constr" table="workshop.invoice">
+		<columns names="suffix,number,tenant,type,contact_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_invoice_created" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="created"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_updated" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="updated"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_tenant" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_contact_id" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="contact_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_type" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="type"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_date" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="invoice_date"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_effective_date" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="effective_date"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_status" table="workshop.invoice"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="status"/>
+		</idxelement>
+</index>
+
+<table name="work_order" layers="0" collapse-mode="2" max-obj-count="16" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="980" y="1100"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="car_line_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="contact_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="number" not-null="true">
+		<type name="character varying" length="100"/>
+	</column>
+	<column name="status" not-null="true" default-value="'P'::bpchar">
+		<type name="character" length="1"/>
+	</column>
+	<column name="plate_number" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="odometer_measurement" not-null="true" default-value="'K'::bpchar">
+		<type name="character" length="1"/>
+	</column>
+	<column name="odometer_value" not-null="true">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="gas_amount" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="notes">
+		<type name="text" length="0"/>
+	</column>
+	<column name="order_date" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="work_order_pkey" type="pk-constr" table="workshop.work_order">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="work_order_number_tenant_key" type="uq-constr" table="workshop.work_order">
+		<columns names="number,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_work_order_car_line_id" table="workshop.work_order"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="car_line_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_work_order_contact_id" table="workshop.work_order"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="contact_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_work_order_plate_number" table="workshop.work_order"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="plate_number"/>
+		</idxelement>
+</index>
+
+<index name="idx_work_order_order_date" table="workshop.work_order"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="order_date"/>
+		</idxelement>
+</index>
+
+<table name="invoice_detail" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1440" y="1740"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="invoice_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="product_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="work_order_id" default-value="NULL">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="quantity" not-null="true" default-value="1">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="unit_price" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="discount_amount" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="invoice_detail_pkey" type="pk-constr" table="workshop.invoice_detail">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="invoice_detail_invoice_id_product_id_tenant_key" type="uq-constr" table="workshop.invoice_detail">
+		<columns names="invoice_id,product_id,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_invoice_detail_invoice_id" table="workshop.invoice_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="invoice_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_detail_product_id" table="workshop.invoice_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="product_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_invoice_detail_work_order_id" table="workshop.invoice_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="work_order_id"/>
+		</idxelement>
+</index>
+
+<table name="sequence" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1100" y="1280"/>
+	<column name="id" not-null="true" default-value="nextval('sequence_id_seq'::regclass)">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="prefix" not-null="true">
+		<type name="character varying" length="5"/>
+	</column>
+	<column name="value" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="description" default-value="NULL">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="tenant" default-value="NULL">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="sequence_pkey" type="pk-constr" table="workshop.sequence">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="sequence_prefix_tenant_key" type="uq-constr" table="workshop.sequence">
+		<columns names="prefix,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="sequence_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="2147483647" cache="1">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+</sequence>
+
+<index name="idx_sequence_tenant" table="workshop.sequence"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<table name="tenant" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1520" y="1280"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="code" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="active" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="tenant_pkey" type="pk-constr" table="workshop.tenant">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="idx_tenant_code" table="workshop.tenant"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="code"/>
+		</idxelement>
+</index>
+
+<table name="application_user" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1880" y="1280"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="tenant_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="provider" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="user_id" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="active" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="application_user_pkey" type="pk-constr" table="workshop.application_user">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="application_user_user_id_provider_key" type="uq-constr" table="workshop.application_user">
+		<columns names="user_id,provider" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="fk_user_tenant1_idx" table="workshop.application_user"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant_id"/>
+		</idxelement>
+</index>
+
+<table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="60" y="1900"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="work_order_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="product_id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="invoice_detail_id" default-value="NULL">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="quantity" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="unit_price" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="work_order_detail_pkey" type="pk-constr" table="workshop.work_order_detail">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="work_order_detail_work_order_id_product_id_tenant_key" type="uq-constr" table="workshop.work_order_detail">
+		<columns names="work_order_id,product_id,tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="fk_work_order_detail_work_order1_idx" table="workshop.work_order_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="work_order_id"/>
+		</idxelement>
+</index>
+
+<index name="fk_work_order_detail_product1_idx" table="workshop.work_order_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="product_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_work_order_detail_tenant" table="workshop.work_order_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="tenant"/>
+		</idxelement>
+</index>
+
+<index name="fk_work_order_detail_invoice_detail1_idx" table="workshop.work_order_detail"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="invoice_detail_id"/>
+		</idxelement>
+</index>
+
+<view name="product_stock" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="1080" y="2000"/>
+	<reference object="workshop.operation_type" type="table" ref-name="operation_type" use-signature="true"/>
+	<reference object="workshop.product" type="table" ref-name="product" use-signature="true"/>
+	<reference object="workshop.inventory" type="table" ref-name="inventory" use-signature="true"/>
+	<simplecol name="total" type="double precision"/>
+	<simplecol name="tenant" type="character varying(50)"/>
+	<simplecol name="name" type="character varying(150)"/>
+	<simplecol name="code" type="character varying(50)"/>
+	<simplecol name="product_id" type="character varying(50)"/>
+	<definition> <![CDATA[ SELECT sum(value) AS total,
+    tenant,
+    name,
+    code,
+    product_id
+   FROM ( SELECT
+                CASE
+                    WHEN (movements.type = 'I'::bpchar) THEN movements.sum_quantity
+                    WHEN (movements.type = 'O'::bpchar) THEN (movements.sum_quantity * ('-1'::integer)::double precision)
+                    ELSE (0)::double precision
+                END AS value,
+            movements.tenant,
+            movements.name,
+            movements.code,
+            movements.id AS product_id
+           FROM ( SELECT i.tenant,
+                    sum(i.quantity) AS sum_quantity,
+                    p.name,
+                    p.code,
+                    p.id,
+                    ot.type
+                   FROM ((inventory i
+                     JOIN product p ON (((i.product_id)::text = (p.id)::text)))
+                     JOIN operation_type ot ON (((i.operation_type_id)::text = (ot.id)::text)))
+                  GROUP BY i.tenant, ot.type, p.name, p.code, p.id) movements) stock
+  GROUP BY tenant, name, code, product_id;]]> </definition>
+</view>
+
+<relationship name="rel_product_stock_operation_type" type="reltv" layers="0"
+	 custom-color="#c732f6"
+	 src-table="workshop.product_stock"
+	 dst-table="workshop.operation_type"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_product_stock_product" type="reltv" layers="0"
+	 custom-color="#907930"
+	 src-table="workshop.product_stock"
+	 dst-table="workshop.product"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_product_stock_inventory" type="reltv" layers="0"
+	 custom-color="#54cc2f"
+	 src-table="workshop.product_stock"
+	 dst-table="workshop.inventory"
+	 src-required="false" dst-required="false"/>
+
+<constraint name="fk_car_line_car_brand1" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.car_brand" table="workshop.car_line">
+	<columns names="car_brand_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="product_product_category_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.product_category" table="workshop.product">
+	<columns names="product_category_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_inventory_operation_type" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.operation_type" table="workshop.inventory">
+	<columns names="operation_type_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_inventory_product" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.product" table="workshop.inventory">
+	<columns names="product_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_invoice_contact" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.contact" table="workshop.invoice">
+	<columns names="contact_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_work_order_car_line" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.car_line" table="workshop.work_order">
+	<columns names="car_line_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_work_order_contact" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.contact" table="workshop.work_order">
+	<columns names="contact_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_invoice_detail_invoice" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.invoice" table="workshop.invoice_detail">
+	<columns names="invoice_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_invoice_detail_product" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.product" table="workshop.invoice_detail">
+	<columns names="product_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_invoice_detail_work_order" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.work_order" table="workshop.invoice_detail">
+	<columns names="work_order_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_user_tenant1" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.tenant" table="workshop.application_user">
+	<columns names="tenant_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_work_order_detail_invoice_detail1" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.invoice_detail" table="workshop.work_order_detail">
+	<columns names="invoice_detail_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_work_order_detail_product1" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.product" table="workshop.work_order_detail">
+	<columns names="product_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_work_order_detail_work_order1" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.work_order" table="workshop.work_order_detail">
+	<columns names="work_order_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_car_line_car_brand" type="relfk" layers="0"
+	 custom-color="#6e8a4f"
+	 src-table="workshop.car_line"
+	 dst-table="workshop.car_brand" reference-fk="fk_car_line_car_brand1"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_product_product_category" type="relfk" layers="0"
+	 custom-color="#ea02a2"
+	 src-table="workshop.product"
+	 dst-table="workshop.product_category" reference-fk="product_product_category_id_fk"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_inventory_operation_type" type="relfk" layers="0"
+	 custom-color="#e1f1e9"
+	 src-table="workshop.inventory"
+	 dst-table="workshop.operation_type" reference-fk="fk_inventory_operation_type"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_inventory_product" type="relfk" layers="0"
+	 custom-color="#72aeca"
+	 src-table="workshop.inventory"
+	 dst-table="workshop.product" reference-fk="fk_inventory_product"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_invoice_contact" type="relfk" layers="0"
+	 custom-color="#f4f129"
+	 src-table="workshop.invoice"
+	 dst-table="workshop.contact" reference-fk="fk_invoice_contact"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_work_order_car_line" type="relfk" layers="0"
+	 custom-color="#6be345"
+	 src-table="workshop.work_order"
+	 dst-table="workshop.car_line" reference-fk="fk_work_order_car_line"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_work_order_contact" type="relfk" layers="0"
+	 custom-color="#6d217b"
+	 src-table="workshop.work_order"
+	 dst-table="workshop.contact" reference-fk="fk_work_order_contact"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_invoice_detail_invoice" type="relfk" layers="0"
+	 custom-color="#ef2e84"
+	 src-table="workshop.invoice_detail"
+	 dst-table="workshop.invoice" reference-fk="fk_invoice_detail_invoice"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_invoice_detail_product" type="relfk" layers="0"
+	 custom-color="#3db63d"
+	 src-table="workshop.invoice_detail"
+	 dst-table="workshop.product" reference-fk="fk_invoice_detail_product"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_invoice_detail_work_order" type="relfk" layers="0"
+	 custom-color="#417120"
+	 src-table="workshop.invoice_detail"
+	 dst-table="workshop.work_order" reference-fk="fk_invoice_detail_work_order"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_application_user_tenant" type="relfk" layers="0"
+	 custom-color="#014465"
+	 src-table="workshop.application_user"
+	 dst-table="workshop.tenant" reference-fk="fk_user_tenant1"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_work_order_detail_invoice_detail" type="relfk" layers="0"
+	 custom-color="#ac4936"
+	 src-table="workshop.work_order_detail"
+	 dst-table="workshop.invoice_detail" reference-fk="fk_work_order_detail_invoice_detail1"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_work_order_detail_product" type="relfk" layers="0"
+	 custom-color="#14ff12"
+	 src-table="workshop.work_order_detail"
+	 dst-table="workshop.product" reference-fk="fk_work_order_detail_product1"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_work_order_detail_work_order" type="relfk" layers="0"
+	 custom-color="#fc839e"
+	 src-table="workshop.work_order_detail"
+	 dst-table="workshop.work_order" reference-fk="fk_work_order_detail_work_order1"
+	 src-required="false" dst-required="true"/>
 
 </dbmodel>
