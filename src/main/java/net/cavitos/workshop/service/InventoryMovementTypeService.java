@@ -1,7 +1,5 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
-import net.cavitos.workshop.domain.model.type.InventoryOperationType;
 import net.cavitos.workshop.domain.model.web.InventoryMovementType;
 import net.cavitos.workshop.factory.BusinessExceptionFactory;
 import net.cavitos.workshop.model.entity.InventoryMovementTypeEntity;
@@ -67,7 +65,7 @@ public class InventoryMovementTypeService {
                     throw BusinessExceptionFactory.createBusinessException("Movement Type already exists");
                 });
 
-        final var code = sequenceProvider.calculateNext(SequenceType.INVENTORY_MOVEMENT, 2);
+        final var code = sequenceProvider.calculateNext(SequenceType.INVENTORY_MOVEMENT, 2, tenant);
 
         final var entity = InventoryMovementTypeEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())

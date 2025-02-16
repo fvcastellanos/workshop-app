@@ -31,25 +31,25 @@ public class SequenceProvider {
     }
 
     @Transactional
-    public String calculateNext(final SequenceType sequenceType) {
+    public String calculateNext(final SequenceType sequenceType, final String tenant) {
 
         return Failsafe.with(buildRetryPolicy())
-                .get(() -> calculateNextValue(sequenceType, PAD_SIZE));
+                .get(() -> calculateNextValue(sequenceType, PAD_SIZE, tenant));
     }
 
     @Transactional
-    public String calculateNext(final SequenceType sequenceType, final int padSize) {
+    public String calculateNext(final SequenceType sequenceType, final int padSize, final String tenant) {
 
         return Failsafe.with(buildRetryPolicy())
-                .get(() -> calculateNextValue(sequenceType, padSize));
+                .get(() -> calculateNextValue(sequenceType, padSize, tenant));
     }
 
     // ------------------------------------------------------------------------------------
 
-    private String calculateNextValue(final SequenceType sequenceType, final int padSize) {
+    private String calculateNextValue(final SequenceType sequenceType, final int padSize, final String tenant) {
 
         try {
-            final var entity = sequenceRepository.findByPrefix(sequenceType.getPrefix())
+            final var entity = sequenceRepository.findByPrefixAndTenant(sequenceType.getPrefix(), tenant)
                                     .orElseThrow(() -> BusinessExceptionFactory.createBusinessException("Unable to Generate Sequence"));
 
             final var value = entity.getValue();

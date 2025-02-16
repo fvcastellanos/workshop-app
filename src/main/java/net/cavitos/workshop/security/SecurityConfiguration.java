@@ -1,6 +1,6 @@
 package net.cavitos.workshop.security;
 
-import net.cavitos.workshop.model.repository.UserRepository;
+import net.cavitos.workshop.model.repository.ApplicationUserRepository;
 import net.cavitos.workshop.security.service.DatabaseUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class SecurityConfiguration {
 
     @Bean
-    public DatabaseUserService databaseUserService(UserRepository userRepository) {
+    public DatabaseUserService databaseUserService(final ApplicationUserRepository applicationUserRepository) {
 
-        return new DatabaseUserService(userRepository);
+        return new DatabaseUserService(applicationUserRepository);
     }
 }

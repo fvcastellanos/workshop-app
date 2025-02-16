@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface SequenceRepository extends CrudRepository<SequenceEntity, Long> {
 
-    Optional<SequenceEntity> findByPrefix(String prefix);
+    Optional<SequenceEntity> findByPrefixAndTenant(String prefix, String tenant);
 }
