@@ -77,17 +77,6 @@
 			<version>${postgresql-connector-j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-
-<!--		<dependency>-->
-<!--			<groupId>org.mariadb.jdbc</groupId>-->
-<!--			<artifactId>mariadb-java-client</artifactId>-->
-<!--			<version>${mariadb-connector-j.version}</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.mysql</groupId>-->
-<!--			<artifactId>mysql-connector-j</artifactId>-->
-<!--			<scope>runtime</scope>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -155,6 +144,7 @@
 				<version>${flyway.version}</version>
 				<configuration>
 					<url>${DATASOURCE_URL}</url>
+					<defaultSchema>workshop</defaultSchema>
 				</configuration>
 			</plugin>
 		</plugins>
