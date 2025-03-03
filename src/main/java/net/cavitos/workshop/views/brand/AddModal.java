@@ -14,11 +14,14 @@ import net.cavitos.workshop.views.DialogBase;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import static java.util.Objects.nonNull;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AddModal extends DialogBase<CarBrandEntity> {
 
     private final Binder<CarBrand> binder;

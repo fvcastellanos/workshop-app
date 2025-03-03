@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchFooter;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTitle;
