@@ -22,6 +22,8 @@ import net.cavitos.workshop.views.model.transformer.TypeTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -30,6 +32,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ProductModalView extends DialogBase<ProductEntity> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductModalView.class);

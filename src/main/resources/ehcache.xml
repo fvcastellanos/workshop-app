@@ -1,0 +1,13 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
+
+<!--    <cache alias="applicationUser">-->
+<!--        <key-type>java.lang.String</key-type>-->
+<!--        <value-type>net.cavitos.workshop.model.entity.ApplicationUserEntity</value-type>-->
+<!--        <expiry>-->
+<!--            <ttl unit="seconds">300</ttl> &lt;!&ndash; Cache expires in 300 seconds &ndash;&gt;-->
+<!--        </expiry>-->
+<!--    </cache>-->
+
+</config>

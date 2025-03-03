@@ -16,6 +16,8 @@ import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.TypeOption;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
 import net.cavitos.workshop.views.model.transformer.TypeTransformer;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import static java.util.Objects.nonNull;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildTypeSelect;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MovementTypeModalView extends DialogBase<InventoryMovementTypeEntity> {
 
     private final InventoryMovementTypeService movementTypeService;
