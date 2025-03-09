@@ -3,19 +3,14 @@ package net.cavitos.workshop.transformer;
 import net.cavitos.workshop.domain.model.web.InventoryMovement;
 import net.cavitos.workshop.domain.model.web.common.CommonOperationType;
 import net.cavitos.workshop.domain.model.web.common.CommonProduct;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InventoryEntity;
-
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 import static java.util.Objects.nonNull;
 
 public class InventoryMovementTransformer {
 
-    public static InventoryMovement toWeb(final InventoryEntity entity) {
-
-        final var dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
-                .withZone(ZoneId.systemDefault());
+    public static InventoryMovement toWeb(final InventoryEntity entity, ZonedDateTimeFactory zonedDateTimeFactory) {
 
         final var product = entity.getProductEntity();
         final var invoiceDetail = entity.getInvoiceDetailEntity();
@@ -41,7 +36,7 @@ public class InventoryMovementTransformer {
             movement.setInvoiceDetailId(invoiceDetail.getId());
         }
 
-        movement.setOperationDate(dateFormatter.format(entity.getOperationDate()));
+        movement.setOperationDate(zonedDateTimeFactory.buildStringFromInstant(entity.getOperationDate()));
         movement.setDescription(entity.getDescription());
         movement.setProduct(commonProduct);
 

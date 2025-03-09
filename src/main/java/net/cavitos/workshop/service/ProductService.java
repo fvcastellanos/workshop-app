@@ -1,8 +1,8 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
 import net.cavitos.workshop.domain.model.type.ProductType;
 import net.cavitos.workshop.domain.model.web.Product;
+import net.cavitos.workshop.domain.model.web.common.CommonProduct;
 import net.cavitos.workshop.model.entity.ProductCategoryEntity;
 import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 
 import static net.cavitos.workshop.domain.model.status.ActiveStatus.ACTIVE;
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
@@ -135,6 +137,18 @@ public class ProductService {
         productRepository.save(entity);
 
         return entity;
+    }
+
+    public List<ProductEntity> loadProducts(final String tenant) {
+
+        try {
+            LOGGER.info("Retrieve all products for tenant={}", tenant);
+            return productRepository.findByTenantAndActive(tenant, 1);
+        } catch (final Exception exception) {
+
+            LOGGER.error("Error al cargar los productos", exception);
+            return Collections.emptyList();
+        }
     }
 
     // ----------------------------------------------------------------------------------------------------

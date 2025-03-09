@@ -7,6 +7,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
@@ -17,7 +18,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import net.cavitos.workshop.domain.model.web.common.CommonCarLine;
 import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.TypeOption;
 import org.apache.commons.collections4.ListUtils;
@@ -162,5 +162,17 @@ public final class ComponentFactory {
         comboBox.setItemLabelGenerator(itemLabelGenerator);
 
         return comboBox;
+    }
+
+    public static DatePicker buildDatePicker(final String label, final String width) {
+
+        final var datePickerI18n = new DatePicker.DatePickerI18n();
+        datePickerI18n.setDateFormat("yyyy-MM-dd");
+
+        final var datePicker = new DatePicker(label);
+        datePicker.setI18n(datePickerI18n);
+        datePicker.setWidth(width);
+
+        return datePicker;
     }
 }

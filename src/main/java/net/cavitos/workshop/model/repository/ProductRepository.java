@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends CrudRepository<ProductEntity, String>,
@@ -30,4 +31,6 @@ public interface ProductRepository extends CrudRepository<ProductEntity, String>
                                Pageable pageable);
 
     Optional<ProductEntity> findByCodeEqualsIgnoreCaseAndTenant(String code, String tenant);
+
+    List<ProductEntity> findByTenantAndActive(String tenant, int active);
 }
