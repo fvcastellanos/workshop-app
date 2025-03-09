@@ -1,6 +1,7 @@
 package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.model.web.InventoryMovement;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InventoryEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.InventoryMovementTypeRepository;
@@ -29,15 +30,19 @@ public class InventoryMovementService {
 
     private final ProductRepository productRepository;
 
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
     private final InventoryMovementTypeRepository inventoryMovementTypeRepository;
 
     public InventoryMovementService(final InventoryRepository inventoryRepository,
                                     final ProductRepository productRepository,
-                                    final InventoryMovementTypeRepository inventoryMovementTypeRepository) {
+                                    final InventoryMovementTypeRepository inventoryMovementTypeRepository,
+                                    final ZonedDateTimeFactory zonedDateTimeFactory) {
 
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
         this.inventoryMovementTypeRepository = inventoryMovementTypeRepository;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
     public Page<InventoryEntity> search(final String operationType,
@@ -88,9 +93,7 @@ public class InventoryMovementService {
 
         final var total = (movement.getUnitPrice() * movement.getQuantity()) - movement.getDiscountAmount();
 
-        final var operationDate = LocalDate.parse(movement.getOperationDate())
-                .atStartOfDay()
-                .toInstant(ZoneOffset.UTC);
+        final var operationDate = zonedDateTimeFactory.buildInstantFrom(movement.getOperationDate());
 
         final var entity = InventoryEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
@@ -128,6 +131,9 @@ public class InventoryMovementService {
         final var operationType = inventoryMovementTypeRepository.findByCodeAndTenant(operationTypeCode, tenant)
                 .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Inventory Movement Type not found"));
 
+        final var operationDate = zonedDateTimeFactory.buildInstantFrom(movement.getOperationDate());
+
+        entity.setOperationDate(operationDate);
         entity.setUpdated(Instant.now());
         entity.setDescription(movement.getDescription());
         entity.setQuantity(movement.getQuantity());

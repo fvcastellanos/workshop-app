@@ -133,12 +133,7 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
         status.setWidth("100%");
         status.setReadOnly(true);
 
-        final var datePickerI18n = new DatePicker.DatePickerI18n();
-        datePickerI18n.setDateFormat("yyyy-MM-dd");
-
-        workOrderDate = new DatePicker("Fecha");
-        workOrderDate.setI18n(datePickerI18n);
-        workOrderDate.setWidth("100%");
+        workOrderDate = ComponentFactory.buildDatePicker("Fecha", "100%");
 
         carPlate = new TextField("Placa");
         carPlate.setWidth("100%");

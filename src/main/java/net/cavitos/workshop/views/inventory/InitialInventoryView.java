@@ -36,27 +36,33 @@ public class InitialInventoryView extends CRUDLayout {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(InitialInventoryView.class);
 
-    private DatePicker initialDate;
-    private DatePicker finalDate;
+    private final InitialInventoryModalView modalView;
+    private final InitialInventoryDeleteDialog deleteDialog;
 
     private final ZonedDateTimeFactory zonedDateTimeFactory;
     private final InventoryMovementService inventoryMovementService;
-
-    private final String initialInventoryCode;
+    private final String initialMovementCode;
 
     private final Grid<InventoryEntity> grid;
 
+    private DatePicker initialDate;
+    private DatePicker finalDate;
+
     protected InitialInventoryView(final AuthenticationContext authenticationContext,
                                    final DatabaseUserService databaseUserService,
-                                   @Value("${initial.inventory.movement-type.code:MI-01}") final String initialInventoryCode,
                                    final ZonedDateTimeFactory zonedDateTimeFactory,
-                                   final InventoryMovementService inventoryMovementService) {
+                                   final InventoryMovementService inventoryMovementService,
+                                   @Value("${initial.inventory.movement-type.code:MI-01}") final String initialInventoryCode,
+                                   final InitialInventoryModalView modalView,
+                                   final InitialInventoryDeleteDialog deleteDialog) {
         super(authenticationContext, databaseUserService);
-
-        this.initialInventoryCode = initialInventoryCode;
 
         this.zonedDateTimeFactory = zonedDateTimeFactory;
         this.inventoryMovementService = inventoryMovementService;
+        this.initialMovementCode = initialInventoryCode;
+
+        this.modalView = modalView;
+        this.deleteDialog = deleteDialog;
 
         this.grid = buildGrid();
 
@@ -78,7 +84,8 @@ public class InitialInventoryView extends CRUDLayout {
         final var fDAte = nonNull(finalDate.getValue()) ? zonedDateTimeFactory.buildInstantFromLocalDate(finalDate.getValue())
                 : zonedDateTimeFactory.buildInstantFrom("2100-01-01");
 
-        final var result = inventoryMovementService.search("%", initialInventoryCode, iDate, fDAte, this.tenant, 0, 1000);
+        final var result = inventoryMovementService.search("%", initialMovementCode, iDate, fDAte, tenant,
+                0, Integer.MAX_VALUE);
 
         grid.setItems(result.getContent());
 
@@ -93,8 +100,8 @@ public class InitialInventoryView extends CRUDLayout {
 
         btnSearch.setWidth("min-content");
 
-        final var btnAdd = new Button("Agregar Orden", event -> {
-//            modalView.openDialogForNew(tenant);
+        final var btnAdd = new Button("Agregar Movimiento", event -> {
+            modalView.openDialogForNew(tenant);
         });
 
         btnAdd.setWidth("min-content");
@@ -106,16 +113,16 @@ public class InitialInventoryView extends CRUDLayout {
         final var searchBox = ComponentFactory.buildSearchBox();
         searchBox.add(buildSearchBody(), searchFooter);
 
+        modalView.addOnSaveEvent(entity -> performSearch());
+        deleteDialog.addOnDeleteEvent(entity -> performSearch());
+
         return searchBox;
     }
 
     private HorizontalLayout buildSearchBody() {
 
-        initialDate = new DatePicker("Fecha Inicial");
-        initialDate.setWidth("50%");
-
-        finalDate = new DatePicker("Fecha Final");
-        finalDate.setWidth("50%");
+        initialDate = ComponentFactory.buildDatePicker("Fecha Inicial", "50%");
+        finalDate = ComponentFactory.buildDatePicker("Fecha Final", "50%");
 
         final var searchBody = ComponentFactory.buildSearchBody();
         searchBody.add(initialDate, finalDate);
@@ -140,7 +147,7 @@ public class InitialInventoryView extends CRUDLayout {
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", inventoryEntity.getId());
-//                        modalView.openDialogForEdit(tenant, invoiceDetail);
+                        modalView.openDialogForEdit(tenant, inventoryEntity);
                     });
 
                     final var deleteImage = new Image("img/icons/trash-can-svgrepo-com.svg", "Eliminar");
@@ -149,8 +156,7 @@ public class InitialInventoryView extends CRUDLayout {
                     deleteImage.getStyle().set("cursor", "pointer");
                     deleteImage.addClickListener(event -> {
                         LOGGER.info("Delete: {}", inventoryEntity.getId());
-//                        deleteDialog.openDialog(tenant, invoiceDetail);
-
+                        deleteDialog.openDialog(tenant, inventoryEntity);
                     });
 
                     layout.add(editImage, deleteImage);
