@@ -2,12 +2,13 @@ package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.model.type.ProductType;
 import net.cavitos.workshop.domain.model.web.Product;
-import net.cavitos.workshop.domain.model.web.common.CommonProduct;
 import net.cavitos.workshop.model.entity.ProductCategoryEntity;
 import net.cavitos.workshop.model.entity.ProductEntity;
+import net.cavitos.workshop.model.entity.ProductStockEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ProductCategoryRepository;
 import net.cavitos.workshop.model.repository.ProductRepository;
+import net.cavitos.workshop.model.repository.ProductStockRepository;
 import net.cavitos.workshop.sequence.domain.SequenceType;
 import net.cavitos.workshop.sequence.provider.SequenceProvider;
 import org.slf4j.Logger;
@@ -34,13 +35,17 @@ public class ProductService {
 
     private final SequenceProvider sequenceProvider;
 
+    private final ProductStockRepository productStockRepository;
+
     public ProductService(final ProductRepository productRepository,
                           final ProductCategoryRepository productCategoryRepository,
+                          final ProductStockRepository productStockRepository,
                           final SequenceProvider sequenceProvider) {
 
         this.productRepository = productRepository;
         this.productCategoryRepository = productCategoryRepository;
         this.sequenceProvider = sequenceProvider;
+        this.productStockRepository = productStockRepository;
     }
 
     public Page<ProductEntity> search(final String tenant,
@@ -149,6 +154,19 @@ public class ProductService {
             LOGGER.error("Error al cargar los productos", exception);
             return Collections.emptyList();
         }
+    }
+
+    public Page<ProductStockEntity> getProductStock(final String text,
+                                                    final String category,
+                                                    final String tenant,
+                                                    final int page,
+                                                    final int size) {
+
+        LOGGER.info("Retrieve product stock for tenant={} with text={}, category={}", tenant, text, category);
+
+        final var pageable = PageRequest.of(page, size);
+
+        return productStockRepository.getProductStock("%" + text + "%", category, tenant, pageable);
     }
 
     // ----------------------------------------------------------------------------------------------------

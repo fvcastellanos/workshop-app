@@ -110,7 +110,7 @@ public class MainLayout  extends AppLayout {
                 createNavigationItemWithSubItems("Inventario", null, "img/icons/inventory-logistics-warehouse-svgrepo-com.svg",
                         createNavigationItem("Inicial", "inventory/initial", "img/icons/entry-point-svgrepo-com.svg"),
                         createNavigationItem("Movimientos", "inventory-adjustments", "img/icons/arrows-rotate-clockwise-svgrepo-com.svg"),
-                        createNavigationItem("Existencias", "inventory-transfers", "img/icons/inventory-svgrepo-com.svg")
+                        createNavigationItem("Existencias", "stock", "img/icons/inventory-svgrepo-com.svg")
                 )
         );
     }
