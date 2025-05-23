@@ -2,10 +2,13 @@ package net.cavitos.workshop.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import net.cavitos.workshop.sequence.model.entity.SequenceEntity;
 
 import java.time.Instant;
 
@@ -43,4 +46,8 @@ public class ProductCategoryEntity {
     @NotEmpty
     @Size(max = 50)
     private String tenant;
+
+    @ManyToOne
+    @JoinColumn(name = "sequence_id")
+    private SequenceEntity sequenceEntity;
 }

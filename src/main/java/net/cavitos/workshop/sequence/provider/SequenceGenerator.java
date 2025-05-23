@@ -4,62 +4,73 @@ import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import net.cavitos.workshop.domain.exception.BusinessException;
 import net.cavitos.workshop.factory.BusinessExceptionFactory;
-import net.cavitos.workshop.factory.DateTimeFactory;
 import net.cavitos.workshop.sequence.domain.SequenceType;
 import net.cavitos.workshop.sequence.model.repository.SequenceRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.Duration;
 
 @Component
-public class SequenceProvider {
+public class SequenceGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SequenceProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequenceGenerator.class);
 
     private static final String PAD_STR = "0";
-    private static final int PAD_SIZE = 5;
+    private static final int PAD_SIZE = 3;
 
     private final SequenceRepository sequenceRepository;
+    private final String sequenceFormat;
+    private final Clock systemClock;
 
-    public SequenceProvider(final SequenceRepository sequenceRepository) {
+    public SequenceGenerator(final SequenceRepository sequenceRepository,
+                             @Value("${sequence.format:%s%s}") final String sequenceFormat,
+                             final Clock systemClock) {
 
         this.sequenceRepository = sequenceRepository;
+        this.sequenceFormat = sequenceFormat;
+        this.systemClock = systemClock;
     }
 
     @Transactional
-    public String calculateNext(final SequenceType sequenceType, final String tenant) {
+    public String nextValue(final SequenceType sequenceType, final String tenant) {
 
         return Failsafe.with(buildRetryPolicy())
-                .get(() -> calculateNextValue(sequenceType, PAD_SIZE, tenant));
+                .get(() -> calculateNextValue(sequenceType, tenant));
     }
 
     @Transactional
-    public String calculateNext(final SequenceType sequenceType, final int padSize, final String tenant) {
+    public String nextValue(final String prefix, final String tenant) {
 
         return Failsafe.with(buildRetryPolicy())
-                .get(() -> calculateNextValue(sequenceType, padSize, tenant));
+                .get(() -> calculateNextValue(prefix, tenant));
     }
 
     // ------------------------------------------------------------------------------------
 
-    private String calculateNextValue(final SequenceType sequenceType, final int padSize, final String tenant) {
+    private String calculateNextValue(final SequenceType sequenceType, final String tenant) {
+
+        return calculateNextValue(sequenceType.getPrefix(), tenant);
+    }
+
+    private String calculateNextValue(final String prefix, final String tenant) {
 
         try {
-            final var entity = sequenceRepository.findByPrefixAndTenant(sequenceType.getPrefix(), tenant)
-                                    .orElseThrow(() -> BusinessExceptionFactory.createBusinessException("Unable to Generate Sequence"));
+            final var entity = sequenceRepository.findByPrefixAndTenant(prefix, tenant)
+                    .orElseThrow(() -> BusinessExceptionFactory.createBusinessException("Unable to Generate Sequence"));
 
             final var value = entity.getValue();
-            final var numericValue = Long.parseLong(value);
 
-            final var padValue = StringUtils.leftPad(value, padSize, PAD_STR);
-            final var sequenceValue = String.format("%s-%s", sequenceType.getPrefix(), padValue);
+            final var padValue = StringUtils.leftPad(Long.toString(value), entity.getPadSize(), PAD_STR);
+            final var sequenceValue = String.format(sequenceFormat, prefix, padValue);
 
-            entity.setValue(Long.toString(numericValue + 1));
-            entity.setUpdated(DateTimeFactory.getUTCNow());
+            entity.setValue(value + entity.getStepSize());
+            entity.setUpdated(systemClock.instant());
 
             sequenceRepository.save(entity);
 
@@ -68,7 +79,7 @@ public class SequenceProvider {
         } catch (Exception exception) {
 
             throw BusinessExceptionFactory.createBusinessException("Unable to generate next sequence value for prefix: %s",
-                    sequenceType.getPrefix());
+                    prefix, exception);
         }
     }
 

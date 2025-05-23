@@ -2,6 +2,8 @@ package db.migration;
 
 import org.flywaydb.core.api.migration.Context;
 
+import net.cavitos.workshop.model.generator.TimeBasedGenerator;
+
 public class V3__AddProductSequence extends FlywayMigration {
 
     @Override
@@ -9,16 +11,24 @@ public class V3__AddProductSequence extends FlywayMigration {
 
         final var jdbcTemplate = getJdbcTemplate(context);
 
-        jdbcTemplate.execute("""
+        final var sql = """
                     insert into workshop.sequence
-                    (prefix, value, tenant) values
-                    ('PR', '1', 'resta')
-                """);
+                    (id, prefix, tenant, description) values
+                    ('%s', 'LL', 'resta', 'Llantas'),
+                    ('%s', 'R', 'resta', 'Repuestos'),
+                    ('%s', 'AG', 'resta', 'Aceites y Grasas'),
+                    ('%s', 'L', 'resta', 'Lubricantes'),
+                    ('%s', 'B', 'resta', 'Baterias'),
+                    ('%s', 'TA', 'resta', 'Talleres Ajenos')
+                """.formatted(
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId()
+                );
 
-        jdbcTemplate.execute("""
-                    insert into workshop.sequence
-                    (prefix, value, tenant) values
-                    ('SR', '1', 'resta')
-                """);
+        jdbcTemplate.execute(sql);
     }
 }

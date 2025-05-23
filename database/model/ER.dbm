@@ -3,8 +3,8 @@
 CAUTION: Do not modify this file unless you know what you are doing.
  Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="20"
-	 last-position="0,1124" last-zoom="1" scene-rect="0,0,2536.44,2362.12"
+<dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="21"
+	 last-position="1097,1464" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
 	 default-schema="public" default-owner="postgres"
 	 layers="Default layer"
 	 active-layers="0"
@@ -31,7 +31,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <schema name="public" layers="0" rect-visible="true" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
 </schema>
 
-<schema name="workshop" layers="0" rect-visible="true" fill-color="#718967" name-color="#000000">
+<schema name="workshop" layers="0" rect-visible="true" fill-color="#83db48" name-color="#000000">
 	<role name="workshop"/>
 </schema>
 
@@ -85,7 +85,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="car_brand" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="460" y="80"/>
+	<position x="480" y="60"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -139,7 +139,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="car_line" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="940" y="80"/>
+	<position x="1040" y="60"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -196,7 +196,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="contact" layers="0" collapse-mode="2" max-obj-count="13" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1340" y="60"/>
+	<position x="1480" y="60"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -297,7 +297,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="discount_type" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1740" y="60"/>
+	<position x="2180" y="60"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -359,7 +359,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="operation_type" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="60" y="840"/>
+	<position x="120" y="600"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -440,11 +440,14 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
-<table name="product_category" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+<table name="product_category" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="160" y="380"/>
+	<position x="1160" y="2700"/>
 	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="sequence_id">
 		<type name="character varying" length="50"/>
 	</column>
 	<column name="code" not-null="true">
@@ -500,7 +503,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="product" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="680" y="520"/>
+	<position x="1580" y="1540"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -528,7 +531,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
-	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+	<column name="updated" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="active" not-null="true" default-value="1">
@@ -588,7 +591,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="inventory" layers="0" collapse-mode="2" max-obj-count="15" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1360" y="620"/>
+	<position x="1400" y="700"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -687,7 +690,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="invoice" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="2020" y="620"/>
+	<position x="2040" y="400"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -799,7 +802,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="work_order" layers="0" collapse-mode="2" max-obj-count="16" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="980" y="1100"/>
+	<position x="60" y="1280"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -885,7 +888,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="invoice_detail" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1440" y="1740"/>
+	<position x="1720" y="2260"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -945,27 +948,36 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
-<table name="sequence" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+<table name="sequence" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1100" y="1280"/>
-	<column name="id" not-null="true" default-value="nextval('sequence_id_seq'::regclass)">
-		<type name="integer" length="0"/>
+	<position x="2300" y="2680"/>
+	<column name="id" not-null="true">
+		<type name="character varying" length="50"/>
 	</column>
 	<column name="prefix" not-null="true">
 		<type name="character varying" length="5"/>
 	</column>
-	<column name="value" not-null="true">
-		<type name="character varying" length="30"/>
-	</column>
-	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
-		<type name="timestamp" length="0"/>
+	<column name="value" not-null="true" default-value="1">
+		<type name="integer" length="30"/>
 	</column>
 	<column name="description" default-value="NULL">
 		<type name="character varying" length="300"/>
 	</column>
+	<column name="pad_size" not-null="true" default-value="3">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="step_size" not-null="true" default-value="1">
+		<type name="integer" length="0"/>
+	</column>
 	<column name="tenant" default-value="NULL">
 		<type name="character varying" length="50"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated">
+		<type name="timestamp" length="0"/>
 	</column>
 	<constraint name="sequence_pkey" type="pk-constr" table="workshop.sequence">
 		<columns names="id" ref-type="src-columns"/>
@@ -974,11 +986,6 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<columns names="prefix,tenant" ref-type="src-columns"/>
 	</constraint>
 </table>
-
-<sequence name="sequence_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="2147483647" cache="1">
-	<schema name="workshop"/>
-	<role name="workshop"/>
-</sequence>
 
 <index name="idx_sequence_tenant" table="workshop.sequence"
 	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
@@ -991,7 +998,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="tenant" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1520" y="1280"/>
+	<position x="2320" y="1920"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1026,7 +1033,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="application_user" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1880" y="1280"/>
+	<position x="2280" y="1340"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1067,7 +1074,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="60" y="1900"/>
+	<position x="160" y="2040"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1135,7 +1142,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <view name="product_stock" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1080" y="2000"/>
+	<position x="880" y="1580"/>
 	<reference object="workshop.operation_type" type="table" ref-name="operation_type" use-signature="true"/>
 	<reference object="workshop.product" type="table" ref-name="product" use-signature="true"/>
 	<reference object="workshop.inventory" type="table" ref-name="inventory" use-signature="true"/>
@@ -1173,26 +1180,40 @@ CAUTION: Do not modify this file unless you know what you are doing.
 </view>
 
 <relationship name="rel_product_stock_operation_type" type="reltv" layers="0"
-	 custom-color="#c732f6"
+	 custom-color="#9ac21c"
 	 src-table="workshop.product_stock"
 	 dst-table="workshop.operation_type"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_product_stock_product" type="reltv" layers="0"
-	 custom-color="#907930"
+	 custom-color="#a5d5ee"
 	 src-table="workshop.product_stock"
 	 dst-table="workshop.product"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_product_stock_inventory" type="reltv" layers="0"
-	 custom-color="#54cc2f"
+	 custom-color="#e71875"
 	 src-table="workshop.product_stock"
 	 dst-table="workshop.inventory"
 	 src-required="false" dst-required="false"/>
 
+<index name="idx_product_category_sequence_id" table="workshop.product_category"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="sequence_id"/>
+		</idxelement>
+</index>
+
 <constraint name="fk_car_line_car_brand1" type="fk-constr" comparison-type="MATCH SIMPLE"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.car_brand" table="workshop.car_line">
 	<columns names="car_brand_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_product_category_sequence_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.sequence" table="workshop.product_category">
+	<columns names="sequence_id" ref-type="src-columns"/>
 	<columns names="id" ref-type="dst-columns"/>
 </constraint>
 
@@ -1275,87 +1296,92 @@ CAUTION: Do not modify this file unless you know what you are doing.
 </constraint>
 
 <relationship name="rel_car_line_car_brand" type="relfk" layers="0"
-	 custom-color="#6e8a4f"
+	 custom-color="#f285e5"
 	 src-table="workshop.car_line"
 	 dst-table="workshop.car_brand" reference-fk="fk_car_line_car_brand1"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_product_product_category" type="relfk" layers="0"
-	 custom-color="#ea02a2"
+	 custom-color="#a57207"
 	 src-table="workshop.product"
 	 dst-table="workshop.product_category" reference-fk="product_product_category_id_fk"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_inventory_operation_type" type="relfk" layers="0"
-	 custom-color="#e1f1e9"
+	 custom-color="#57fd7a"
 	 src-table="workshop.inventory"
 	 dst-table="workshop.operation_type" reference-fk="fk_inventory_operation_type"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_inventory_product" type="relfk" layers="0"
-	 custom-color="#72aeca"
+	 custom-color="#0c298c"
 	 src-table="workshop.inventory"
 	 dst-table="workshop.product" reference-fk="fk_inventory_product"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_invoice_contact" type="relfk" layers="0"
-	 custom-color="#f4f129"
+	 custom-color="#fd5717"
 	 src-table="workshop.invoice"
 	 dst-table="workshop.contact" reference-fk="fk_invoice_contact"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_work_order_car_line" type="relfk" layers="0"
-	 custom-color="#6be345"
+	 custom-color="#9eb8cf"
 	 src-table="workshop.work_order"
 	 dst-table="workshop.car_line" reference-fk="fk_work_order_car_line"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_work_order_contact" type="relfk" layers="0"
-	 custom-color="#6d217b"
+	 custom-color="#9fa36a"
 	 src-table="workshop.work_order"
 	 dst-table="workshop.contact" reference-fk="fk_work_order_contact"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_invoice_detail_invoice" type="relfk" layers="0"
-	 custom-color="#ef2e84"
+	 custom-color="#417bd0"
 	 src-table="workshop.invoice_detail"
 	 dst-table="workshop.invoice" reference-fk="fk_invoice_detail_invoice"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_invoice_detail_product" type="relfk" layers="0"
-	 custom-color="#3db63d"
+	 custom-color="#0eb3c5"
 	 src-table="workshop.invoice_detail"
 	 dst-table="workshop.product" reference-fk="fk_invoice_detail_product"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_invoice_detail_work_order" type="relfk" layers="0"
-	 custom-color="#417120"
+	 custom-color="#576384"
 	 src-table="workshop.invoice_detail"
 	 dst-table="workshop.work_order" reference-fk="fk_invoice_detail_work_order"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_application_user_tenant" type="relfk" layers="0"
-	 custom-color="#014465"
+	 custom-color="#aa5827"
 	 src-table="workshop.application_user"
 	 dst-table="workshop.tenant" reference-fk="fk_user_tenant1"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_work_order_detail_invoice_detail" type="relfk" layers="0"
-	 custom-color="#ac4936"
+	 custom-color="#0adfcc"
 	 src-table="workshop.work_order_detail"
 	 dst-table="workshop.invoice_detail" reference-fk="fk_work_order_detail_invoice_detail1"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_work_order_detail_product" type="relfk" layers="0"
-	 custom-color="#14ff12"
+	 custom-color="#cbb45f"
 	 src-table="workshop.work_order_detail"
 	 dst-table="workshop.product" reference-fk="fk_work_order_detail_product1"
 	 src-required="false" dst-required="true"/>
 
 <relationship name="rel_work_order_detail_work_order" type="relfk" layers="0"
-	 custom-color="#fc839e"
+	 custom-color="#ae783d"
 	 src-table="workshop.work_order_detail"
 	 dst-table="workshop.work_order" reference-fk="fk_work_order_detail_work_order1"
 	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_product_category_sequence" type="relfk" layers="0"
+	 src-table="workshop.product_category"
+	 dst-table="workshop.sequence" reference-fk="fk_product_category_sequence_id"
+	 src-required="false" dst-required="false"/>
 
 </dbmodel>

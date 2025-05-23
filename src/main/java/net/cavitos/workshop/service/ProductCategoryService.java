@@ -1,10 +1,12 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.status.ActiveStatus;
 import net.cavitos.workshop.domain.model.web.ProductCategory;
+import net.cavitos.workshop.domain.model.web.common.CommonSequence;
 import net.cavitos.workshop.model.entity.ProductCategoryEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ProductCategoryRepository;
+import net.cavitos.workshop.sequence.model.entity.SequenceEntity;
+import net.cavitos.workshop.sequence.service.SequenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,7 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.List;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
@@ -23,10 +25,16 @@ public class ProductCategoryService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductCategoryService.class);
 
     private final ProductCategoryRepository productCategoryRepository;
+    private final SequenceService sequenceService;
+    private final Clock systemClock;
 
-    public ProductCategoryService(final ProductCategoryRepository productCategoryRepository) {
+    public ProductCategoryService(final ProductCategoryRepository productCategoryRepository,
+                                  final SequenceService sequenceService,
+                                  final Clock systemClock) {
 
         this.productCategoryRepository = productCategoryRepository;
+        this.sequenceService = sequenceService;
+        this.systemClock = systemClock;
     }
 
     public Page<ProductCategoryEntity> search(final String tenant,
@@ -64,13 +72,15 @@ public class ProductCategoryService {
 
         verifyProductCategoryCode(tenant, productCategory.getCode());
 
+        final var sequenceEntity = findSequence(productCategory.getSequence(), tenant);
+
         var entity = ProductCategoryEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .code(productCategory.getCode())
                 .name(productCategory.getName())
                 .description(productCategory.getDescription())
-                .created(Instant.now())
-                .updated(Instant.now())
+                .sequenceEntity(sequenceEntity)
+                .created(systemClock.instant())
                 .tenant(tenant)
                 .active(1)
                 .build();
@@ -92,11 +102,14 @@ public class ProductCategoryService {
             verifyProductCategoryCode(tenant, productCategory.getCode());
         }
 
+        final var sequenceEntity = findSequence(productCategory.getSequence(), tenant);
+
         entity.setName(productCategory.getName());
         entity.setCode(productCategory.getCode());
         entity.setDescription(productCategory.getDescription());
-        entity.setUpdated(Instant.now());
+        entity.setUpdated(systemClock.instant());
         entity.setActive(productCategory.getActive());
+        entity.setSequenceEntity(sequenceEntity);
 
         return productCategoryRepository.save(entity);
     }
@@ -140,5 +153,11 @@ public class ProductCategoryService {
         }
 
         return entity;
+    }
+
+    private SequenceEntity findSequence(final CommonSequence sequence, final String tenant) {
+
+        return sequenceService.getById(sequence.getId(), tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Sequence not found"));
     }
 }

@@ -13,15 +13,15 @@ public class V5__AddDefaultInventoryOperationType extends FlywayMigration {
                     insert into operation_type
                     (id, type, code, name, description, active, tenant)
                     values
-                    ('%s', 'I', 'MI-01', 'INVENTARIO INICIAL', '', 1, 'resta'),
-                    ('%s', 'I', 'MI-02', 'IMPORTACION', '', 1, 'resta'),
-                    ('%s', 'I', 'MI-03', 'COMPRAS LOCALES', '', 1, 'resta'),
-                    ('%s', 'I', 'MI-04', 'DEVOLUCION', '', 1, 'resta'),
-                    ('%s', 'I', 'MI-05', 'AJUSTE INVENTARIO (+)', '', 1, 'resta'),
-                    ('%s', 'O', 'MI-06', 'AJUSTE INVENTARIO (-)', '', 1, 'resta'),
-                    ('%s', 'I', 'MI-07', 'NOTA TEMPORAL INGRESO', '', 1, 'resta'),
-                    ('%s', 'O', 'MI-08', 'NOTA TEMPORAL EGRESO', '', 1, 'resta'),
-                    ('%s', 'O', 'MI-09', 'VENTAS LOCALES', '', 1, 'resta')
+                    ('%s', 'I', 'MI01', 'INVENTARIO INICIAL', '', 1, 'resta'),
+                    ('%s', 'I', 'MI02', 'IMPORTACION', '', 1, 'resta'),
+                    ('%s', 'I', 'MI03', 'COMPRAS LOCALES', '', 1, 'resta'),
+                    ('%s', 'I', 'MI04', 'DEVOLUCION', '', 1, 'resta'),
+                    ('%s', 'I', 'MI05', 'AJUSTE INVENTARIO (+)', '', 1, 'resta'),
+                    ('%s', 'O', 'MI06', 'AJUSTE INVENTARIO (-)', '', 1, 'resta'),
+                    ('%s', 'I', 'MI07', 'NOTA TEMPORAL INGRESO', '', 1, 'resta'),
+                    ('%s', 'O', 'MI08', 'NOTA TEMPORAL EGRESO', '', 1, 'resta'),
+                    ('%s', 'O', 'MI09', 'VENTAS LOCALES', '', 1, 'resta')
                 """.formatted(
                         TimeBasedGenerator.generateTimeBasedId(),
                         TimeBasedGenerator.generateTimeBasedId(),
@@ -38,9 +38,12 @@ public class V5__AddDefaultInventoryOperationType extends FlywayMigration {
 
         jdbcTemplate.execute("""
                     insert into sequence
-                    (prefix, value, tenant)
+                    (id, prefix, value, tenant, description, pad_size)
                     values
-                    ('MI', '10', 'tenant')
-                """);
+                    ('%s', 'MI', 10, 'resta', 'Tipo Mov. Inv.', 2)
+                """.formatted(
+                        TimeBasedGenerator.generateTimeBasedId()
+                    )
+                );
     }
 }

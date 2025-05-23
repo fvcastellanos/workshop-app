@@ -22,6 +22,7 @@ public interface ProductCategoryRepository extends CrudRepository<ProductCategor
                         UPPER(productCategory.code) like UPPER(:text)
                         or UPPER(productCategory.name) like UPPER(:text)
                     )
+                order by productCategory.code, productCategory.name
             """)
     Page<ProductCategoryEntity> search(String text, int active, String tenant, Pageable pageable);
 

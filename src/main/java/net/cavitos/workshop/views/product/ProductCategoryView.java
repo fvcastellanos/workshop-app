@@ -147,7 +147,13 @@ public class ProductCategoryView extends CRUDLayout {
                 .setHeader("Nombre")
                 .setSortable(true)
                 .setResizable(true)
-                .setWidth("30%");
+                .setWidth("20%");
+
+        grid.addColumn("sequenceEntity.prefix")
+                .setHeader("Secuencia")
+                .setSortable(true)
+                .setResizable(true)
+                .setWidth("10%");
 
         grid.addColumn(new ComponentRenderer<>(productCategoryEntity -> {
 

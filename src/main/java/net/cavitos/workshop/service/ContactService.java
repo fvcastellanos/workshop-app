@@ -5,7 +5,7 @@ import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ContactRepository;
 import net.cavitos.workshop.sequence.domain.SequenceType;
-import net.cavitos.workshop.sequence.provider.SequenceProvider;
+import net.cavitos.workshop.sequence.provider.SequenceGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,13 +24,13 @@ public class ContactService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContactService.class);
 
     private final ContactRepository contactRepository;
-    private final SequenceProvider sequenceProvider;
+    private final SequenceGenerator sequenceGenerator;
 
     public ContactService(final ContactRepository contactRepository,
-                          final SequenceProvider sequenceProvider) {
+                          final SequenceGenerator sequenceGenerator) {
 
         this.contactRepository = contactRepository;
-        this.sequenceProvider = sequenceProvider;
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     public Page<ContactEntity> search(final String tenant,
@@ -140,9 +140,9 @@ public class ContactService {
     private String calculateCode(final String type, final String tenant) {
 
         return switch (type) {
-            case "C" -> sequenceProvider.calculateNext(SequenceType.CUSTOMER, tenant);
-            case "P" -> sequenceProvider.calculateNext(SequenceType.PROVIDER, tenant);
-            default -> sequenceProvider.calculateNext(SequenceType.UNKNOWN, tenant);
+            case "C" -> sequenceGenerator.nextValue(SequenceType.CUSTOMER, tenant);
+            case "P" -> sequenceGenerator.nextValue(SequenceType.PROVIDER, tenant);
+            default -> sequenceGenerator.nextValue(SequenceType.UNKNOWN, tenant);
         };
     }
 }
