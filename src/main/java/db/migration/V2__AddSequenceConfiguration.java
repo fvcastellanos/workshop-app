@@ -2,6 +2,8 @@ package db.migration;
 
 import org.flywaydb.core.api.migration.Context;
 
+import net.cavitos.workshop.model.generator.TimeBasedGenerator;
+
 public class V2__AddSequenceConfiguration extends FlywayMigration {
 
     @Override
@@ -9,22 +11,18 @@ public class V2__AddSequenceConfiguration extends FlywayMigration {
 
         final var jdbcTemplate = getJdbcTemplate(context);
 
-        jdbcTemplate.execute("""
-                    insert into workshop.sequence
-                    (prefix, value, tenant) values
-                    ('C', '1', 'resta')
-                """);
+        final var sql = """
+                insert into workshop.sequence
+                (id, prefix, tenant, description) values
+                ('%s', 'C', 'resta', 'Clientes'),
+                ('%s', 'P', 'resta', 'Proveedores'),
+                ('%s', 'U', 'resta', 'Desconocido / Generico')
+                """.formatted(
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId(),
+                        TimeBasedGenerator.generateTimeBasedId()
+                    );
 
-        jdbcTemplate.execute("""
-                    insert into workshop.sequence
-                    (prefix, value, tenant) values
-                    ('P', '1', 'resta')
-                """);
-
-        jdbcTemplate.execute("""
-                    insert into workshop.sequence
-                    (prefix, value, tenant) values
-                    ('U', '1', 'resta')
-                """);
+        jdbcTemplate.execute(sql);
     }
 }

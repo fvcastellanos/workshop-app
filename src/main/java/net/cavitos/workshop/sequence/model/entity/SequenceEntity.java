@@ -1,9 +1,11 @@
 package net.cavitos.workshop.sequence.model.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 
 import java.time.Instant;
 
@@ -28,15 +29,20 @@ import java.time.Instant;
 public class SequenceEntity {
 
     @Id
-    private long id;
+    private String id;
+
+    @Column(name = "pad_size")
+    private int padSize;
+
+    @Column(name = "step_size")
+    private int stepSize;
 
     @NotEmpty
     @Size(max = 5)
     private String prefix;
 
-    @NotEmpty
-    @Size(max = 30)
-    private String value;
+    @NotNull
+    private long value;
 
     @Size(max = 300)
     private String description;
@@ -46,4 +52,6 @@ public class SequenceEntity {
     private String tenant;
 
     private Instant updated;
+
+    private Instant created;
 }

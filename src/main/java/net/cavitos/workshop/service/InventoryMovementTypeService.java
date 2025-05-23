@@ -6,7 +6,7 @@ import net.cavitos.workshop.model.entity.InventoryMovementTypeEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.InventoryMovementTypeRepository;
 import net.cavitos.workshop.sequence.domain.SequenceType;
-import net.cavitos.workshop.sequence.provider.SequenceProvider;
+import net.cavitos.workshop.sequence.provider.SequenceGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,13 +24,13 @@ public class InventoryMovementTypeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryMovementTypeService.class);
 
     private final InventoryMovementTypeRepository inventoryMovementTypeRepository;
-    private final SequenceProvider sequenceProvider;
+    private final SequenceGenerator sequenceGenerator;
 
     public InventoryMovementTypeService(final InventoryMovementTypeRepository inventoryMovementTypeRepository,
-                                        final SequenceProvider sequenceProvider) {
+                                        final SequenceGenerator sequenceGenerator) {
 
         this.inventoryMovementTypeRepository = inventoryMovementTypeRepository;
-        this.sequenceProvider = sequenceProvider;
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     public Page<InventoryMovementTypeEntity> search(final int active,
@@ -65,7 +65,7 @@ public class InventoryMovementTypeService {
                     throw BusinessExceptionFactory.createBusinessException("Movement Type already exists");
                 });
 
-        final var code = sequenceProvider.calculateNext(SequenceType.INVENTORY_MOVEMENT, 2, tenant);
+        final var code = sequenceGenerator.nextValue(SequenceType.INVENTORY_MOVEMENT, tenant);
 
         final var entity = InventoryMovementTypeEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())

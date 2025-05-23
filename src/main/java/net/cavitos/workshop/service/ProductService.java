@@ -10,7 +10,7 @@ import net.cavitos.workshop.model.repository.ProductCategoryRepository;
 import net.cavitos.workshop.model.repository.ProductRepository;
 import net.cavitos.workshop.model.repository.ProductStockRepository;
 import net.cavitos.workshop.sequence.domain.SequenceType;
-import net.cavitos.workshop.sequence.provider.SequenceProvider;
+import net.cavitos.workshop.sequence.provider.SequenceGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -33,19 +34,23 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductCategoryRepository productCategoryRepository;
 
-    private final SequenceProvider sequenceProvider;
+    private final SequenceGenerator sequenceGenerator;
 
     private final ProductStockRepository productStockRepository;
+
+    private final Clock systemClock;
 
     public ProductService(final ProductRepository productRepository,
                           final ProductCategoryRepository productCategoryRepository,
                           final ProductStockRepository productStockRepository,
-                          final SequenceProvider sequenceProvider) {
+                          final SequenceGenerator sequenceGenerator,
+                          final Clock systemClock) {
 
         this.productRepository = productRepository;
         this.productCategoryRepository = productCategoryRepository;
-        this.sequenceProvider = sequenceProvider;
+        this.sequenceGenerator = sequenceGenerator;
         this.productStockRepository = productStockRepository;
+        this.systemClock = systemClock;
     }
 
     public Page<ProductEntity> search(final String tenant,
@@ -85,7 +90,7 @@ public class ProductService {
 
         verifyExistingCodeAndTypeForTenant(tenant, product);
         final var categoryEntity = findProductCategory(tenant, product.getCategory().getId());
-        final var code = sequenceProvider.calculateNext(SequenceType.PRODUCT, tenant);
+        final var code = calculateCode(categoryEntity, tenant);
 
         var entity = ProductEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
@@ -96,8 +101,7 @@ public class ProductService {
                 .minimalQuantity(product.getMinimalQuantity())
                 .tenant(tenant)
                 .active(ACTIVE.value())
-                .created(Instant.now())
-                .updated(Instant.now())
+                .created(systemClock.instant())
                 .productCategoryEntity(categoryEntity)
                 .build();
 
@@ -124,11 +128,10 @@ public class ProductService {
 
         var productType = product.getType();
 
-        var code = entity.getCode();
-        if (!productType.equalsIgnoreCase(entity.getType())) {
-
-            code = calculateCode(product.getType(), tenant);
-        }
+        final var currentCategoryEntity = entity.getProductCategoryEntity();
+        var code = !currentCategoryEntity.getId().equalsIgnoreCase(category.getId()) ?
+                calculateCode(categoryEntity, tenant)
+                : entity.getCode();
 
         entity.setActive(product.getActive());
         entity.setName(product.getName());
@@ -136,12 +139,10 @@ public class ProductService {
         entity.setDescription(product.getDescription());
         entity.setType(productType);
         entity.setMinimalQuantity(product.getMinimalQuantity());
-        entity.setUpdated(Instant.now());
+        entity.setUpdated(systemClock.instant());
         entity.setProductCategoryEntity(categoryEntity);
 
-        productRepository.save(entity);
-
-        return entity;
+        return productRepository.save(entity);
     }
 
     public List<ProductEntity> loadProducts(final String tenant) {
@@ -202,9 +203,19 @@ public class ProductService {
         final var productType = ProductType.valueOf(type);
 
         return switch (productType) {
-            case PRODUCT -> sequenceProvider.calculateNext(SequenceType.PRODUCT, tenant);
-            case SERVICE -> sequenceProvider.calculateNext(SequenceType.SERVICE, tenant);
+            case PRODUCT -> sequenceGenerator.nextValue(SequenceType.PRODUCT, tenant);
+            case SERVICE -> sequenceGenerator.nextValue(SequenceType.SERVICE, tenant);
         };
     }
 
+    private String calculateCode(final ProductCategoryEntity categoryEntity, final String tenant) {
+
+        final var sequenceEntity = categoryEntity.getSequenceEntity();
+
+        if (sequenceEntity != null) {
+            return sequenceGenerator.nextValue(sequenceEntity.getPrefix(), tenant);
+        }
+
+        return sequenceGenerator.nextValue(SequenceType.UNKNOWN, tenant);
+    }
 }
