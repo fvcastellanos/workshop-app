@@ -112,8 +112,8 @@ public class ProductView extends CRUDLayout {
 
         final var contactTypes = List.of(
                 new TypeOption("Todos", "%"),
-                new TypeOption("Producto", "P"),
-                new TypeOption("Servicio", "S")
+                new TypeOption("Almacenable", "Y"),
+                new TypeOption("No almacenable", "N")
         );
 
         final var categories = new ArrayList<TypeOption>();
@@ -194,9 +194,22 @@ public class ProductView extends CRUDLayout {
 
         grid.addColumn(new ComponentRenderer<>(productEntity -> {
 
-                    final var type = productEntity.getType().equals("P") ? "Producto" : "Servicio";
-                    return new Text(type);
-                })).setHeader("Tipo")
+                    final var layout = new HorizontalLayout();
+                    layout.setWidthFull();
+                    layout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+                    if (productEntity.isStorable()) {
+
+                        final var editImage = new Image("img/icons/check-svgrepo-com.svg", "Almacenable");
+                        editImage.setWidth("20px");
+                        editImage.setHeight("20px");
+
+                        layout.add(editImage);
+                    }
+
+                    return layout;
+
+                })).setHeader("Almacenable")
                 .setSortable(true)
                 .setWidth("10%");
 

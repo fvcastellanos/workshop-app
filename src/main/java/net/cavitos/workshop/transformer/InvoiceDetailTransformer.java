@@ -19,7 +19,7 @@ public final class InvoiceDetailTransformer {
         final var product = new CommonProduct();
         product.setCode(productEntity.getCode());
         product.setName(productEntity.getName());
-        product.setType(productEntity.getType());
+        product.setStorable(product.isStorable());
 
         final var detail = new InvoiceDetail();
         detail.setId(entity.getId());

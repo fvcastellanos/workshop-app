@@ -19,7 +19,7 @@ public class WorkOrderDetailTransformer {
 
         final var product = new CommonProduct();
         product.setCode(productEntity.getCode());
-        product.setType(productEntity.getType());
+        product.setStorable(productEntity.isStorable());
         product.setName(productEntity.getName());
 
         final var detail = new WorkOrderDetail();

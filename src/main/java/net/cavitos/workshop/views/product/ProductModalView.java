@@ -1,5 +1,6 @@
 package net.cavitos.workshop.views.product;
 
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -42,10 +43,12 @@ public class ProductModalView extends DialogBase<ProductEntity> {
     private final Binder<Product> binder;
 
     private Select<Status> statusField;
-    private Select<TypeOption> typeSelect;
     private Select<TypeOption> categoryType;
     private NumberField minStockField;
     private TextField codeField;
+    private Checkbox isStorableField;
+    private TextField nameField;
+    private TextArea descriptionField;
 
     private ProductEntity productEntity;
 
@@ -73,7 +76,7 @@ public class ProductModalView extends DialogBase<ProductEntity> {
         statusField.setValue(StatusTransformer.toView(1)); // Active status
         statusField.setReadOnly(!isEdit);
 
-        typeSelect.setValue(TypeTransformer.toProductView("P")); // Product type
+        isStorableField.setValue(true);
 
         categoryType.setItems(loadProductCategories());
         minStockField.setValue(1.0);
@@ -95,25 +98,22 @@ public class ProductModalView extends DialogBase<ProductEntity> {
         final var contentLayout = new VerticalLayout();
         contentLayout.setWidthFull();
 
-        typeSelect = ComponentFactory.buildTypeSelect("100%", "Tipo", List.of(
-                new TypeOption("Producto", "P"),
-                new TypeOption("Servicio", "S")
-        ), "P");
-        typeSelect.setAutofocus(true);
-
         final var initialItems = Collections.singletonList(new TypeOption("Seleccione", StringUtils.EMPTY));
         categoryType = ComponentFactory.buildTypeSelect("100%", "Categoría", initialItems, StringUtils.EMPTY);
+
+        isStorableField = new Checkbox("¿Almacenable?");
+        isStorableField.setValue(true);
 
         codeField = new TextField();
         codeField.setLabel("Código");
         codeField.setWidth("100%");
         codeField.setReadOnly(true);
 
-        final var nameField = new TextField();
+        nameField = new TextField();
         nameField.setLabel("Nombre");
         nameField.setWidth("100%");
 
-        final var descriptionField = new TextArea("Descripción");
+        descriptionField = new TextArea("Descripción");
         descriptionField.setWidth("100%");
 
         minStockField = new NumberField("Cantidad Mínima");
@@ -123,12 +123,30 @@ public class ProductModalView extends DialogBase<ProductEntity> {
 
         statusField = ComponentFactory.buildStatusSelect("100%", StatusTransformer.toView(1));
 
-        // Bind fields
-        binder.forField(typeSelect)
-                .asRequired("El tipo es requerido")
-                .withConverter(TypeTransformer::toDomain, TypeTransformer::toProductView)
-                .bind(Product::getType, Product::setType);
+        contentLayout.add(
+                categoryType,
+                codeField,
+                nameField,
+                descriptionField,
+                minStockField,
+                isStorableField,
+                statusField
+        );
 
+        bindComponents();
+
+        final var footerLayout = new HorizontalLayout(
+                ComponentFactory.buildCloseDialogButton(event -> this.close()),
+                ComponentFactory.buildSaveDialogButton(event -> this.saveChanges())
+        );
+
+        add(contentLayout);
+        add(footerLayout);
+    }
+
+    private void bindComponents() {
+
+        // Bind fields
         binder.forField(categoryType)
                 .withValidator(category -> nonNull(category) && !category.getValue().equals(StringUtils.EMPTY), "Seleccione una categoría")
                 .withConverter(CategoryTransformer::toDomain, CategoryTransformer::toView)
@@ -144,35 +162,20 @@ public class ProductModalView extends DialogBase<ProductEntity> {
                 .bind(Product::getName, Product::setName);
 
         binder.forField(descriptionField)
-                 .withValidator(description -> description.length() <= 300, "Longitud máxima 300 caracteres")
-                 .bind(Product::getDescription, Product::setDescription);
+                .withValidator(description -> description.length() <= 300, "Longitud máxima 300 caracteres")
+                .bind(Product::getDescription, Product::setDescription);
 
         binder.forField(minStockField)
-                 .withValidator(minStock -> nonNull(minStock) && minStock >= 1, "Cantidad mínima 1")
-                 .bind(Product::getMinimalQuantity, Product::setMinimalQuantity);
+                .withValidator(minStock -> nonNull(minStock) && minStock >= 1, "Cantidad mínima 1")
+                .bind(Product::getMinimalQuantity, Product::setMinimalQuantity);
 
         binder.forField(statusField)
                 .asRequired("El estado es requerido")
                 .withConverter(StatusTransformer::toDomain, StatusTransformer::toView)
                 .bind(Product::getActive, Product::setActive);
 
-        contentLayout.add(
-                typeSelect,
-                categoryType,
-                codeField,
-                nameField,
-                descriptionField,
-                minStockField,
-                statusField
-        );
-
-        final var footerLayout = new HorizontalLayout(
-                ComponentFactory.buildCloseDialogButton(event -> this.close()),
-                ComponentFactory.buildSaveDialogButton(event -> this.saveChanges())
-        );
-
-        add(contentLayout);
-        add(footerLayout);
+        binder.forField(isStorableField)
+                .bind(Product::isStorable, Product::setStorable);
     }
 
     private List<TypeOption> loadProductCategories() {

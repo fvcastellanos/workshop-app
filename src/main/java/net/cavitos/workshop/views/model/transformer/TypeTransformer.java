@@ -2,8 +2,6 @@ package net.cavitos.workshop.views.model.transformer;
 
 import net.cavitos.workshop.views.model.TypeOption;
 
-import java.util.List;
-
 public final class TypeTransformer {
 
     private TypeTransformer() {
@@ -26,7 +24,7 @@ public final class TypeTransformer {
                 new TypeOption("Proveedor", "P");
     }
 
-    public static TypeOption toProductView(final String value) {
+    public static TypeOption toProductCategoryTypeView(final String value) {
 
             return value.equalsIgnoreCase("P") ? new TypeOption("Producto", "P") :
                     new TypeOption("Servicio", "S");

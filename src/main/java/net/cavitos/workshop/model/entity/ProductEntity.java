@@ -27,9 +27,7 @@ public class ProductEntity {
     @Size(max = 50)
     private String code;
 
-    @NotEmpty
-    @Size(max = 1)
-    private String type;
+    private boolean storable;
 
     @NotEmpty
     @Size(max = 150)

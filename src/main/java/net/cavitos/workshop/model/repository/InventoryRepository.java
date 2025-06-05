@@ -11,6 +11,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface InventoryRepository extends CrudRepository<InventoryEntity, String>,
@@ -37,6 +38,16 @@ public interface InventoryRepository extends CrudRepository<InventoryEntity, Str
                                                                                                                InvoiceDetailEntity invoiceDetailEntity,
                                                                                                                InventoryMovementTypeEntity inventoryMovementType,
                                                                                                                String tenant);
+
+    @Query("""
+                select inventory from InventoryEntity inventory
+                where inventory.productEntity.id = :productId
+                    and inventory.invoiceDetailEntity.id = :invoiceDetailId
+                    and inventory.tenant = :tenant
+            """)
+    List<InventoryEntity> findInventoryMovementsFor(String productId,
+                                                    String invoiceDetailId,
+                                                    String tenant);
 
     Optional<InventoryEntity> findByIdAndTenant(String id, String tenant);
 }

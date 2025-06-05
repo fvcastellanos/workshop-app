@@ -93,7 +93,6 @@ public class ProductCategoryModalView extends DialogBase<ProductCategoryEntity> 
 
         nameField = new TextField("Nombre");
         nameField.setWidth("100%");
-        nameField.setAutofocus(true);
 
         final var initialItems = Collections.singletonList(new TypeOption("Seleccione", StringUtils.EMPTY));
         sequenceField = ComponentFactory.buildTypeSelect("100%", "Secuencia", initialItems, StringUtils.EMPTY);

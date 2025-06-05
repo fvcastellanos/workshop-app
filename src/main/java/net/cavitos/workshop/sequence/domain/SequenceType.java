@@ -6,6 +6,7 @@ public enum SequenceType {
     PROVIDER("P"),
     PRODUCT("PR"),
     SERVICE("SR"),
+    PRODUCT_CATEGORY("CP"),
     INVENTORY_MOVEMENT("MI"),
     UNKNOWN("U");
 

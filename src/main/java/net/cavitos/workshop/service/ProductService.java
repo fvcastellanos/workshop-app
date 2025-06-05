@@ -54,18 +54,22 @@ public class ProductService {
     }
 
     public Page<ProductEntity> search(final String tenant,
-                                      final String type,
+                                      final String storable,
                                       final String category,
                                       final String text,
                                       final int active,
                                       final int page,
                                       final int size) {
 
-        LOGGER.info("Retrieve all products for tenant={} with text={}, category={}, type={},active={}", tenant, text, category, type, active);
+        LOGGER.info("Retrieve all products for tenant={} with text={}, category={}, storable={},active={}",
+                tenant, text, category, storable, active);
 
         final var pageable = PageRequest.of(page, size);
 
-        return productRepository.search("%" + text + "%", type, category, active, tenant, pageable);
+        final var evaluate = !storable.equalsIgnoreCase("%");
+        var isStorable = evaluate && storable.equalsIgnoreCase("Y");
+
+        return productRepository.search("%" + text + "%", evaluate, isStorable, category, active, tenant, pageable);
     }
 
     public ProductEntity findById(final String tenant, final String id) {
@@ -94,7 +98,7 @@ public class ProductService {
 
         var entity = ProductEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
-                .type(product.getType())
+                .storable(product.isStorable())
                 .name(product.getName())
                 .code(code)
                 .description(product.getDescription())
@@ -126,8 +130,6 @@ public class ProductService {
         final var category = product.getCategory();
         final var categoryEntity = findProductCategory(tenant, category.getId());
 
-        var productType = product.getType();
-
         final var currentCategoryEntity = entity.getProductCategoryEntity();
         var code = !currentCategoryEntity.getId().equalsIgnoreCase(category.getId()) ?
                 calculateCode(categoryEntity, tenant)
@@ -137,7 +139,7 @@ public class ProductService {
         entity.setName(product.getName());
         entity.setCode(code);
         entity.setDescription(product.getDescription());
-        entity.setType(productType);
+        entity.setStorable(product.isStorable());
         entity.setMinimalQuantity(product.getMinimalQuantity());
         entity.setUpdated(systemClock.instant());
         entity.setProductCategoryEntity(categoryEntity);
@@ -179,7 +181,7 @@ public class ProductService {
 
         if (existingProductHolder.isPresent()) {
 
-            LOGGER.error("Product with code={}, type={} already exists for tenant={}", product.getCode(), product.getType(), tenant);
+            LOGGER.error("Product with code={}, storable={} already exists for tenant={}", product.getCode(), product.isStorable(), tenant);
             throw createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product already exists");
         }
     }

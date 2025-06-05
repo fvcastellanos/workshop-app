@@ -6,10 +6,10 @@ import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InventoryEntity;
 import net.cavitos.workshop.model.entity.InventoryMovementTypeEntity;
 import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
-import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.InventoryMovementTypeRepository;
 import net.cavitos.workshop.model.repository.InventoryRepository;
+import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +17,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static java.util.Objects.nonNull;
-import static net.cavitos.workshop.factory.DateTimeFactory.getUTCNow;
 
 @Component
 public class InvoiceDetailInventoryListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceDetailInventoryListener.class);
 
-    private static final String INVENTORY_PRODUCT_TYPE = "P";
     private static final String MOVEMENT_DESCRIPTION = "Inventory automatic movement triggered by invoice detail event";
 
     private final InventoryRepository inventoryRepository;
@@ -79,14 +75,16 @@ public class InvoiceDetailInventoryListener {
 
         LOGGER.info("Adding an inventory movement for tenant={} and invoice_detail_id={}", tenant, invoiceDetailEntity.getId());
 
-        if (INVENTORY_PRODUCT_TYPE.equalsIgnoreCase(productEntity.getType())) {
+        if (productEntity.isStorable()) {
 
-            final var movementHolder = findInventoryMovement(productEntity, invoiceDetailEntity, movementType, tenant);
+//            final var movementHolder = findInventoryMovement(productEntity, invoiceDetailEntity, movementType, tenant);
+            final var inventoryMovements = inventoryRepository.findInventoryMovementsFor(productEntity.getId(),
+                    invoiceDetailEntity.getId(), tenant);
 
-            if (movementHolder.isPresent()) {
+            if (!ListUtils.emptyIfNull(inventoryMovements).isEmpty()) {
 
-                LOGGER.error("Movement already registered for invoice_detail_id={} and tenant={}", invoiceDetailEntity.getId(),
-                        tenant);
+                LOGGER.error("Movements already registered for invoice_detail_id={} and tenant={}",
+                        invoiceDetailEntity.getId(), tenant);
 
                 return;
             }
@@ -156,28 +154,20 @@ public class InvoiceDetailInventoryListener {
 
         final var tenant = invoiceDetailEntity.getTenant();
         final var productEntity = invoiceDetailEntity.getProductEntity();
-        final var inputMovementTypeEntity = findBuyLocalMovementType(tenant);
-        final var outputMovementTypeEntity = findLocalSellMovementType(tenant);
 
         LOGGER.info("Deleting inventory movement for tenant={} and invoice_detail_id={}", tenant, invoiceDetailEntity.getId());
 
-        if (INVENTORY_PRODUCT_TYPE.equalsIgnoreCase(productEntity.getType())) {
+        if (productEntity.isStorable()) {
 
-            findInventoryMovement(productEntity, invoiceDetailEntity, inputMovementTypeEntity, tenant)
-                    .ifPresent(inventoryEntity -> {
+            final var inventoryMovements = inventoryRepository.findInventoryMovementsFor(productEntity.getId(),
+                    invoiceDetailEntity.getId(), tenant);
 
-                        LOGGER.info("Deleting input movement for inventory_id={} for tenant={}", inventoryEntity.getId(), tenant);
-//                        inventoryRepository.delete(inventoryEntity);
-                    });
+            if (!ListUtils.emptyIfNull(inventoryMovements).isEmpty()) {
 
-            if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
+                LOGGER.info("Deleting inventory movements for productId={} and invoiceDetailId={} for tenant={}",
+                        productEntity.getId(), invoiceDetailEntity.getId(), tenant);
 
-                findInventoryMovement(productEntity, invoiceDetailEntity, outputMovementTypeEntity, tenant)
-                        .ifPresent(inventoryEntity ->  {
-
-                            LOGGER.info("Deleting output movement for inventory_id={} for tenant={}", inventoryEntity.getId(), tenant);
-//                            inventoryRepository.delete(inventoryEntity);
-                        });
+                inventoryRepository.deleteAll(inventoryMovements);
             }
 
             return;
@@ -195,15 +185,6 @@ public class InvoiceDetailInventoryListener {
     }
 
     // --------------------------------------------------------------------------------------------------
-
-    private Optional<InventoryEntity> findInventoryMovement(final ProductEntity productEntity,
-                                                            final InvoiceDetailEntity invoiceDetailEntity,
-                                                            final InventoryMovementTypeEntity inventoryMovementTypeEntity,
-                                                            final String tenant) {
-
-        return inventoryRepository.findByProductEntityAndInvoiceDetailEntityAndInventoryMovementTypeEntityAndTenant(productEntity,
-                invoiceDetailEntity, inventoryMovementTypeEntity, tenant);
-    }
 
     private InventoryMovementTypeEntity findBuyLocalMovementType(final String tenant) {
 

@@ -141,7 +141,7 @@ public class ProductCategoryView extends CRUDLayout {
                 .setHeader("Código")
                 .setSortable(true)
                 .setResizable(true)
-                .setWidth("10%");
+                .setWidth("5%");
 
         grid.addColumn("name")
                 .setHeader("Nombre")

@@ -14,9 +14,7 @@ public final class ProductTransformer {
 
     public static Product toWeb(final ProductEntity productEntity) {
 
-
-        final var product = getProduct(productEntity);
-        return product;
+        return getProduct(productEntity);
     }
 
     private static Product getProduct(ProductEntity productEntity) {
@@ -25,9 +23,9 @@ public final class ProductTransformer {
         product.setCode(productEntity.getCode());
         product.setName(productEntity.getName());
         product.setDescription(productEntity.getDescription());
-        product.setType(productEntity.getType());
         product.setActive(productEntity.getActive());
         product.setMinimalQuantity(productEntity.getMinimalQuantity());
+        product.setStorable(productEntity.isStorable());
 
         final var productCategoryEntity = productEntity.getProductCategoryEntity();
         if (Objects.nonNull(productCategoryEntity)) {

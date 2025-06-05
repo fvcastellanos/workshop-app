@@ -5,7 +5,9 @@ import net.cavitos.workshop.domain.model.web.common.CommonSequence;
 import net.cavitos.workshop.model.entity.ProductCategoryEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ProductCategoryRepository;
+import net.cavitos.workshop.sequence.domain.SequenceType;
 import net.cavitos.workshop.sequence.model.entity.SequenceEntity;
+import net.cavitos.workshop.sequence.provider.SequenceGenerator;
 import net.cavitos.workshop.sequence.service.SequenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +28,17 @@ public class ProductCategoryService {
 
     private final ProductCategoryRepository productCategoryRepository;
     private final SequenceService sequenceService;
+    private final SequenceGenerator sequenceGenerator;
     private final Clock systemClock;
 
     public ProductCategoryService(final ProductCategoryRepository productCategoryRepository,
                                   final SequenceService sequenceService,
+                                  final SequenceGenerator sequenceGenerator,
                                   final Clock systemClock) {
 
         this.productCategoryRepository = productCategoryRepository;
         this.sequenceService = sequenceService;
+        this.sequenceGenerator = sequenceGenerator;
         this.systemClock = systemClock;
     }
 
@@ -70,13 +75,12 @@ public class ProductCategoryService {
 
         verifyProductCategoryName(tenant, productCategory.getName());
 
-        verifyProductCategoryCode(tenant, productCategory.getCode());
-
         final var sequenceEntity = findSequence(productCategory.getSequence(), tenant);
+        final var code = sequenceGenerator.nextValue(SequenceType.PRODUCT_CATEGORY, tenant);
 
         var entity = ProductCategoryEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
-                .code(productCategory.getCode())
+                .code(code)
                 .name(productCategory.getName())
                 .description(productCategory.getDescription())
                 .sequenceEntity(sequenceEntity)
@@ -97,15 +101,9 @@ public class ProductCategoryService {
             verifyProductCategoryName(tenant, productCategory.getName());
         }
 
-        if (!entity.getCode().equalsIgnoreCase(productCategory.getCode())) {
-
-            verifyProductCategoryCode(tenant, productCategory.getCode());
-        }
-
         final var sequenceEntity = findSequence(productCategory.getSequence(), tenant);
 
         entity.setName(productCategory.getName());
-        entity.setCode(productCategory.getCode());
         entity.setDescription(productCategory.getDescription());
         entity.setUpdated(systemClock.instant());
         entity.setActive(productCategory.getActive());
@@ -126,18 +124,6 @@ public class ProductCategoryService {
 
                     throw createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY,
                                 "Product Category with name: %s already exists", name);
-                });
-    }
-
-    private void verifyProductCategoryCode(final String tenant, final String code) {
-
-        productCategoryRepository.findByTenantAndCode(tenant, code)
-                .ifPresent(existingEntity -> {
-
-                    LOGGER.error("Product Category code: {} already exists for tenant: {}",
-                            code, tenant);
-                    throw createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY,
-                                "Product Category with code: %s already exists", code);
                 });
     }
 
