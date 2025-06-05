@@ -181,15 +181,13 @@ public class ProviderInvoiceDetailModalView extends DialogBase<InvoiceDetail> {
     private List<CommonProduct> loadProducts() {
 
         try {
-            final var searchResult = productService.search(tenant, "%", "%", "", 1, 0, 5000);
-
-            return searchResult.getContent()
+            return productService.loadProducts(tenant)
                     .stream()
                     .map(entity -> {
 
                         final var product = new CommonProduct();
                         product.setCode(entity.getCode());
-                        product.setType(entity.getType());
+                        product.setStorable(entity.isStorable());
                         product.setName(entity.getName());
 
                         return product;

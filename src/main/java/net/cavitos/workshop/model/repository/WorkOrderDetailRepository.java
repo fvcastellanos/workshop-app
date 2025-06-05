@@ -17,9 +17,32 @@ public interface WorkOrderDetailRepository extends CrudRepository<WorkOrderDetai
                                                                                    ProductEntity productEntity,
                                                                                    String tenant);
 
+    @Query("""
+                select orderDetail from WorkOrderDetailEntity orderDetail
+                where orderDetail.workOrderEntity.id = :workOrderId
+                    and orderDetail.productEntity.id = :productId
+                    and tenant = :tenant
+           """)
+    Optional<WorkOrderDetailEntity> findDetailByWorkOrder(String workOrderId,
+                                                          String productId,
+                                                          String tenant);
+
+    @Query("""
+                select orderDetail from WorkOrderDetailEntity orderDetail
+                where productEntity.id = :productId
+                    and orderDetail.invoiceDetailEntity.id = :invoiceDetailId
+                    and tenant = :tenant
+           """)
+    Optional<WorkOrderDetailEntity> findDetailByInvoiceDetail(String invoiceDetailId,
+                                                              String productId,
+                                                              String tenant);
+
     Optional<WorkOrderDetailEntity> findByIdAndTenant(String id, String tenant);
 
-    @Query("select orderDetail from WorkOrderDetailEntity orderDetail where orderDetail.workOrderEntity.id = :orderId")
+    @Query("""
+               select orderDetail from WorkOrderDetailEntity orderDetail
+               where orderDetail.workOrderEntity.id = :orderId
+           """)
     List<WorkOrderDetailEntity> getOrderDetails(String orderId);
 
 }

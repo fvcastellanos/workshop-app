@@ -1,6 +1,7 @@
 package net.cavitos.workshop.event.listener;
 
 import net.cavitos.workshop.event.model.InvoiceDetailEvent;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import static java.util.Objects.nonNull;
-import static net.cavitos.workshop.factory.DateTimeFactory.getUTCNow;
 
 @Component
 public class WorkOrderInvoiceDetailListener {
@@ -20,9 +20,12 @@ public class WorkOrderInvoiceDetailListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkOrderInvoiceDetailListener.class);
 
     private final WorkOrderDetailRepository workOrderDetailRepository;
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
 
-    public WorkOrderInvoiceDetailListener(final WorkOrderDetailRepository workOrderDetailRepository) {
+    public WorkOrderInvoiceDetailListener(final WorkOrderDetailRepository workOrderDetailRepository,
+                                          final ZonedDateTimeFactory zonedDateTimeFactory) {
         this.workOrderDetailRepository = workOrderDetailRepository;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
     @EventListener(InvoiceDetailEvent.class)
@@ -50,7 +53,7 @@ public class WorkOrderInvoiceDetailListener {
         final var productEntity = invoiceDetailEntity.getProductEntity();
         final var tenant = invoiceDetailEntity.getTenant();
 
-        workOrderDetailRepository.findByWorkOrderEntityAndProductEntityAndTenant(workOrderEntity, productEntity, tenant)
+        workOrderDetailRepository.findDetailByInvoiceDetail(invoiceDetailEntity.getId(), productEntity.getId(), tenant)
                 .ifPresent(workOrderDetailEntity -> {
 
                     LOGGER.info("work_order_detail={} found, deleting it for tenant={}", workOrderDetailEntity, tenant);
@@ -68,8 +71,8 @@ public class WorkOrderInvoiceDetailListener {
         if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
             LOGGER.info("Adding a new work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
 
-            final var detailHolder = workOrderDetailRepository.findByWorkOrderEntityAndProductEntityAndTenant(workOrderEntity,
-                    productEntity, tenant);
+            final var detailHolder = workOrderDetailRepository.findDetailByWorkOrder(workOrderEntity.getId(),
+                    productEntity.getId(), tenant);
 
             if (detailHolder.isPresent()) {
 
@@ -87,7 +90,7 @@ public class WorkOrderInvoiceDetailListener {
                     .quantity(invoiceDetailEntity.getQuantity())
                     .unitPrice(invoiceDetailEntity.getUnitPrice())
                     .tenant(tenant)
-                    .created(getUTCNow())
+                    .created(zonedDateTimeFactory.getSystemNow())
                     .build();
 
             workOrderDetailRepository.save(detail);
@@ -101,21 +104,7 @@ public class WorkOrderInvoiceDetailListener {
     @Transactional
     void updateWorkOrderDetailFor(final InvoiceDetailEntity invoiceDetailEntity) {
 
-        final var workOrderEntity = invoiceDetailEntity.getWorkOrderEntity();
-        final var productEntity = invoiceDetailEntity.getProductEntity();
-        final var tenant = invoiceDetailEntity.getTenant();
-
-        workOrderDetailRepository.findByWorkOrderEntityAndProductEntityAndTenant(workOrderEntity, productEntity, tenant)
-                .ifPresent(detail -> {
-
-                    LOGGER.info("Update work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
-
-                    detail.setWorkOrderEntity(workOrderEntity);
-                    detail.setProductEntity(productEntity);
-                    detail.setQuantity(invoiceDetailEntity.getQuantity());
-                    detail.setUnitPrice(invoiceDetailEntity.getUnitPrice());
-
-                    workOrderDetailRepository.save(detail);
-                });
+        deleteWorkOrderDetailFor(invoiceDetailEntity);
+        addWorkOrderDetailFor(invoiceDetailEntity);
     }
 }

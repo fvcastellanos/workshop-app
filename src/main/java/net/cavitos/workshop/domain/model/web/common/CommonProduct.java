@@ -13,5 +13,5 @@ public class CommonProduct {
 
     private String code;
     private String name;
-    private String type;
+    private boolean storable;
 }

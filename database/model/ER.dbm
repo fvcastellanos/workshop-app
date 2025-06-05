@@ -4,7 +4,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
  Unexpected results may occur if the code is changed deliberately.
 -->
 <dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="21"
-	 last-position="1097,1464" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
+	 last-position="908,2319" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
 	 default-schema="public" default-owner="postgres"
 	 layers="Default layer"
 	 active-layers="0"
@@ -38,7 +38,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="flyway_schema_history" layers="0" collapse-mode="2" max-obj-count="12" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="60" y="60"/>
+	<position x="60" y="80"/>
 	<column name="installed_rank" not-null="true">
 		<type name="integer" length="0"/>
 	</column>
@@ -85,7 +85,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="car_brand" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="480" y="60"/>
+	<position x="480" y="80"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -139,7 +139,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="car_line" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1040" y="60"/>
+	<position x="1040" y="80"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -196,7 +196,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="contact" layers="0" collapse-mode="2" max-obj-count="13" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1480" y="60"/>
+	<position x="1480" y="80"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -297,7 +297,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="discount_type" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="2180" y="60"/>
+	<position x="2180" y="80"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -359,7 +359,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="operation_type" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="120" y="600"/>
+	<position x="120" y="620"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -443,7 +443,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="product_category" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1160" y="2700"/>
+	<position x="1160" y="2720"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -462,7 +462,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
-	<column name="updated" not-null="true" default-value="CURRENT_TIMESTAMP">
+	<column name="updated">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="active" not-null="true" default-value="1">
@@ -503,15 +503,15 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="product" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1580" y="1540"/>
+	<position x="1580" y="1560"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
 	<column name="product_category_id" default-value="NULL">
 		<type name="character varying" length="50"/>
 	</column>
-	<column name="type" not-null="true" default-value="'P'::bpchar">
-		<type name="character" length="1"/>
+	<column name="storable" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
 	</column>
 	<column name="code" not-null="true">
 		<type name="character varying" length="50"/>
@@ -580,18 +580,10 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
-<index name="idx_product_type" table="workshop.product"
-	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
-	 index-type="btree" factor="90">
-		<idxelement use-sorting="false">
-			<column name="type"/>
-		</idxelement>
-</index>
-
 <table name="inventory" layers="0" collapse-mode="2" max-obj-count="15" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1400" y="700"/>
+	<position x="1400" y="720"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -690,7 +682,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="invoice" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="2040" y="400"/>
+	<position x="2040" y="420"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -802,7 +794,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="work_order" layers="0" collapse-mode="2" max-obj-count="16" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="60" y="1280"/>
+	<position x="60" y="1300"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -888,7 +880,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="invoice_detail" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="1720" y="2260"/>
+	<position x="1720" y="2280"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -951,7 +943,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="sequence" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="2300" y="2680"/>
+	<position x="2300" y="2700"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -998,7 +990,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="tenant" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="2320" y="1920"/>
+	<position x="2320" y="1940"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1033,7 +1025,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="application_user" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="2280" y="1340"/>
+	<position x="2280" y="1360"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1074,7 +1066,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="160" y="2040"/>
+	<position x="160" y="2060"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1142,7 +1134,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <view name="product_stock" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="880" y="1580"/>
+	<position x="880" y="1600"/>
 	<reference object="workshop.operation_type" type="table" ref-name="operation_type" use-signature="true"/>
 	<reference object="workshop.product" type="table" ref-name="product" use-signature="true"/>
 	<reference object="workshop.inventory" type="table" ref-name="inventory" use-signature="true"/>
@@ -1202,6 +1194,14 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 index-type="btree" factor="0">
 		<idxelement use-sorting="false">
 			<column name="sequence_id"/>
+		</idxelement>
+</index>
+
+<index name="idx_product_storable" table="workshop.product"
+	 concurrent="false" unique="false" fast-update="false" buffering="false" nulls-not-distinct="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="storable"/>
 		</idxelement>
 </index>
 

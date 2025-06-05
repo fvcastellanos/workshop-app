@@ -176,7 +176,7 @@ public class InitialInventoryModalView extends DialogBase<InventoryEntity> {
 
                     final var product = new CommonProduct();
                     product.setCode(entity.getCode());
-                    product.setType(entity.getType());
+                    product.setStorable(entity.isStorable());
                     product.setName(entity.getName());
 
                     return product;

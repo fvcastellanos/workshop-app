@@ -19,7 +19,7 @@ public class InventoryMovementTransformer {
         final var commonProduct = new CommonProduct();
         commonProduct.setCode(product.getCode());
         commonProduct.setName(product.getName());
-        commonProduct.setType(product.getType());
+        commonProduct.setStorable(product.isStorable());
 
         final var commonOperationType = new CommonOperationType();
         commonOperationType.setCode(operationType.getCode());

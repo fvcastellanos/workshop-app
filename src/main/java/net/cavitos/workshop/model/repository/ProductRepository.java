@@ -19,12 +19,13 @@ public interface ProductRepository extends CrudRepository<ProductEntity, String>
                 where
                     product.tenant = :tenant
                     and product.active = :active
-                    and product.type like :type
+                    and (false = :evaluate or product.storable = :storable)
                     and product.productCategoryEntity.id like :category
                     and (UPPER(product.code) like UPPER(:text) or UPPER(product.name) like UPPER(:text))
             """)
     Page<ProductEntity> search(String text,
-                               String type,
+                               boolean evaluate,
+                               boolean storable,
                                String category,
                                int active,
                                String tenant,

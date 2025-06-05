@@ -12,8 +12,12 @@ import java.util.Optional;
 public interface WorkOrderRepository extends CrudRepository<WorkOrderEntity, String>,
                                              PagingAndSortingRepository<WorkOrderEntity, String> {
 
-    @Query("select workOrder from WorkOrderEntity workOrder where workOrder.tenant = :tenant and workOrder.status like :status " +
-            "and (UPPER(workOrder.number) like UPPER(:text) or UPPER(workOrder.plateNumber) like UPPER(:text))")
+    @Query("""
+               select workOrder from WorkOrderEntity workOrder
+               where workOrder.tenant = :tenant
+                and workOrder.status like :status
+                and (UPPER(workOrder.number) like UPPER(:text) or UPPER(workOrder.plateNumber) like UPPER(:text))
+           """)
     Page<WorkOrderEntity> search(String tenant, String status, String text, Pageable pageable);
 
     Optional<WorkOrderEntity> findByNumberEqualsIgnoreCaseAndTenant(String number, String tenant);

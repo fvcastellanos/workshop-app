@@ -13,7 +13,7 @@ import net.cavitos.workshop.domain.model.web.common.CommonProductCategory;
 public class Product {
 
     private String code;
-    private String type;
+    private boolean storable;
     private String name;
     private String description;
     private double minimalQuantity;

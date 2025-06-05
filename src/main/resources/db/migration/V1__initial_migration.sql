@@ -325,7 +325,7 @@ CREATE TABLE workshop.product_category (
 	name character varying(150) NOT NULL,
 	description character varying(300) DEFAULT NULL,
 	created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated timestamp,
 	active integer NOT NULL DEFAULT 1,
 	tenant character varying(50) NOT NULL,
 	CONSTRAINT product_category_pkey PRIMARY KEY (id)
@@ -369,7 +369,7 @@ WITH (FILLFACTOR = 90);
 CREATE TABLE workshop.product (
 	id character varying(50) NOT NULL,
 	product_category_id character varying(50) DEFAULT NULL,
-	type character(1) NOT NULL DEFAULT 'P'::bpchar,
+	storable boolean NOT NULL DEFAULT true,
 	code character varying(50) NOT NULL,
 	name character varying(150) NOT NULL,
 	description character varying(300) DEFAULT NULL,
@@ -422,16 +422,6 @@ CREATE INDEX idx_product_active ON workshop.product
 USING btree
 (
 	active
-)
-WITH (FILLFACTOR = 90);
--- ddl-end --
-
--- object: idx_product_type | type: INDEX --
--- DROP INDEX IF EXISTS workshop.idx_product_type CASCADE;
-CREATE INDEX idx_product_type ON workshop.product
-USING btree
-(
-	type
 )
 WITH (FILLFACTOR = 90);
 -- ddl-end --
@@ -913,6 +903,15 @@ CREATE INDEX idx_product_category_sequence_id ON workshop.product_category
 USING btree
 (
 	sequence_id
+);
+-- ddl-end --
+
+-- object: idx_product_storable | type: INDEX --
+-- DROP INDEX IF EXISTS workshop.idx_product_storable CASCADE;
+CREATE INDEX idx_product_storable ON workshop.product
+USING btree
+(
+	storable
 );
 -- ddl-end --
 
