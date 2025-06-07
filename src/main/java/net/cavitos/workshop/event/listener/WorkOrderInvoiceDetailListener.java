@@ -49,7 +49,6 @@ public class WorkOrderInvoiceDetailListener {
     @Transactional
     void deleteWorkOrderDetailFor(final InvoiceDetailEntity invoiceDetailEntity) {
 
-        final var workOrderEntity = invoiceDetailEntity.getWorkOrderEntity();
         final var productEntity = invoiceDetailEntity.getProductEntity();
         final var tenant = invoiceDetailEntity.getTenant();
 

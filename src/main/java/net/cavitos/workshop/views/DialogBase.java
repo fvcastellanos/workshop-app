@@ -3,7 +3,6 @@ package net.cavitos.workshop.views;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import net.cavitos.workshop.model.entity.CarBrandEntity;
 
 import java.util.function.Consumer;
 

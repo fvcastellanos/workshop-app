@@ -1,6 +1,5 @@
 package net.cavitos.workshop.service;
 
-import net.cavitos.workshop.domain.model.type.ProductType;
 import net.cavitos.workshop.domain.model.web.Product;
 import net.cavitos.workshop.model.entity.ProductCategoryEntity;
 import net.cavitos.workshop.model.entity.ProductEntity;
@@ -19,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -198,16 +196,6 @@ public class ProductService {
         }
 
         return categoryEntity;
-    }
-
-    private String calculateCode(final String type, final String tenant) {
-
-        final var productType = ProductType.valueOf(type);
-
-        return switch (productType) {
-            case PRODUCT -> sequenceGenerator.nextValue(SequenceType.PRODUCT, tenant);
-            case SERVICE -> sequenceGenerator.nextValue(SequenceType.SERVICE, tenant);
-        };
     }
 
     private String calculateCode(final ProductCategoryEntity categoryEntity, final String tenant) {

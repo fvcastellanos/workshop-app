@@ -71,13 +71,11 @@ public class InvoiceDetailInventoryListener {
 
         final var tenant = invoiceDetailEntity.getTenant();
         final var productEntity = invoiceDetailEntity.getProductEntity();
-        final var movementType = findBuyLocalMovementType(tenant);
 
         LOGGER.info("Adding an inventory movement for tenant={} and invoice_detail_id={}", tenant, invoiceDetailEntity.getId());
 
         if (productEntity.isStorable()) {
 
-//            final var movementHolder = findInventoryMovement(productEntity, invoiceDetailEntity, movementType, tenant);
             final var inventoryMovements = inventoryRepository.findInventoryMovementsFor(productEntity.getId(),
                     invoiceDetailEntity.getId(), tenant);
 
@@ -132,7 +130,7 @@ public class InvoiceDetailInventoryListener {
                         .unitPrice(unitPrice)
                         .total(total)
                         .inventoryMovementTypeEntity(movementOutputTypeEntity)
-                        .operationDate(operationDate)
+                        .operationDate(zonedDateTimeFactory.getSystemNow())
                         .tenant(tenant)
                         .description(MOVEMENT_DESCRIPTION)
                         .created(zonedDateTimeFactory.getSystemNow())

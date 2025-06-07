@@ -3,8 +3,6 @@ package net.cavitos.workshop.views.factory;
 import com.vaadin.flow.component.combobox.ComboBox;
 import net.cavitos.workshop.domain.model.web.common.CommonProduct;
 
-import java.util.List;
-
 public final class ProductDropDownFactory {
 
     private ProductDropDownFactory() {

@@ -1,7 +1,5 @@
 package net.cavitos.workshop.views.model.transformer;
 
-import net.cavitos.workshop.domain.model.web.WorkOrder;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
