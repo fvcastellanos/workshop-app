@@ -22,7 +22,6 @@ public class SequenceGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequenceGenerator.class);
 
     private static final String PAD_STR = "0";
-    private static final int PAD_SIZE = 3;
 
     private final SequenceRepository sequenceRepository;
     private final String sequenceFormat;

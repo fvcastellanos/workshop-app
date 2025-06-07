@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
-import java.util.function.Supplier;
 
 public abstract class CRUDLayout extends VerticalLayout {
 

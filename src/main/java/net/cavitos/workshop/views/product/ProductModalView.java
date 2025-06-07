@@ -19,7 +19,6 @@ import net.cavitos.workshop.views.model.Status;
 import net.cavitos.workshop.views.model.TypeOption;
 import net.cavitos.workshop.views.model.transformer.CategoryTransformer;
 import net.cavitos.workshop.views.model.transformer.StatusTransformer;
-import net.cavitos.workshop.views.model.transformer.TypeTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
