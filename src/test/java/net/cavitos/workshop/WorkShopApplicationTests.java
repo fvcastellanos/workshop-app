@@ -2,10 +2,10 @@ package net.cavitos.workshop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootTest
-@ContextConfiguration(locations = "net.cavitos.workshop")
+@ComponentScan(basePackages = "net.cavitos.workshop")
 class WorkShopApplicationTests {
 
 	@Test
