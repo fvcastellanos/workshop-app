@@ -12,9 +12,7 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: workshop
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
@@ -33,7 +31,7 @@ jobs:
 
       - name: Build and Run Unit Tests
         env:
-            DATASOURCE_URL: jdbc:postgresql://localhost:5432/workshop?user=test&password=test
+            DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
             AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
             AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
             AUTH0_ISSUER: ${{ secrets.AUTH0_ISSUER }}
