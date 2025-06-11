@@ -35,14 +35,14 @@ jobs:
       - name: Wait for Postgres to be ready
         run: |
           for i in {1..10}; do
-            pg_isready -h localhost -p 5432 -U test && break
+            pg_isready -h localhost -p 5432 -U workshop && break
             sleep 2
           done
 
       - name: Create custom schema
         run: |
-          PGPASSWORD=test psql -h localhost -U test -d workshop -c "CREATE SCHEMA IF NOT EXISTS workshop;"
-          PGPASSWORD=test psql -h localhost -U test -d workshop -c "ALTER SCHEMA workshop OWNER TO test;"          
+          PGPASSWORD=test psql -h localhost -U workshop -d workshop -c "CREATE SCHEMA IF NOT EXISTS workshop;"
+          PGPASSWORD=test psql -h localhost -U workshop -d workshop -c "ALTER SCHEMA workshop OWNER TO workshop;"
 
       - name: Build and Run Unit Tests
         env:
