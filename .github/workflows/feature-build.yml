@@ -12,7 +12,10 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: test
+          POSTGRES_DB: workshop
+          POSTGRES_PASSWORD: test
+
         ports:
           - 5432:5432
         options: >-
@@ -28,6 +31,18 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..10}; do
+            pg_isready -h localhost -p 5432 -U test && break
+            sleep 2
+          done
+
+      - name: Create custom schema
+        run: |
+          PGPASSWORD=test psql -h localhost -U test -d workshop -c "CREATE SCHEMA IF NOT EXISTS workshop;"
+          PGPASSWORD=test psql -h localhost -U test -d workshop -c "ALTER SCHEMA workshop OWNER TO test;"          
 
       - name: Build and Run Unit Tests
         env:
