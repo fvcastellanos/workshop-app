@@ -1,0 +1,57 @@
+name: Release and Prepare Next Development Version
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-and-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Remove -SNAPSHOT for Release Version
+        id: release
+        run: |
+          current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          release_version=$(echo "$current_version" | sed 's/-SNAPSHOT//')
+          mvn versions:set -DnewVersion=$release_version
+          mvn versions:commit
+          echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
+
+      - name: Commit and Tag Release Version
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add pom.xml
+          git commit -m "chore(release): release version $RELEASE_VERSION [skip ci]"
+          git tag "v$RELEASE_VERSION"
+          git push origin HEAD:main --tags
+
+      - name: Prepare Next Minor SNAPSHOT Version
+        id: bump
+        run: |
+          major=$(echo $RELEASE_VERSION | awk -F. '{print $1}')
+          minor=$(echo $RELEASE_VERSION | awk -F. '{print $2}')
+          next_minor=$((minor + 1))
+          next_version="${major}.${next_minor}.0-SNAPSHOT"
+          mvn versions:set -DnewVersion=$next_version
+          mvn versions:commit
+          echo "NEXT_VERSION=$next_version" >> $GITHUB_ENV
+
+      - name: Commit Next Development Version and Merge to Develop
+        run: |
+          git add pom.xml
+          git commit -m "chore: start $NEXT_VERSION development [skip ci]"
+          git fetch origin develop:develop || git checkout -b develop
+          git checkout develop
+          git merge --no-ff main -m "Merge release v$RELEASE_VERSION into develop"
+          git push origin develop
+          
