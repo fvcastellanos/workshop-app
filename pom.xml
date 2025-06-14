@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>net.cavitos.workshop</groupId>
 	<artifactId>workshop-app</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>WorkShopERP</name>
 	<scm>
 		<connection/>
@@ -152,6 +152,18 @@
 					<defaultSchema>workshop</defaultSchema>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.amashchenko.maven.plugin</groupId>
+				<artifactId>gitflow-maven-plugin</artifactId>
+				<version>1.21.0</version>
+				<configuration>
+					<gitFlowConfig>
+						<productionBranch>main</productionBranch>
+						<developmentBranch>develop</developmentBranch>
+						<origin>origin</origin>
+					</gitFlowConfig>
+				</configuration>
+        	</plugin>			
 		</plugins>
 	</build>
 
