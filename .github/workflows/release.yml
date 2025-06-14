@@ -2,8 +2,7 @@ name: GitFlow Release
 
 on:
   workflow_dispatch:
-    branches:
-      - develop
+
 jobs:
   release:
     runs-on: ubuntu-latest
