@@ -2,7 +2,8 @@ name: GitFlow Release
 
 on:
   workflow_dispatch:
-    
+    branches:
+      - develop
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -17,10 +18,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Execute GitFlow Release
+      - name: Prepare Release Version
         run: |
-          mvn gitflow:release -DversionDigitToIncrement=1
+          mvn -B release:prepare -Darguments=-DskipTests
 
-      - name: Complete GitFlow Release
+      - name: Complete Release
         run: |
-          mvn gitflow:release-finish
+          mvn -B release:perform
