@@ -6,7 +6,7 @@ steps:
 - name: sleep
   image: busybox:latest
   commands:
-  - sleep 5
+  - sleep 10
 
 - name: build
   image: maven:3.9-eclipse-temurin-21
@@ -25,5 +25,5 @@ services:
     environment:
       POSTGRES_USER: drone
       POSTGRES_PASSWORD: drone
-      POSTGRES_DB: drone
+      POSTGRES_DB: workshop
       
