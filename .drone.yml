@@ -3,11 +3,11 @@ type: docker
 name: default
 
 steps:
-- name: greeting
-  image: alpine
+- name: sleep
+  image: busybox:latest
   commands:
-  - echo hello
-  - echo world
+  - sleep 5
+
 - name: build
   image: maven:3.9-eclipse-temurin-21
   commands:
@@ -26,6 +26,4 @@ services:
       POSTGRES_USER: drone
       POSTGRES_PASSWORD: drone
       POSTGRES_DB: drone
-    ports:
-      - 5432:5432
       
