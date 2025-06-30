@@ -8,3 +8,24 @@ steps:
   commands:
   - echo hello
   - echo world
+- name: build
+  image: maven:3.9-eclipse-temurin-21
+  commands:
+  - mvn clean test verify
+
+trigger:
+  branch:
+    include:
+      - feature/*
+      - develop
+
+services:
+  - name: postgres
+    image: postgres:16
+    environment:
+      POSTGRES_USER: drone
+      POSTGRES_PASSWORD: drone
+      POSTGRES_DB: drone
+    ports:
+      - 5432:5432
+      
