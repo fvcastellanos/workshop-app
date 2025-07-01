@@ -7,7 +7,7 @@ steps:
   image: postgres:16
   environment:
     POSTGRES_DB:
-      from_secret: POSTGRES_DB
+      from_secret: postgres_db
   commands:
   - while ! pg_isready -h postgres -d ${POSTGRES_DB}; do sleep 2; done
 
