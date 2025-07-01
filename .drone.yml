@@ -16,6 +16,7 @@ steps:
   - export PGPASSWORD=$POSTGRES_PASSWORD
   - while ! pg_isready -h postgres -d $POSTGRES_DB; do sleep 2; done
   - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE SCHEMA IF NOT EXISTS workshop;"
+  - psql -h postgres -U $POSTGRES_USER -d $POSTGRES_DB -c "GRANT ALL ON SCHEMA workshop TO $POSTGRES_USER;"
 
 - name: build
   image: maven:3.9-eclipse-temurin-21
