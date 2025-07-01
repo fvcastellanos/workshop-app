@@ -30,7 +30,7 @@ steps:
       from_secret: POSTGRES_DB
       
   commands:
-  - export DATASOURCE_URL="jdbc:postgresql://postgres:5432/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
+  - export DATASOURCE_URL="jdbc:postgresql://postgres:5432/$POSTGRES_DB?user=$POSTGRES_USER&password=$POSTGRES_PASSWORD"
   - mvn clean test verify
 
 trigger:
