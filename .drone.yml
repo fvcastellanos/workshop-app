@@ -7,7 +7,11 @@ steps:
   image: postgres:16
   environment:
     POSTGRES_DB:
-      from_secret: postgres_db
+      from_secret: POSTGRES_DB
+    POSTGRES_USER:
+      from_secret: POSTGRES_USER
+    POSTGRES_PASSWORD:
+      from_secret: POSTGRES_PASSWORD
   commands:
   - while ! pg_isready -h postgres -d $POSTGRES_DB; do sleep 2; done
   - psql -h postgres -U $POSTGRES_USER -W $POSTGRES_PASSWORD -d $POSTGRES_DB -c "CREATE SCHEMA IF NOT EXISTS workshop;"
