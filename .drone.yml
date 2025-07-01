@@ -9,7 +9,7 @@ steps:
     POSTGRES_DB:
       from_secret: postgres_db
   commands:
-  - while ! pg_isready -h postgres -d ${POSTGRES_DB}; do sleep 2; done
+  - while ! pg_isready -h postgres -d $POSTGRES_DB; do sleep 2; done
 
 - name: build
   image: maven:3.9-eclipse-temurin-21
@@ -28,9 +28,9 @@ steps:
       from_secret: POSTGRES_PASSWORD
     POSTGRES_DB:
       from_secret: POSTGRES_DB
-    DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
       
   commands:
+  - export DATASOURCE_URL="jdbc:postgresql://postgres:5432/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
   - mvn clean test verify
 
 trigger:
