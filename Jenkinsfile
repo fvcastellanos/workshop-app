@@ -2,7 +2,7 @@ node {
 
     imageName = 'maven:3.9-eclipse-temurin-21'
 
-    stage 'Checkout' {
+    stage('Checkout') {
 
         checkout scm: scmGit(
             branches: [[name: '$BRANCH_NAME']], 
@@ -14,7 +14,7 @@ node {
         )
     }
 
-    stage 'Build' {
+    stage('Build') {
 
         docker.image(imageName)
             .inside {
