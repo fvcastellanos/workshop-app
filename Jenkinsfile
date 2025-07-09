@@ -12,18 +12,18 @@ node {
 
     stage('Prepare Data Services') {
 
-        docker.image(postgresImageName).withRun(
-             '-e POSTGRES_USER=$DB_CREDENTIALS_USR ' +
-             '-e POSTGRES_PASSWORD=$DB_CREDENTIALS_PSW ' +
-             '-e POSTGRES_DB=$DB_NAME ' +
-             '-e PGPASSWORD=$DB_CREDENTIALS_PSW'
-        ) { container ->
+        // docker.image(postgresImageName).withRun(
+        //      '-e POSTGRES_USER=$DB_CREDENTIALS_USR ' +
+        //      '-e POSTGRES_PASSWORD=${DB_CREDENTIALS_PSW} ' +
+        //      '-e POSTGRES_DB=${DB_NAME} ' +
+        //      '-e PGPASSWORD=${DB_CREDENTIALS_PSW}'
+        // ) { container ->
 
-            docker.image(postgresImageName).inside("--link ${container.name}:postgres") {
-                sh 'while ! pg_isready -h postgres -d DB_NAME; do sleep 2; done'
-                sh 'psql -h postgres -U $DB_CREDENTIALS_USR -d $DB_NAME -c "CREATE SCHEMA IF NOT EXISTS $DB_SCHEMA;"'
-            }
-        }
+        //     docker.image(postgresImageName).inside("--link ${container.id}:postgres") {
+        //         sh 'while ! pg_isready -h postgres -d ${DB_NAME}; do sleep 2; done'
+        //         sh 'psql -h postgres -U ${DB_CREDENTIALS_USR} -d ${DB_NAME} -c "CREATE SCHEMA IF NOT EXISTS ${DB_SCHEMA};"'
+        //     }
+        // }
     }
 
     stage('Checkout') {
