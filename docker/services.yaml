@@ -1,13 +1,20 @@
 version: '3.7'
 services:
+  networks:
+    host:
+      external: true
   postgres:
     image: 'postgres:17'
+    container_name: postgres
     environment:
-      - 'POSTGRES_DB=${WORKSHOP_DB}'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=${DB_NAME}'
+      - 'POSTGRES_USER=${DB_CREDENTIALS_USR}'
+      - 'POSTGRES_PASSWORD=${DB_CREDENTIALS_PSW}'
+      - 'PGPASSWORD=${DB_CREDENTIALS_PSW}'
     ports:
-      - '15432'
-    
-    volumes:
-      - './docker/service-config:/docker-entrypoint-initdb.d'
+      - '5432'
+    healthcheck:
+      test: 'pg_isready -U ${DB_CREDENTIALS_USR} -d ${DB_NAME}'
+      interval: 10s
+      timeout: 5s
+      retries: 5
