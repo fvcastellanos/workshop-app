@@ -1,14 +1,14 @@
 node {
 
-    repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
-    mavenImageName = 'maven:3.9-eclipse-temurin-21'
-    postgresImageName = 'postgres:17'
+    def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
+    def mavenImageName = 'maven:3.9-eclipse-temurin-21'
+    def postgresImageName = 'postgres:17'
 
-    environment {
-        env.DB_CREDENTIALS = credentials('workshop-db-credentials')
-        env.DB_NAME = credentials('workshop-db')
-        env.DB_SCHEMA = credentials('workshop-schema')
-    }
+    def DB_CREDENTIALS = credentials('workshop-db-credentials').split(':')
+    def DB_CREDENTIALS_USR = DB_CREDENTIALS[0]
+    def DB_CREDENTIALS_PWD = DB_CREDENTIALS[1]
+    def DB_NAME = credentials('workshop-db')
+    def DB_SCHEMA = credentials('workshop-schema')
 
     stages {
         stage('Prepare Data Services') {
@@ -49,5 +49,4 @@ node {
 
         }
     }
-
 }
