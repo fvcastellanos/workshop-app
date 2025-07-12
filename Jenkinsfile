@@ -12,6 +12,8 @@ node {
 
     stage('Prepare Data Services') {
 
+        sh 'echo $DB_CREDENTIALS_USR'
+
         // docker.image(postgresImageName).withRun(
         //      '-e POSTGRES_USER=$DB_CREDENTIALS_USR ' +
         //      '-e POSTGRES_PASSWORD=${DB_CREDENTIALS_PSW} ' +
