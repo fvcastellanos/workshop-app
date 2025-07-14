@@ -10,7 +10,8 @@ node {
         string(credentialsId: 'workshop-schema', variable: 'DB_SCHEMA'),
         string(credentialsId: 'auth0-client-id', variable: 'AUTH0_CLIENT_ID'),
         string(credentialsId: 'auth0-client-secret', variable: 'AUTH0_CLIENT_SECRET'),
-        string(credentialsId: 'workshop-cors-origins', variable: 'WORKSHOP_CORS_ORIGINS')
+        string(credentialsId: 'workshop-cors-origins', variable: 'WORKSHOP_CORS_ORIGINS'),
+        string(credentialsId: 'auth0-issuer', variable: 'AUTH0_ISSUER'),
     ]) {
         try {
 
