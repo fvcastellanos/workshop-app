@@ -8,7 +8,7 @@ node {
         usernamePassword(credentialsId: 'workshop-db-credentials', usernameVariable: 'DB_CREDENTIALS_USR', passwordVariable: 'DB_CREDENTIALS_PSW'),
         string(credentialsId: 'workshop-db', variable: 'DB_NAME'),
         string(credentialsId: 'workshop-schema', variable: 'DB_SCHEMA')
-   ]) {
+    ]) {
         try {
             stage('Prepare Data Services') {
                 sh '''
