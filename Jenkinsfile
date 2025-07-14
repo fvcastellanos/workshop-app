@@ -7,9 +7,14 @@ node {
     withCredentials([
         usernamePassword(credentialsId: 'workshop-db-credentials', usernameVariable: 'DB_CREDENTIALS_USR', passwordVariable: 'DB_CREDENTIALS_PSW'),
         string(credentialsId: 'workshop-db', variable: 'DB_NAME'),
-        string(credentialsId: 'workshop-schema', variable: 'DB_SCHEMA')
+        string(credentialsId: 'workshop-schema', variable: 'DB_SCHEMA'),
+        string(credentialsId: 'auth0-client-id', variable: 'AUTH0_CLIENT_ID'),
+        string(credentialsId: 'auth0-client-secret', variable: 'AUTH0_CLIENT_SECRET'),
+        string(credentialsId: 'workshop-cors-origins', variable: 'WORKSHOP_CORS_ORIGINS')
     ]) {
         try {
+
+            def env.DATASOURCE_URL = "jdbc:postgresql://localhost:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"
 
             stage('Checkout') {
 
@@ -35,7 +40,7 @@ node {
 
                 docker.image(mavenImageName)
                     .inside {
-                        sh 'mvn -B clean package -DskipTests'
+                        sh 'mvn -B clean test verify'
                     }
             }
         } catch (Exception exception) {
