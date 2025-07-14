@@ -3,6 +3,7 @@ node {
     def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
     def mavenImageName = 'maven:3.9-eclipse-temurin-21'
     def postgresImageName = 'postgres:17'
+    def hostAddress = InetAddress.localHost.hostAddress
 
     withCredentials([
         usernamePassword(credentialsId: 'workshop-db-credentials', usernameVariable: 'DB_CREDENTIALS_USR', passwordVariable: 'DB_CREDENTIALS_PSW'),
@@ -48,7 +49,8 @@ node {
 
                 docker.image(mavenImageName)
                     .inside {
-                        sh 'export DATASOURCE_URL="jdbc:postgresql://localhost:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"'
+                        sh 'echo $hostAddress'
+                        sh 'export DATASOURCE_URL="jdbc:postgresql://$hostAddress:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"'
                         sh 'mvn -B clean test verify'
                     }
             }
