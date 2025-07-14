@@ -1,7 +1,4 @@
 services:
-  networks:
-    host:
-      external: true
   postgres:
     image: 'postgres:17'
     container_name: postgres
