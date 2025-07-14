@@ -29,7 +29,16 @@ node {
             stage('Prepare Data Services') {
                 sh '''
                     docker compose -f ./docker/services.yaml up -d
-                    while ! docker exec postgres pg_isready -U $DB_CREDENTIALS_USR -d $DB_NAME; do sleep 2; done
+                    max_attempts=10 \
+                    attempt=1 \
+                    while ! docker exec postgres pg_isready -U $DB_CREDENTIALS_USR -d $DB_NAME; do \
+                        if [ $attempt -ge $max_attempts ]; then \
+                            echo "Postgres did not become ready after $max_attempts attempts." \
+                            exit 1 \
+                        fi \
+                        sleep 2; \
+                        attempt=$((attempt + 1)) \
+                    done
                     docker exec -i postgres psql -U $DB_CREDENTIALS_USR -d $DB_NAME -c "CREATE SCHEMA IF NOT EXISTS $DB_SCHEMA;"
                 '''
             }
