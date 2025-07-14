@@ -27,7 +27,7 @@ node {
                 sh '''
                     docker compose -f ./docker/services.yaml up -d
                     while ! docker exec postgres pg_isready -U $DB_CREDENTIALS_USR -d $DB_NAME; do sleep 2; done
-                    docker exec -i postgres psql -U $DB_CREDENTIALS_USR -d $DB_NAME -c 'CREATE SCHEMA IF NOT EXISTS $DB_SCHEMA;'
+                    docker exec -i postgres psql -U $DB_CREDENTIALS_USR -d $DB_NAME -c "CREATE SCHEMA IF NOT EXISTS $DB_SCHEMA;"
                 '''
             }
 
