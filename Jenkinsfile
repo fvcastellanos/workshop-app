@@ -10,13 +10,6 @@ node {
         string(credentialsId: 'workshop-schema', variable: 'DB_SCHEMA')
     ]) {
         try {
-            stage('Prepare Data Services') {
-                sh '''
-                    docker compose -f ./docker/services.yaml up -d
-                    while ! docker exec postgres pg_isready -U $DB_CREDENTIALS_USR -d $DB_NAME; do sleep 2; done
-                    docker exec -i postgres psql -U $DB_CREDENTIALS_USR -d $DB_NAME -c 'CREATE SCHEMA IF NOT EXISTS $DB_SCHEMA;'
-                '''
-            }
 
             stage('Checkout') {
 
@@ -28,6 +21,14 @@ node {
                         url: repositoryUrl
                     ]]
                 )
+            }
+
+            stage('Prepare Data Services') {
+                sh '''
+                    docker compose -f ./docker/services.yaml up -d
+                    while ! docker exec postgres pg_isready -U $DB_CREDENTIALS_USR -d $DB_NAME; do sleep 2; done
+                    docker exec -i postgres psql -U $DB_CREDENTIALS_USR -d $DB_NAME -c 'CREATE SCHEMA IF NOT EXISTS $DB_SCHEMA;'
+                '''
             }
 
             stage('Build') {
