@@ -46,9 +46,9 @@ node {
 
             stage('Build') {
 
-                sh 'set DATASOURCE_URL="jdbc:postgresql://localhost:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"'
                 docker.image(mavenImageName)
                     .inside {
+                        sh 'set DATASOURCE_URL="jdbc:postgresql://localhost:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"'
                         sh 'mvn -B clean test verify'
                     }
             }
