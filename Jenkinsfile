@@ -14,8 +14,6 @@ node {
     ]) {
         try {
 
-            def env.DATASOURCE_URL = "jdbc:postgresql://localhost:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"
-
             stage('Checkout') {
 
                 checkout scm: scmGit(
@@ -38,7 +36,7 @@ node {
 
             stage('Build') {
 
-                docker.image(mavenImageName)
+                docker.image(mavenImageName, args: '-e DATASOURCE_URL="jdbc:postgresql://localhost:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"')
                     .inside {
                         sh 'mvn -B clean test verify'
                     }
