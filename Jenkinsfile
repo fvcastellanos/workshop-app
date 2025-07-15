@@ -49,7 +49,7 @@ node {
 
                 docker.image(mavenImageName)
                     .inside {
-                        sh 'echo $hostAddress'
+                        sh 'echo "host-address=${hostAddress}"'
                         sh 'export DATASOURCE_URL="jdbc:postgresql://$hostAddress:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"'
                         sh 'mvn -B clean test verify'
                     }
