@@ -49,11 +49,15 @@ node {
 
             stage('Build') {
 
-                docker.image(mavenImageName, args: "-e IP=${ipAddress}")
-                    .inside {
-                        sh 'export DATASOURCE_URL="jdbc:postgresql://$IP:5432/$DB_NAME?user=$DB_CREDENTIALS_USR&password=$DB_CREDENTIALS_PSW&currentSchema=$DB_SCHEMA"'
-                        sh 'mvn -B clean test verify'
-                    }
+                def dataSourceUrl = "jdbc:postgresql://${ipAddress}:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"
+
+                withEnv(["DATASOURCE_URL=${dataSourceUrl}"]) {
+
+                    docker.image(mavenImageName)
+                        .inside {
+                            sh 'mvn -B clean test verify'
+                        }
+                }
             }
         } catch (Exception exception) {
             echo "An error occurred: ${exception.getMessage()}"
