@@ -1,0 +1,65 @@
+node {
+    def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
+    def mavenImageName = 'maven:3.9-eclipse-temurin-21'
+
+    withCredentials([
+        usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_CREDENTIALS_USR', passwordVariable: 'GIT_CREDENTIALS_PSW'),
+    ]) {
+
+        stage('Checkout') {
+            checkout scm: scmGit(
+                branches: [[name: '$BRANCH_NAME']],
+                extensions: [],
+                userRemoteConfigs: [[
+                    credentialsId: 'git-credentials',
+                    url: repositoryUrl
+                ]]
+            )
+        }
+
+        stage('Determine Release Version') {
+            // Use bash to extract version from pom.xml
+            def pomVersion = sh(
+                script: '''
+                    version=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>(.*)<\\/version>.*/\\1/')
+                    echo $version
+                ''',
+                returnStdout: true
+            ).trim()
+
+            // Remove -SNAPSHOT suffix
+            def releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
+
+            // Split version into parts
+            def (major, minor) = releaseVersion.tokenize('.')
+
+            // Get version strategy from parameter (default to 'Keep')
+            def strategy = params.VERSION_STRATEGY ?: 'Keep'
+
+            switch(strategy) {
+                case 'Major':
+                    major = (major.toInteger() + 1).toString()
+                    minor = '0'
+                break
+                case 'Minor':
+                    minor = (minor.toInteger() + 1).toString()
+                break
+                case 'Keep':
+                    // Do nothing
+                break
+                default:
+                    error "Unknown VERSION_STRATEGY: ${strategy}"
+            }
+
+            def nextVersion = [major, minor, patch].join('.')
+            echo "Current version: ${pomVersion}"
+            echo "Release version: ${releaseVersion}"
+            echo "Next version (${strategy}): ${nextVersion}"
+
+            // Set as environment variable for later stages
+            env.RELEASE_VERSION = releaseVersion
+            env.NEXT_VERSION = nextVersion
+        }
+    }
+
+}
