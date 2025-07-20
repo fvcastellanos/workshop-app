@@ -117,7 +117,7 @@ node {
         } finally {
 
                 echo 'Cleaning up...'
-                // sh "docker rmi -f ${mavenImageName}"    
+                sh "docker rmi -f ${mavenImageName}"
         }
     }
 
