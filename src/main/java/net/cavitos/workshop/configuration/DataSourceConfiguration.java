@@ -19,10 +19,12 @@ import javax.sql.DataSource;
 public class DataSourceConfiguration {
 
     @Bean
-    public DataSource dataSource(@Value("${spring.datasource.url}") final String url) {
+    public DataSource dataSource(@Value("${spring.datasource.url}") final String url,
+                                 @Value("${dbShema:workshop}") final String dbSchema) {
 
         final var configuration = new HikariConfig();
         configuration.setJdbcUrl(url);
+        configuration.setSchema(dbSchema);
 
         return new HikariDataSource(configuration);
     }

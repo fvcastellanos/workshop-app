@@ -1,0 +1,124 @@
+node {
+    def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
+    def mavenImageName = 'maven:3.9-eclipse-temurin-21'
+
+    withCredentials([
+        usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_CREDENTIALS_USR', passwordVariable: 'GIT_CREDENTIALS_PSW'),
+    ]) {
+
+        try {
+
+            def nextDevelopmentVersion = ''
+            def releaseVersion = ''
+
+            stage('Checkout') {
+                checkout scm: scmGit(
+                    branches: [[name: 'develop']],
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-credentials',
+                        url: repositoryUrl
+                    ]]
+                )
+            }
+
+            stage('Determine Release Version') {
+
+                def pomVersion = ''
+
+                docker.image(mavenImageName)
+                    .inside {
+                        pomVersion = sh(
+                            script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
+                            returnStdout: true
+                        ).trim()            
+                        echo "Current POM version: ${pomVersion}"
+                    }
+
+
+                // Remove -SNAPSHOT suffix
+                releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
+
+                // Split version into parts
+                def (major, minor) = releaseVersion.tokenize('.')
+
+                // Get version strategy from parameter (default to 'Keep')
+                def strategy = params.VERSION_STRATEGY ?: 'Keep'
+
+                switch(strategy) {
+                    case 'Major':
+                        major = (major.toInteger() + 1).toString()
+                        minor = '0'
+                    break
+                    case 'Minor':
+                        minor = (minor.toInteger() + 1).toString()
+                    break
+                    case 'Keep':
+                        // Do nothing
+                    break
+                    default:
+                        error "Unknown VERSION_STRATEGY: ${strategy}"
+                }
+
+                nextDevelopmentVersion = [major, minor].join('.') + '-SNAPSHOT'
+                echo "Current development version: ${pomVersion}"
+                echo "Release version: ${releaseVersion}"
+                echo "Next development version (${strategy}): ${nextDevelopmentVersion}"
+            }
+
+            stage('Merge to Main and Tag Release') {
+                // Configure Git user if needed
+                sh 'git config user.email "ci-bot@example.com"'
+                sh 'git config user.name "CI Bot"'
+
+                // Create release branch
+                sh "git checkout -b release/${releaseVersion}"
+
+                docker.image(mavenImageName)
+                    .inside {
+                        sh "mvn versions:set -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false"
+                        sh 'mvn versions:commit'
+                    }
+
+                // Checkout main branch and merge changes
+                sh 'git checkout main'
+                sh "git merge release/${releaseVersion}"
+
+                // Push changes to main
+                sh 'git remote set-url origin https://${GIT_CREDENTIALS_USR}:${GIT_CREDENTIALS_PSW}@github.com/fvcastellanos/workshop-app.git'
+                sh 'git push origin main'
+
+                // Create and push tag
+                sh "git tag v${releaseVersion}"
+                sh "git push origin v${releaseVersion}"
+
+                // Delete release branch
+                sh "git branch -d release/${releaseVersion}"
+                sh "git push origin --delete release/${releaseVersion}"
+            }
+
+            stage('Set next development version') {
+
+                sh 'git checkout develop'
+
+                docker.image(mavenImageName)
+                    .inside {
+                        sh "mvn versions:set -DnewVersion=${nextDevelopmentVersion} -DgenerateBackupPoms=false"
+                        sh 'mvn versions:commit'
+                    }
+
+                sh 'git push origin develop'
+            }
+
+        } catch (Exception exception) {
+            echo "An error occurred: ${exception.getMessage()}"
+            currentBuild.result = 'FAILURE'
+            throw exception
+        } finally {
+
+                echo 'Cleaning up...'
+                sh "docker rmi -f ${mavenImageName}"
+        }
+    }
+
+}
