@@ -6,63 +6,78 @@ node {
         usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GIT_CREDENTIALS_USR', passwordVariable: 'GIT_CREDENTIALS_PSW'),
     ]) {
 
-        stage('Checkout') {
-            checkout scm: scmGit(
-                branches: [[name: 'feature/WE-40']],
-                extensions: [],
-                userRemoteConfigs: [[
-                    credentialsId: 'github-credentials',
-                    url: repositoryUrl
-                ]]
-            )
-        }
+        try {
 
-        stage('Determine Release Version') {
-
-            def pomVersion = ''
-
-            docker.image(mavenImageName)
-                .inside {
-                    pomVersion = sh(
-                        script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
-                        returnStdout: true
-                    ).trim()            
-                    echo "Current POM version: ${pomVersion}"
-                }
-
-
-            // Remove -SNAPSHOT suffix
-            def releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
-
-            // Split version into parts
-            def (major, minor) = releaseVersion.tokenize('.')
-
-            // Get version strategy from parameter (default to 'Keep')
-            def strategy = params.VERSION_STRATEGY ?: 'Keep'
-
-            switch(strategy) {
-                case 'Major':
-                    major = (major.toInteger() + 1).toString()
-                    minor = '0'
-                break
-                case 'Minor':
-                    minor = (minor.toInteger() + 1).toString()
-                break
-                case 'Keep':
-                    // Do nothing
-                break
-                default:
-                    error "Unknown VERSION_STRATEGY: ${strategy}"
+            stage('Checkout') {
+                checkout scm: scmGit(
+                    branches: [[name: 'feature/WE-40']],
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-credentials',
+                        url: repositoryUrl
+                    ]]
+                )
             }
 
-            def nextVersion = [major, minor, patch].join('.')
-            echo "Current version: ${pomVersion}"
-            echo "Release version: ${releaseVersion}"
-            echo "Next version (${strategy}): ${nextVersion}"
+            stage('Determine Release Version') {
 
-            // Set as environment variable for later stages
-            env.RELEASE_VERSION = releaseVersion
-            env.NEXT_VERSION = nextVersion
+                def pomVersion = ''
+
+                docker.image(mavenImageName)
+                    .inside {
+                        pomVersion = sh(
+                            script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
+                            returnStdout: true
+                        ).trim()            
+                        echo "Current POM version: ${pomVersion}"
+                    }
+
+
+                // Remove -SNAPSHOT suffix
+                def releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
+
+                // Split version into parts
+                def (major, minor) = releaseVersion.tokenize('.')
+
+                // Get version strategy from parameter (default to 'Keep')
+                def strategy = params.VERSION_STRATEGY ?: 'Keep'
+
+                switch(strategy) {
+                    case 'Major':
+                        major = (major.toInteger() + 1).toString()
+                        minor = '0'
+                    break
+                    case 'Minor':
+                        minor = (minor.toInteger() + 1).toString()
+                    break
+                    case 'Keep':
+                        // Do nothing
+                    break
+                    default:
+                        error "Unknown VERSION_STRATEGY: ${strategy}"
+                }
+
+                def nextVersion = [major, minor].join('.')
+                echo "Current version: ${pomVersion}"
+                echo "Release version: ${releaseVersion}"
+                echo "Next version (${strategy}): ${nextVersion}"
+
+                // Set as environment variable for later stages
+                env.RELEASE_VERSION = releaseVersion
+                env.NEXT_VERSION = nextVersion
+            }
+
+        } catch (Exception exception) {
+            echo "An error occurred: ${exception.getMessage()}"
+            currentBuild.result = 'FAILURE'
+            throw exception
+        } finally {
+
+                echo 'Cleaning up...'
+                sh "docker compose -f ./docker/services.yaml down --remove-orphans"
+                sh "docker volume prune -f"
+                sh "docker network prune -f"
+                sh "docker rmi -f ${mavenImageName} ${postgresImageName}"    
         }
     }
 
