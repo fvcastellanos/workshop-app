@@ -23,7 +23,7 @@ node {
 
             docker.image(mavenImageName)
                 .inside {
-                    def pomVersion = sh(
+                    pomVersion = sh(
                         script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
                         returnStdout: true
                     ).trim()            
