@@ -57,14 +57,14 @@ node {
                         error "Unknown VERSION_STRATEGY: ${strategy}"
                 }
 
-                def nextVersion = [major, minor].join('.')
-                echo "Current version: ${pomVersion}"
+                def nextDevelopmentVersion = [major, minor].join('.') + '-SNAPSHOT'
+                echo "Current development version: ${pomVersion}"
                 echo "Release version: ${releaseVersion}"
-                echo "Next version (${strategy}): ${nextVersion}"
+                echo "Next development version (${strategy}): ${nextDevelopmentVersion}"
 
                 // Set as environment variable for later stages
-                env.RELEASE_VERSION = releaseVersion
-                env.NEXT_VERSION = nextVersion
+                // env.RELEASE_VERSION = releaseVersion
+                // env.NEXT_VERSION = nextVersion
             }
 
         } catch (Exception exception) {
@@ -74,10 +74,9 @@ node {
         } finally {
 
                 echo 'Cleaning up...'
-                sh "docker compose -f ./docker/services.yaml down --remove-orphans"
                 sh "docker volume prune -f"
                 sh "docker network prune -f"
-                sh "docker rmi -f ${mavenImageName} ${postgresImageName}"    
+                // sh "docker rmi -f ${mavenImageName}"    
         }
     }
 
