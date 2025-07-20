@@ -18,14 +18,10 @@ node {
         }
 
         stage('Determine Release Version') {
-            // Use bash to extract version from pom.xml
             def pomVersion = sh(
-                script: '''
-                    version=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>(.*)<\\/version>.*/\\1/')
-                    echo $version
-                ''',
+                script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
                 returnStdout: true
-            ).trim()
+            ).trim()            
 
             // Remove -SNAPSHOT suffix
             def releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
