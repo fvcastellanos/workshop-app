@@ -8,9 +8,12 @@ node {
 
         try {
 
+            def nextDevelopmentVersion = ''
+            def releaseVersion = ''
+
             stage('Checkout') {
                 checkout scm: scmGit(
-                    branches: [[name: 'feature/WE-40']],
+                    branches: [[name: 'develop']],
                     extensions: [],
                     userRemoteConfigs: [[
                         credentialsId: 'github-credentials',
@@ -34,7 +37,7 @@ node {
 
 
                 // Remove -SNAPSHOT suffix
-                def releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
+                releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
 
                 // Split version into parts
                 def (major, minor) = releaseVersion.tokenize('.')
@@ -57,14 +60,54 @@ node {
                         error "Unknown VERSION_STRATEGY: ${strategy}"
                 }
 
-                def nextDevelopmentVersion = [major, minor].join('.') + '-SNAPSHOT'
+                nextDevelopmentVersion = [major, minor].join('.') + '-SNAPSHOT'
                 echo "Current development version: ${pomVersion}"
                 echo "Release version: ${releaseVersion}"
                 echo "Next development version (${strategy}): ${nextDevelopmentVersion}"
+            }
 
-                // Set as environment variable for later stages
-                // env.RELEASE_VERSION = releaseVersion
-                // env.NEXT_VERSION = nextVersion
+            stage('Merge to Main and Tag Release') {
+                // Configure Git user if needed
+                sh 'git config user.email "ci-bot@example.com"'
+                sh 'git config user.name "CI Bot"'
+
+                // Create release branch
+                sh "git checkout -b release/${releaseVersion}"
+
+                docker.image(mavenImageName)
+                    .inside {
+                        sh "mvn versions:set -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false"
+                        sh 'mvn versions:commit'
+                    }
+
+                // Checkout main branch and merge changes
+                sh 'git checkout main'
+                sh "git merge release/${releaseVersion}"
+
+                // Push changes to main
+                sh 'git remote set-url origin https://${GIT_CREDENTIALS_USR}:${GIT_CREDENTIALS_PSW}@github.com/fvcastellanos/workshop-app.git'
+                sh 'git push origin main'
+
+                // Create and push tag
+                sh "git tag v${releaseVersion}"
+                sh "git push origin v${releaseVersion}"
+
+                // Delete release branch
+                sh "git branch -d release/${releaseVersion}"
+                sh "git push origin --delete release/${releaseVersion}"
+            }
+
+            stage('Set next development version') {
+
+                sh 'git checkout develop'
+
+                docker.image(mavenImageName)
+                    .inside {
+                        sh "mvn versions:set -DnewVersion=${nextDevelopmentVersion} -DgenerateBackupPoms=false"
+                        sh 'mvn versions:commit'
+                    }
+
+                sh 'git push origin develop'
             }
 
         } catch (Exception exception) {
@@ -74,8 +117,6 @@ node {
         } finally {
 
                 echo 'Cleaning up...'
-                sh "docker volume prune -f"
-                sh "docker network prune -f"
                 // sh "docker rmi -f ${mavenImageName}"    
         }
     }
