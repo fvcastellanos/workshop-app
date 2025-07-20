@@ -24,7 +24,7 @@ node {
                     branches: [[name: '$BRANCH_NAME']], 
                     extensions: [], 
                     userRemoteConfigs: [[
-                        credentialsId: 'git-credentials', 
+                        credentialsId: 'github-credentials', 
                         url: repositoryUrl
                     ]]
                 )
