@@ -18,10 +18,18 @@ node {
         }
 
         stage('Determine Release Version') {
-            def pomVersion = sh(
-                script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
-                returnStdout: true
-            ).trim()            
+
+            def pomVersion = ''
+
+            docker.image(mavenImageName)
+                .inside {
+                    def pomVersion = sh(
+                        script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
+                        returnStdout: true
+                    ).trim()            
+                    echo "Current POM version: ${pomVersion}"
+                }
+
 
             // Remove -SNAPSHOT suffix
             def releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
