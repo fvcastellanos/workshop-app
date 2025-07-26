@@ -77,8 +77,11 @@ node {
                 docker.image(mavenImageName)
                     .inside {
                         sh "mvn versions:set -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false"
-                        sh 'mvn versions:commit'
                     }
+
+                // Commit changes
+                sh 'git add pom.xml'
+                sh 'git commit -m "Release version ${releaseVersion}"'
 
                 // Checkout main branch and merge changes
                 sh 'git checkout main'
@@ -104,8 +107,11 @@ node {
                 docker.image(mavenImageName)
                     .inside {
                         sh "mvn versions:set -DnewVersion=${nextDevelopmentVersion} -DgenerateBackupPoms=false"
-                        sh 'mvn versions:commit'
                     }
+
+                // Commit changes
+                sh 'git add pom.xml'
+                sh "git commit -m 'Set next development version to ${nextDevelopmentVersion}'"
 
                 sh 'git push origin develop'
             }
@@ -116,8 +122,12 @@ node {
             throw exception
         } finally {
 
-                echo 'Cleaning up...'
-                sh "docker rmi -f ${mavenImageName}"
+            sh 'git branch -D release/${releaseVersion} || true'
+            sh 'git checkout develop'
+
+            // Cleanup: remove Docker image if it was pulled
+            echo 'Cleaning up...'
+            sh "docker rmi -f ${mavenImageName}"
         }
     }
 
