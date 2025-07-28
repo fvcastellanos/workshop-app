@@ -42,8 +42,8 @@ node {
                 // Split version into parts
                 def (major, minor) = releaseVersion.tokenize('.')
 
-                // Get version strategy from parameter (default to 'Keep')
-                def strategy = params.VERSION_STRATEGY ?: 'Keep'
+                // Get version strategy from parameter (default to 'Minor')
+                def strategy = params.VERSION_STRATEGY ?: 'Minor'
 
                 switch(strategy) {
                     case 'Major':
