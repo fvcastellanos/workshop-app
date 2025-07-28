@@ -53,9 +53,6 @@ node {
                     case 'Minor':
                         minor = (minor.toInteger() + 1).toString()
                     break
-                    case 'Keep':
-                        // Do nothing
-                    break
                     default:
                         error "Unknown VERSION_STRATEGY: ${strategy}"
                 }
