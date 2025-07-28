@@ -3,7 +3,7 @@ node {
     def mavenImageName = 'maven:3.9-eclipse-temurin-21'
 
     withCredentials([
-        string(credentialsId: 'JenkinsHL', gitToolName: 'Default'),
+        string(credentialsId: 'JenkinsHL', variable: 'GH_TOKEN'),
     ]) {
 
         try {
@@ -125,6 +125,7 @@ node {
 
             echo 'Cleaning up...'
             sh 'rm -rf ./*'
+            sh 'rm -rf .git .gitattributes .github .gitignore .mvn'
 
             // Cleanup: remove Docker image if it was pulled
             sh "docker rmi -f ${mavenImageName}"
