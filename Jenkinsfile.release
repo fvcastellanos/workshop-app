@@ -89,7 +89,7 @@ node {
                 sh "git merge release/${releaseVersion}"
 
                 // Push changes to main
-                sh 'git remote set-url origin https://github.com/fvcastellanos/workshop-app.git'
+                sh "git remote set-url origin https://${GH_TOKEN}@github.com/fvcastellanos/workshop-app.git"
                 sh 'git push origin main'
 
                 // Create and push tag
