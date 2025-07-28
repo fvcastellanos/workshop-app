@@ -98,7 +98,6 @@ node {
 
                 // Delete release branch
                 sh "git branch -d release/${releaseVersion}"
-                sh "git push origin --delete release/${releaseVersion}"
             }
 
             stage('Set next development version') {
