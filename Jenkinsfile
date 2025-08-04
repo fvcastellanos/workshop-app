@@ -69,14 +69,14 @@ node {
                 }
             }
 
-            // stage('Quality Gate') {
-            //     timeout(time: 10, unit: 'MINUTES') {
-            //         def qg = waitForQualityGate()
-            //         if (qg.status != 'OK') {
-            //             error "SonarQube quality gate failed: ${qg.status}"
-            //         }
-            //     }
-            // }
+            stage('Quality Gate') {
+                timeout(time: 10, unit: 'MINUTES') {
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "SonarQube quality gate failed: ${qg.status}"
+                    }
+                }
+            }
         } catch (Exception exception) {
             echo "An error occurred: ${exception.getMessage()}"
             currentBuild.result = 'FAILURE'
