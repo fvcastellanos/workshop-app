@@ -59,6 +59,15 @@ node {
                         }
                 }
             }
+            
+            stage('SonarQube Analysis') {
+                withSonarQubeEnv() {
+                    docker.image(mavenImageName)
+                    .inside {
+                        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=workshop-app -Dsonar.projectName='Workshop Application''
+                    }
+                }
+            }
         } catch (Exception exception) {
             echo "An error occurred: ${exception.getMessage()}"
             currentBuild.result = 'FAILURE'
