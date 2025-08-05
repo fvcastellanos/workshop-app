@@ -54,6 +54,8 @@ jobs:
               ;;
           esac
           NEXT_DEV_VERSION="${MAJOR}.${MINOR}-SNAPSHOT"
+          echo "Release version: $RELEASE_VERSION"
+          echo "Next development version: $NEXT_DEV_VERSION"
           echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
           echo "next_dev_version=$NEXT_DEV_VERSION" >> $GITHUB_OUTPUT
 
