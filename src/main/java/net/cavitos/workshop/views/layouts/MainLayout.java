@@ -111,7 +111,8 @@ public class MainLayout  extends AppLayout {
                 ),
                 createNavigationItemWithSubItems("Configuración", null, "img/icons/settings-svgrepo-com.svg",
                         createNavigationItem("Secuencias", "sequences", "img/icons/numbered-list-svgrepo-com.svg")
-                )
+                ),
+                createNavigationItem("Acerca de ...", "about", "img/icons/about-svgrepo-com.svg")
         );
     }
 

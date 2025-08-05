@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'develop'
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_USER: workshop
           POSTGRES_DB: workshop
