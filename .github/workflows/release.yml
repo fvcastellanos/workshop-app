@@ -1,27 +1,82 @@
-name: Application Release
+name: Release
+
 on:
   workflow_dispatch:
+    inputs:
+      VERSION_STRATEGY:
+        description: 'Version strategy (Major, Minor, default: Minor)'
+        required: false
+        default: 'Minor'
 
 jobs:
   release:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout develop branch
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: develop
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Prepare Release Version
+      - name: Set up Git user
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"        
-          mvn -B release:prepare -Darguments=-DskipTests
+          git config user.email "ci-bot@github.com"
+          git config user.name "CI Bot"
 
-      - name: Complete Release
+      - name: Get current version from pom.xml
+        id: get_version
         run: |
-          mvn -B release:perform
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "pom_version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate release and next development version
+        id: calc_versions
+        run: |
+          POM_VERSION="${{ steps.get_version.outputs.pom_version }}"
+          RELEASE_VERSION="${POM_VERSION/-SNAPSHOT/}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$RELEASE_VERSION"
+          STRATEGY="${{ github.event.inputs.VERSION_STRATEGY }}"
+          if [ -z "$STRATEGY" ]; then STRATEGY="Minor"; fi
+          case "$STRATEGY" in
+            Major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              ;;
+            Minor)
+              MINOR=$((MINOR + 1))
+              ;;
+            Keep)
+              ;;
+            *)
+              echo "Unknown VERSION_STRATEGY: $STRATEGY"
+              exit 1
+              ;;
+          esac
+          NEXT_DEV_VERSION="${MAJOR}.${MINOR}-SNAPSHOT"
+          echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          echo "next_dev_version=$NEXT_DEV_VERSION" >> $GITHUB_OUTPUT
+
+      # - name: Create release branch and set release version
+      #   run: |
+      #     git checkout -b release/${{ steps.calc_versions.outputs.release_version }}
+      #     mvn versions:set -DnewVersion=${{ steps.calc_versions.outputs.release_version }} -DgenerateBackupPoms=false
+      #     git add pom.xml
+      #     git commit -m "Release version ${{ steps.calc_versions.outputs.release_version }}"
+
+      # - name: Merge to main and tag release
+      #   run: |
+      #     git checkout main
+      #     git merge release/${{ steps.calc_versions.outputs.release_version }}
+      #     git push origin main
+      #     git tag v${{ steps.calc_versions.outputs.release_version }}
+      #     git push origin v${{ steps.calc_versions.outputs.release_version }}
+      #     git branch -d release/${{ steps.calc_versions.outputs.release_version }}
+
+      # - name: Set next development version on develop
+      #   run: |
+      #     git checkout develop
+      #     mvn versions:set -DnewVersion=${{ steps.calc_versions.outputs.next_dev_version }} -DgenerateBackupPoms=false
+      #     git add pom.xml
+      #     git commit -m "Set next development version to ${{ steps.calc_versions.outputs.next_dev_version }}"
+      #     git push origin develop
