@@ -4,8 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn clean package -Pproduction -DskipTests && \
-    ls -la target
+RUN mvn clean package -Pproduction -DskipTests
 
 FROM azul/zulu-openjdk:21-jre-latest AS runner
 
@@ -17,8 +16,7 @@ RUN useradd -m workshop -s /bin/bash && \
 COPY --from=builder /app/target/*.jar /opt/cavitos/apps/workshop-app.jar
 
 RUN chown workshop:workshop /opt/cavitos/apps/workshop-app.jar && \
-    chmod 755 /opt/cavitos/apps/workshop-app.jar && \
-    ls -la /opt/cavitos/apps
+    chmod 755 /opt/cavitos/apps/workshop-app.jar
 
 WORKDIR /opt/cavitos/apps
 
