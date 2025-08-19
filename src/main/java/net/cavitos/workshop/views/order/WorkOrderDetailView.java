@@ -1,5 +1,7 @@
 package net.cavitos.workshop.views.order;
 
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
@@ -44,6 +46,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private final Clock systemClock;
     private final WorkOrderService workOrderService;
     private final WorkOrderDetailService workOrderDetailService;
+    private final WorkOrderDetailModalView modalView;    
 
     private final Grid<WorkOrderDetailEntity> grid;
 
@@ -61,12 +64,14 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                                   final DatabaseUserService databaseUserService,
                                   final WorkOrderService workOrderService,
                                   final WorkOrderDetailService workOrderDetailService,
+                                  final WorkOrderDetailModalView modalView,
                                   final Clock systemClock) {
         super(authenticationContext, databaseUserService);
 
         this.systemClock = systemClock;
         this.workOrderService = workOrderService;
         this.workOrderDetailService = workOrderDetailService;
+        this.modalView = modalView;
 
         searchTitle = buildSearchTitle("Búsqueda");
 
@@ -102,10 +107,17 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
     private VerticalLayout buildOrderInformationBox() {
 
+        final var btnAdd = new Button("Agregar Detalle", event -> {
+            modalView.openDialogForNew(tenant);
+        });
+
+        btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
         final var footerBox = ComponentFactory.buildSearchFooter();
         footerBox.setWidth("100%");
         footerBox.add(
-                ComponentFactory.buildRedirectButton("Regresar", "work-orders")
+                ComponentFactory.buildRedirectButton("Regresar", "work-orders"),
+                btnAdd
         );
 
         orderDate = new TextField("Fecha");
@@ -219,7 +231,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         })).setHeader("#")
           .setSortable(false)
           .setResizable(false)
-          .setWidth("10%");
+          .setWidth("5%");
 
         grid.addColumn("quantity")
             .setHeader("Cantidad")
@@ -240,7 +252,12 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
             .setWidth("30%");
 
         grid.addColumn("unitPrice")
-            .setHeader("Precio Unitario")
+            .setHeader("Costo")
+            .setSortable(true)
+            .setWidth("10%");
+
+        grid.addColumn("salePrice")
+            .setHeader("Venta")
             .setSortable(true)
             .setWidth("10%");
 

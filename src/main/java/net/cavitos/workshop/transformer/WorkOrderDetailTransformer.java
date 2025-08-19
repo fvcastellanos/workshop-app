@@ -27,7 +27,10 @@ public class WorkOrderDetailTransformer {
         detail.setOrderId(workOrderEntity.getId());
         detail.setQuantity(entity.getQuantity());
         detail.setUnitPrice(entity.getUnitPrice());
+        detail.setSalePrice(entity.getSalePrice());
         detail.setProduct(product);
+        detail.setDescription(entity.getDescription());
+        detail.setNotes(entity.getNotes());
 
         if (nonNull(invoiceDetailEntity)) {
 

@@ -37,6 +37,10 @@ public class WorkOrderDetailEntity {
     @JoinColumn(name = "invoice_detail_id")
     private InvoiceDetailEntity invoiceDetailEntity;
 
+    private String description;
+
+    private String notes;
+
     @NotNull
     @Min(value = 0)
     private double quantity;
@@ -44,6 +48,10 @@ public class WorkOrderDetailEntity {
     @NotNull
     @Min(value = 0)
     private double unitPrice;
+
+    @NotNull
+    @Min(value = 0)
+    private double salePrice;
 
     @NotEmpty
     @Size(max = 50)

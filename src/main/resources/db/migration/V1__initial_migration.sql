@@ -810,12 +810,15 @@ WITH (FILLFACTOR = 90);
 CREATE TABLE workshop.work_order_detail (
 	id character varying(50) NOT NULL,
 	work_order_id character varying(50) NOT NULL,
-	product_id character varying(50) NOT NULL,
+	product_id character varying(50),
 	invoice_detail_id character varying(50) DEFAULT NULL,
 	quantity double precision NOT NULL DEFAULT 0,
 	unit_price double precision NOT NULL DEFAULT 0,
+	sale_price double precision NOT NULL DEFAULT 0,
 	tenant character varying(50) NOT NULL,
 	created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	description text,
+	notes text,
 	CONSTRAINT work_order_detail_pkey PRIMARY KEY (id),
 	CONSTRAINT work_order_detail_work_order_id_product_id_tenant_key UNIQUE (work_order_id,product_id,tenant)
 );
@@ -866,7 +869,7 @@ WITH (FILLFACTOR = 90);
 -- object: workshop.product_stock | type: VIEW --
 -- DROP VIEW IF EXISTS workshop.product_stock CASCADE;
 CREATE VIEW workshop.product_stock
-AS
+AS 
 SELECT sum(value) AS total,
     tenant,
     name,
@@ -913,6 +916,19 @@ USING btree
 (
 	storable
 );
+-- ddl-end --
+
+-- object: workshop.application_configuration | type: TABLE --
+-- DROP TABLE IF EXISTS workshop.application_configuration CASCADE;
+CREATE TABLE workshop.application_configuration (
+	tenant character varying(50) NOT NULL,
+	configuration text,
+	created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated timestamp,
+	CONSTRAINT application_configuration_pk PRIMARY KEY (tenant)
+);
+-- ddl-end --
+ALTER TABLE workshop.application_configuration OWNER TO workshop;
 -- ddl-end --
 
 -- object: fk_car_line_car_brand1 | type: CONSTRAINT --

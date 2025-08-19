@@ -1,6 +1,7 @@
 package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ProductRepository;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
@@ -27,13 +27,17 @@ public class WorkOrderDetailService {
 
     private final ProductRepository productRepository;
 
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
     public WorkOrderDetailService(final WorkOrderRepository workOrderRepository,
                                   final WorkOrderDetailRepository workOrderDetailRepository,
-                                  final ProductRepository productRepository) {
+                                  final ProductRepository productRepository,
+                                  final ZonedDateTimeFactory zonedDateTimeFactory) {
 
         this.workOrderRepository = workOrderRepository;
         this.workOrderDetailRepository = workOrderDetailRepository;
         this.productRepository = productRepository;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
     public List<WorkOrderDetailEntity> getOrderDetails(final String tenant, final String orderId) {
@@ -61,9 +65,11 @@ public class WorkOrderDetailService {
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .workOrderEntity(workOrderEntity)
                 .productEntity(productEntity)
+                .description(workOrderDetail.getDescription())
+                .notes(workOrderDetail.getNotes())
                 .quantity(workOrderDetail.getQuantity())
                 .unitPrice(workOrderDetail.getUnitPrice())
-                .created(Instant.now())
+                .created(zonedDateTimeFactory.getSystemNow())
                 .tenant(tenant)
                 .build();
 

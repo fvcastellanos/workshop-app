@@ -4,7 +4,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
  Unexpected results may occur if the code is changed deliberately.
 -->
 <dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="21"
-	 last-position="908,2319" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
+	 last-position="0,2455" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
 	 default-schema="public" default-owner="postgres"
 	 layers="Default layer"
 	 active-layers="0"
@@ -794,7 +794,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="work_order" layers="0" collapse-mode="2" max-obj-count="16" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
-	<position x="60" y="1300"/>
+	<position x="220" y="1320"/>
 	<column name="id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
@@ -1063,7 +1063,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
-<table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+<table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="13" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
 	<position x="160" y="2060"/>
@@ -1073,7 +1073,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="work_order_id" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
-	<column name="product_id" not-null="true">
+	<column name="product_id">
 		<type name="character varying" length="50"/>
 	</column>
 	<column name="invoice_detail_id" default-value="NULL">
@@ -1085,11 +1085,20 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="unit_price" not-null="true" default-value="0">
 		<type name="double precision" length="0"/>
 	</column>
+	<column name="sale_price" not-null="true" default-value="0">
+		<type name="double precision" length="0"/>
+	</column>
 	<column name="tenant" not-null="true">
 		<type name="character varying" length="50"/>
 	</column>
 	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
+	</column>
+	<column name="description">
+		<type name="text" length="0"/>
+	</column>
+	<column name="notes">
+		<type name="text" length="0"/>
 	</column>
 	<constraint name="work_order_detail_pkey" type="pk-constr" table="workshop.work_order_detail">
 		<columns names="id" ref-type="src-columns"/>
@@ -1204,6 +1213,27 @@ CAUTION: Do not modify this file unless you know what you are doing.
 			<column name="storable"/>
 		</idxelement>
 </index>
+
+<table name="application_configuration" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="workshop"/>
+	<role name="workshop"/>
+	<position x="160" y="2940"/>
+	<column name="tenant" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="configuration">
+		<type name="text" length="0"/>
+	</column>
+	<column name="created" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="application_configuration_pk" type="pk-constr" table="workshop.application_configuration">
+		<columns names="tenant" ref-type="src-columns"/>
+	</constraint>
+</table>
 
 <constraint name="fk_car_line_car_brand1" type="fk-constr" comparison-type="MATCH SIMPLE"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="workshop.car_brand" table="workshop.car_line">
@@ -1371,7 +1401,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 custom-color="#cbb45f"
 	 src-table="workshop.work_order_detail"
 	 dst-table="workshop.product" reference-fk="fk_work_order_detail_product1"
-	 src-required="false" dst-required="true"/>
+	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_work_order_detail_work_order" type="relfk" layers="0"
 	 custom-color="#ae783d"
