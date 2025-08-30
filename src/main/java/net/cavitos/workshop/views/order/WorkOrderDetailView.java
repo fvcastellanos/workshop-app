@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
@@ -21,6 +22,7 @@ import net.cavitos.workshop.model.entity.WorkOrderEntity;
 import net.cavitos.workshop.security.service.DatabaseUserService;
 import net.cavitos.workshop.service.WorkOrderDetailService;
 import net.cavitos.workshop.service.WorkOrderService;
+import net.cavitos.workshop.transformer.WorkOrderDetailTransformer;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
@@ -59,6 +61,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private TextField carModel;
     private TextField status;
     private TextArea notes;
+    private TextField workOrderTotal;
 
     protected WorkOrderDetailView(final AuthenticationContext authenticationContext,
                                   final DatabaseUserService databaseUserService,
@@ -105,9 +108,21 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         return new PageImpl<WorkOrderDetailEntity>(details, Pageable.unpaged(), details.size());
     }
 
+    private void calculateTotal() {
+
+        final var details = workOrderDetailService.getOrderDetails(tenant, workOrderEntity.getId());
+        final var total = details.stream()
+                .mapToDouble(WorkOrderDetailEntity::getSalePrice)
+                .sum();
+
+        workOrderTotal.setValue(String.valueOf(total));
+    }
+
     private VerticalLayout buildOrderInformationBox() {
 
         final var btnAdd = new Button("Agregar Detalle", event -> {
+
+            modalView.setWorkOrderId(workOrderEntity.getId());
             modalView.openDialogForNew(tenant);
         });
 
@@ -144,6 +159,11 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         notes.setReadOnly(true);
         notes.setWidth("100%");
 
+        workOrderTotal = new TextField("Total");
+        workOrderTotal.setReadOnly(true);
+        workOrderTotal.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        workOrderTotal.setWidth("30%");
+
         final var row1 = new HorizontalLayout(
                 orderDate,
                 plateNumber,
@@ -153,7 +173,8 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
         final var row2 = new HorizontalLayout(
                 carModel,
-                status
+                status,
+                workOrderTotal
         );
         row2.setWidth("100%");
 
@@ -175,6 +196,11 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                 detailBody,
                 footerBox
         );
+
+        modalView.addOnSaveEvent(entity ->  {
+            performSearch();
+            calculateTotal(); 
+        });
 
         return searchBox;
     }
@@ -204,6 +230,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
         notes.setValue(workOrderEntity.getNotes());
 
+        calculateTotal();
     }
 
     private Grid<WorkOrderDetailEntity> buildGrid() {
@@ -216,6 +243,15 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                     layout.setWidthFull();
                     layout.setJustifyContentMode(JustifyContentMode.CENTER);
 
+                    final var editImage = new Image("img/icons/edit-3-svgrepo-com.svg", "Editar");
+                    editImage.setWidth("20px");
+                    editImage.setHeight("20px");
+                    editImage.getStyle().set("cursor", "pointer");
+                    editImage.addClickListener(event -> {
+                        LOGGER.info("Edit: {}", workOrderDetailEntity.getId());
+                        modalView.openDialogForEdit(tenant, WorkOrderDetailTransformer.toWeb(workOrderDetailEntity));
+                    });
+
                     final var deleteImage = new Image("img/icons/trash-can-svgrepo-com.svg", "Eliminar");
                     deleteImage.setWidth("20px");
                     deleteImage.setHeight("20px");
@@ -225,7 +261,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 //                        modalView.openDialogForEdit(tenant, workOrderEntity);
                     });
 
-                    layout.add(deleteImage);
+                    layout.add(editImage, deleteImage);
 
                     return layout;
         })).setHeader("#")

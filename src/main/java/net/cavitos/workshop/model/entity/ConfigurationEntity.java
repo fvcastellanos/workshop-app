@@ -24,13 +24,17 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Table(name = "application_configuration")
-public class ApplicationConfigurationEntity {
+@Table(name = "configuration")
+public class ConfigurationEntity {
     
     @Id
-    private String tenant;
+    private String id;
 
-    private String configuration;
+    private String key;
+
+    private String value;
+
+    private String tenant;
 
     @NotNull
     @CreatedDate

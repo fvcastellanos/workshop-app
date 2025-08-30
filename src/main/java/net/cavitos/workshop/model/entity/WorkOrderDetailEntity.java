@@ -51,6 +51,7 @@ public class WorkOrderDetailEntity {
 
     @NotNull
     @Min(value = 0)
+    @Column(name = "sale_price")
     private double salePrice;
 
     @NotEmpty

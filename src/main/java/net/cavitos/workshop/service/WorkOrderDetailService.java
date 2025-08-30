@@ -93,4 +93,30 @@ public class WorkOrderDetailService {
 
         workOrderDetailRepository.delete(workOrderDetailEntity);
     }
+
+    public WorkOrderDetailEntity updateOrderDetail(final String workOrderId, final String workOrderDetailId, final WorkOrderDetail workOrderDetail, final String tenant) {
+
+        LOGGER.info("update custom order detail for order_id={} and tenant={}", workOrderId, tenant);
+
+        final var workOrderDetailEntity = workOrderDetailRepository.findByIdAndTenant(workOrderDetailId, tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Work Order Detail not found for tenant"));
+
+        final var workOrderEntity = workOrderRepository.findByIdAndTenant(workOrderId, tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Work Order not found for tenant"));                
+
+        final var product = workOrderDetail.getProduct();
+
+        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+
+        workOrderDetailEntity.setWorkOrderEntity(workOrderEntity);
+        workOrderDetailEntity.setProductEntity(productEntity);
+        workOrderDetailEntity.setDescription(workOrderDetail.getDescription());
+        workOrderDetailEntity.setNotes(workOrderDetail.getNotes());
+        workOrderDetailEntity.setQuantity(workOrderDetail.getQuantity());
+        workOrderDetailEntity.setUnitPrice(workOrderDetail.getUnitPrice());
+        workOrderDetailEntity.setSalePrice(workOrderDetail.getSalePrice());
+
+        return workOrderDetailRepository.save(workOrderDetailEntity);
+    }
 }
