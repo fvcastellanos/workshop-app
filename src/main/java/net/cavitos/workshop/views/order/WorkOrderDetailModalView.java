@@ -3,6 +3,7 @@ package net.cavitos.workshop.views.order;
 import static java.util.Objects.nonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,8 +219,9 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
 
         final var unitPrice = unitPriceField.getValue();
         final var quantity = quantityField.getValue();
+        final var price = salePriceField.getValue();
 
-        if (unitPrice != null && quantity != null) {
+        if (unitPrice != null && quantity != null && Objects.isNull(price)) {
 
             final var salePrice = priceService.calculatePrice(unitPrice * quantity, tenant);
             salePriceField.setValue(salePrice);
