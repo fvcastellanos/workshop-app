@@ -158,4 +158,20 @@ public class InventoryMovementService {
 
         inventoryRepository.delete(movementHolder.get());
     }
+
+    public Double findLatestUnitPrice(final String productCode, final String tenant) {
+
+        LOGGER.info("Find latest unit price for productCode: {} and tenant: {}", productCode, tenant);
+
+        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(productCode, tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product not found"));
+
+        final var pageable = inventoryRepository.findLatestUnitPriceByProductIdAndTenant(productEntity.getId(),
+                tenant, PageRequest.of(0, 1));
+
+        return pageable.stream()
+                .findFirst()
+                .map(InventoryEntity::getUnitPrice)
+                .orElse(0.0);
+    }
 }

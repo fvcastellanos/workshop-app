@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTitle;
 
@@ -48,13 +50,16 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private final Clock systemClock;
     private final WorkOrderService workOrderService;
     private final WorkOrderDetailService workOrderDetailService;
-    private final WorkOrderDetailModalView modalView;    
+    private final WorkOrderDetailModalView modalView;
+    private final WorkOrderLaborModalView laborModalView;
 
     private final Grid<WorkOrderDetailEntity> grid;
+    private final Grid<WorkOrderDetailEntity> laborGrid;
 
     private WorkOrderEntity workOrderEntity;
 
-    private H3 searchTitle;
+    private final H3 searchTitle;
+
     private TextField orderDate;
     private TextField plateNumber;
     private TextField contact;
@@ -68,6 +73,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                                   final WorkOrderService workOrderService,
                                   final WorkOrderDetailService workOrderDetailService,
                                   final WorkOrderDetailModalView modalView,
+                                  final WorkOrderLaborModalView laborModalView,
                                   final Clock systemClock) {
         super(authenticationContext, databaseUserService);
 
@@ -75,15 +81,17 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         this.workOrderService = workOrderService;
         this.workOrderDetailService = workOrderDetailService;
         this.modalView = modalView;
+        this.laborModalView = laborModalView;
 
         searchTitle = buildSearchTitle("Búsqueda");
 
         grid = buildGrid();
+        laborGrid =buildLaborGrid();
 
         add(
                 searchTitle,
                 buildOrderInformationBox(),
-                grid
+                buildTabSheet()
         );
     }
 
@@ -103,9 +111,18 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
         final var details = workOrderDetailService.getOrderDetails(tenant, workOrderEntity.getId());
 
-        grid.setItems(details);
+        final var products = details.stream()
+                .filter(detail -> Objects.nonNull(detail.getProductEntity()))
+                .toList();
 
-        return new PageImpl<WorkOrderDetailEntity>(details, Pageable.unpaged(), details.size());
+        final var labor = details.stream()
+                .filter(detail -> Objects.isNull(detail.getProductEntity()))
+                .toList();
+
+        grid.setItems(products);
+        laborGrid.setItems(labor);
+
+        return new PageImpl<>(details, Pageable.unpaged(), details.size());
     }
 
     private void calculateTotal() {
@@ -120,19 +137,10 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
     private VerticalLayout buildOrderInformationBox() {
 
-        final var btnAdd = new Button("Agregar Detalle", event -> {
-
-            modalView.setWorkOrderId(workOrderEntity.getId());
-            modalView.openDialogForNew(tenant);
-        });
-
-        btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
         final var footerBox = ComponentFactory.buildSearchFooter();
         footerBox.setWidth("100%");
         footerBox.add(
-                ComponentFactory.buildRedirectButton("Regresar", "work-orders"),
-                btnAdd
+                ComponentFactory.buildRedirectButton("Regresar", "work-orders")
         );
 
         orderDate = new TextField("Fecha");
@@ -233,6 +241,40 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         calculateTotal();
     }
 
+    private TabSheet buildTabSheet() {
+
+        final var btnAdd = new Button("Agregar Detalle", event -> {
+
+            modalView.setWorkOrderId(workOrderEntity.getId());
+            modalView.openDialogForNew(tenant);
+        });
+        btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        final var btnAddLabor = new Button("Agregar Mano de Obra", event -> {
+
+            laborModalView.setWorkOrderId(workOrderEntity.getId());
+            laborModalView.openDialogForNew(tenant);
+        });
+        btnAddLabor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        final var productsTab = new VerticalLayout(
+                btnAdd,
+                grid
+        );
+
+        final var laborTab = new VerticalLayout(
+                btnAddLabor,
+                laborGrid
+        );
+
+        final var tabSheet = new TabSheet();
+        tabSheet.setWidthFull();
+        tabSheet.add("Productos", productsTab);
+        tabSheet.add("Mano de Obra", laborTab);
+
+        return tabSheet;
+    }
+
     private Grid<WorkOrderDetailEntity> buildGrid() {
 
         final var grid = ComponentFactory.buildGrid(WorkOrderDetailEntity.class);
@@ -294,6 +336,53 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
         grid.addColumn("salePrice")
             .setHeader("Venta")
+            .setSortable(true)
+            .setWidth("10%");
+
+        return grid;
+    }
+
+    private Grid<WorkOrderDetailEntity> buildLaborGrid() {
+
+        final var grid = ComponentFactory.buildGrid(WorkOrderDetailEntity.class);
+
+        grid.addColumn(new ComponentRenderer<>(workOrderDetailEntity -> {
+
+                    final var layout = new HorizontalLayout();
+                    layout.setWidthFull();
+                    layout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+                    final var editImage = new Image("img/icons/edit-3-svgrepo-com.svg", "Editar");
+                    editImage.setWidth("20px");
+                    editImage.setHeight("20px");
+                    editImage.getStyle().set("cursor", "pointer");
+                    editImage.addClickListener(event -> {
+                        LOGGER.info("Edit: {}", workOrderDetailEntity.getId());
+                        laborModalView.openDialogForEdit(tenant, WorkOrderDetailTransformer.toWeb(workOrderDetailEntity));
+                    });
+
+                    final var deleteImage = new Image("img/icons/trash-can-svgrepo-com.svg", "Eliminar");
+                    deleteImage.setWidth("20px");
+                    deleteImage.setHeight("20px");
+                    deleteImage.getStyle().set("cursor", "pointer");
+                    deleteImage.addClickListener(event -> {
+                        LOGGER.info("Delete: {}", workOrderDetailEntity.getId());
+                    });
+
+            return layout;
+        })).setHeader("#")
+            .setSortable(false)
+            .setResizable(false)
+            .setWidth("5%");
+
+        grid.addColumn("description")
+            .setHeader("Descripción")
+            .setSortable(true)
+            .setResizable(true)
+            .setWidth("30%");
+
+        grid.addColumn("salePrice")
+            .setHeader("Costo")
             .setSortable(true)
             .setWidth("10%");
 

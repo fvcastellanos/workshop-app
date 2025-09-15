@@ -77,6 +77,7 @@ public class WorkOrderDetailService {
                 .notes(workOrderDetail.getNotes())
                 .quantity(workOrderDetail.getQuantity())
                 .unitPrice(workOrderDetail.getUnitPrice())
+                .salePrice(workOrderDetail.getSalePrice())
                 .created(zonedDateTimeFactory.getSystemNow())
                 .tenant(tenant)
                 .build();

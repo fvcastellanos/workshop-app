@@ -28,7 +28,7 @@ public class V8__AddConfigurationTable  extends FlywayMigration {
                 (
                     key,
                     tenant
-                );                
+                );
             """);
     }
     

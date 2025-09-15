@@ -13,13 +13,14 @@ public class PriceService {
 
     public double calculatePrice(final double price, final String tenant) {
 
-        return price + (price * getSalePercentage(tenant));
+        final var salePercentage = 1 - getSalePercentage(tenant);
+        return Math.ceil(price / salePercentage);
     }
 
     private double getSalePercentage(String tenant) {
         final var properties = configurationService.getConfiguration(tenant);
 
-        final var value = properties.getProperty("sale.percentage", "0.20");
+        final var value = properties.getProperty("sale.percentage", "0.35");
 
         return Double.parseDouble(value);
     }

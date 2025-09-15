@@ -4,7 +4,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
  Unexpected results may occur if the code is changed deliberately.
 -->
 <dbmodel pgmodeler-ver="1.1.3" use-changelog="false" max-obj-count="21"
-	 last-position="0,2199" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
+	 last-position="69,1836" last-zoom="1" scene-rect="0,0,2717.1,3229.12"
 	 default-schema="public" default-owner="postgres"
 	 layers="Default layer"
 	 active-layers="0"
@@ -1063,7 +1063,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
-<table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="13" z-value="0">
+<table name="work_order_detail" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
 	<schema name="workshop"/>
 	<role name="workshop"/>
 	<position x="160" y="2060"/>
@@ -1087,6 +1087,9 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	</column>
 	<column name="sale_price" not-null="true" default-value="0">
 		<type name="double precision" length="0"/>
+	</column>
+	<column name="labor_sale" not-null="true" default-value="false">
+		<type name="bool" length="0"/>
 	</column>
 	<column name="tenant" not-null="true">
 		<type name="character varying" length="50"/>
@@ -1180,6 +1183,12 @@ CAUTION: Do not modify this file unless you know what you are doing.
   GROUP BY tenant, name, code, product_id;]]> </definition>
 </view>
 
+<relationship name="rel_product_stock_inventory" type="reltv" layers="0"
+	 custom-color="#e71875"
+	 src-table="workshop.product_stock"
+	 dst-table="workshop.inventory"
+	 src-required="false" dst-required="false"/>
+
 <relationship name="rel_product_stock_operation_type" type="reltv" layers="0"
 	 custom-color="#9ac21c"
 	 src-table="workshop.product_stock"
@@ -1190,12 +1199,6 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 custom-color="#a5d5ee"
 	 src-table="workshop.product_stock"
 	 dst-table="workshop.product"
-	 src-required="false" dst-required="false"/>
-
-<relationship name="rel_product_stock_inventory" type="reltv" layers="0"
-	 custom-color="#e71875"
-	 src-table="workshop.product_stock"
-	 dst-table="workshop.inventory"
 	 src-required="false" dst-required="false"/>
 
 <index name="idx_product_category_sequence_id" table="workshop.product_category"

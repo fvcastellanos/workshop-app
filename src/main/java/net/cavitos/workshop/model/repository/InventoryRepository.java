@@ -50,4 +50,13 @@ public interface InventoryRepository extends CrudRepository<InventoryEntity, Str
                                                     String tenant);
 
     Optional<InventoryEntity> findByIdAndTenant(String id, String tenant);
+
+    @Query("""
+                select inventory from InventoryEntity inventory
+                where inventory.productEntity.id = :productId
+                    and inventory.inventoryMovementTypeEntity.type = 'I'
+                    and inventory.tenant = :tenant
+                order by inventory.operationDate desc
+            """)
+    Page<InventoryEntity> findLatestUnitPriceByProductIdAndTenant(String productId, String tenant, Pageable pageable);
 }

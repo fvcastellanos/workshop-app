@@ -12,7 +12,7 @@ public final class ProductDropDownFactory {
 
     public static ComboBox<CommonProduct> buildProductDropDown(final String width) {
 
-        return ComponentFactory.buildComboBox("Producto", width, CommonProduct::getName);
+        return ComponentFactory.buildComboBox("Producto", width, value -> value.getCode() + " - " + value.getName());
     }
 
     public static void addProducts(final List<CommonProduct> products, final ComboBox<CommonProduct> productField) {
