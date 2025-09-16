@@ -78,7 +78,7 @@ public class InitialInventoryModalView extends DialogBase<InventoryEntity> {
 
         binder.refreshFields();
 
-        productField.setItems(loadProducts());
+        ProductDropDownFactory.addProducts(loadProducts(), productField);
 
         final var operationType = new CommonOperationType();
         operationType.setCode(initialInventoryCode);
@@ -112,7 +112,6 @@ public class InitialInventoryModalView extends DialogBase<InventoryEntity> {
         quantityField.setMin(1);
         quantityField.setStep(1);
 
-        productField = ComponentFactory.buildComboBox("Producto", "100%", CommonProduct::getName);
         productField = ProductDropDownFactory.buildProductDropDown("100%");
 
         unitPriceField = new NumberField("Precio Unitario");

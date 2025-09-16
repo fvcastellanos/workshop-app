@@ -10,6 +10,7 @@ import net.cavitos.workshop.model.repository.ContactRepository;
 import net.cavitos.workshop.model.repository.WorkOrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;

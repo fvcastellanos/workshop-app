@@ -29,6 +29,10 @@ public class WorkOrderDetail {
     @NotNull
     private CommonProduct product;
 
+    private String description;
+
+    private String notes;
+
     @Min(0)
     @NotNull
     private double quantity;
@@ -36,4 +40,7 @@ public class WorkOrderDetail {
     @Min(0)
     @NotNull
     private double unitPrice;
+
+    @NotNull
+    private double salePrice;
 }
