@@ -4,6 +4,7 @@ import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
 import net.cavitos.workshop.event.model.EventType;
 import net.cavitos.workshop.event.model.WorkOrderDetailEvent;
 import net.cavitos.workshop.factory.ZonedDateTimeFactory;
+import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ProductRepository;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
 
@@ -66,8 +68,15 @@ public class WorkOrderDetailService {
         final var workOrderEntity = workOrderRepository.findByIdAndTenant(workOrderId, tenant)
                 .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Work Order not found for tenant"));
 
-        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
-                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+//        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+//                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+
+        ProductEntity productEntity = null;
+        if (Objects.nonNull(product)) {
+
+            productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+                    .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+        }
 
         final var entity = WorkOrderDetailEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
@@ -121,11 +130,14 @@ public class WorkOrderDetailService {
 
         final var product = workOrderDetail.getProduct();
 
-        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
-                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+        if (Objects.nonNull(product)) {
+            final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+                    .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+
+            workOrderDetailEntity.setProductEntity(productEntity);
+        }
 
         workOrderDetailEntity.setWorkOrderEntity(workOrderEntity);
-        workOrderDetailEntity.setProductEntity(productEntity);
         workOrderDetailEntity.setDescription(workOrderDetail.getDescription());
         workOrderDetailEntity.setNotes(workOrderDetail.getNotes());
         workOrderDetailEntity.setQuantity(workOrderDetail.getQuantity());

@@ -7,6 +7,7 @@ import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.InventoryMovementTypeRepository;
 import net.cavitos.workshop.model.repository.InventoryRepository;
 import net.cavitos.workshop.model.repository.ProductRepository;
+import net.cavitos.workshop.model.repository.WorkOrderDetailRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
+
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
 
 @Service
@@ -31,14 +35,18 @@ public class InventoryMovementService {
 
     private final InventoryMovementTypeRepository inventoryMovementTypeRepository;
 
+    private final WorkOrderDetailRepository workOrderDetailRepository;
+
     public InventoryMovementService(final InventoryRepository inventoryRepository,
                                     final ProductRepository productRepository,
                                     final InventoryMovementTypeRepository inventoryMovementTypeRepository,
+                                    final WorkOrderDetailRepository workOrderDetailRepository,
                                     final ZonedDateTimeFactory zonedDateTimeFactory) {
 
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
         this.inventoryMovementTypeRepository = inventoryMovementTypeRepository;
+        this.workOrderDetailRepository = workOrderDetailRepository;
         this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
@@ -107,6 +115,15 @@ public class InventoryMovementService {
                 .updated(Instant.now())
                 .build();
 
+        final var workOrderDetailId = movement.getWorkOrderDetailId();
+        if (Objects.nonNull(workOrderDetailId)) {
+
+            final var workOrderDetailEntity = workOrderDetailRepository.findById(workOrderDetailId)
+                    .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Work Order Detail not found"));
+
+            entity.setWorkOrderDetailEntity(workOrderDetailEntity);
+        }
+
         return inventoryRepository.save(entity);
     }
 
@@ -138,7 +155,6 @@ public class InventoryMovementService {
         entity.setUnitPrice(movement.getUnitPrice());
         entity.setProductEntity(productEntity);
         entity.setInventoryMovementTypeEntity(operationType);
-//        entity.setInvoiceDetailEntity(null);
 
         return inventoryRepository.save(entity);
     }
@@ -173,5 +189,12 @@ public class InventoryMovementService {
                 .findFirst()
                 .map(InventoryEntity::getUnitPrice)
                 .orElse(0.0);
+    }
+
+    public Optional<InventoryEntity> findByWorkOrderDetailId(final String workOrderDetailId, final String tenant) {
+
+        LOGGER.info("Find inventory movement for workOrderDetailId: {} and tenant: {}", workOrderDetailId, tenant);
+
+        return inventoryRepository.findByWorkOrderDetailEntityIdAndTenant(workOrderDetailId, tenant);
     }
 }

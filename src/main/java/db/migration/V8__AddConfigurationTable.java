@@ -21,15 +21,8 @@ public class V8__AddConfigurationTable  extends FlywayMigration {
                     CONSTRAINT application_configuration_pk PRIMARY KEY (id)
                 );
 
-                ALTER TABLE workshop.configuration OWNER TO workshop;
-
-                CREATE UNIQUE INDEX uq_configuration_key ON workshop.configuration
-                USING btree
-                (
-                    key,
-                    tenant
-                );
+                ALTER TABLE workshop.configuration \
+                ADD CONSTRAINT uq_configuration_key UNIQUE (key, tenant);
             """);
     }
-    
 }

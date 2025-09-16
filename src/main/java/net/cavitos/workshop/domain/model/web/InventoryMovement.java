@@ -21,6 +21,9 @@ public class InventoryMovement {
     @Size(max = 50)
     private String id;
 
+    @Size(max = 50)
+    private String workOrderDetailId;
+
     @NotNull
     private CommonProduct product;
 

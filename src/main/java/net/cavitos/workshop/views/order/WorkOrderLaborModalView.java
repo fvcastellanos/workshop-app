@@ -4,11 +4,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.binder.Binder;
 import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
 import net.cavitos.workshop.service.WorkOrderDetailService;
-import net.cavitos.workshop.transformer.WorkOrderDetailTransformer;
-import net.cavitos.workshop.views.DialogBase;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,33 +13,19 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import static java.util.Objects.nonNull;
-
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class WorkOrderLaborModalView extends DialogBase<WorkOrderDetail> {
+public class WorkOrderLaborModalView extends WorkOrderBaseModal {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkOrderLaborModalView.class);
-
-    private final WorkOrderDetailService workOrderDetailService;
-
-    private final Binder<WorkOrderDetail> binder;
 
     private TextArea descriptionField;
     private NumberField salePriceField;
     private TextArea notesField;
 
-    private String workOrderId;
-    private WorkOrderDetail workOrderDetailEntity;
-
     public WorkOrderLaborModalView(final WorkOrderDetailService workOrderDetailService) {
 
-        super();
-
-        this.workOrderDetailService = workOrderDetailService;
-
-        this.binder = new Binder<>(WorkOrderDetail.class);
-
+        super(workOrderDetailService);
         buildContent();
     }
 
@@ -61,10 +44,6 @@ public class WorkOrderLaborModalView extends DialogBase<WorkOrderDetail> {
         }
 
         open();
-    }
-
-    public void setWorkOrderId(final String workOrderId) {
-        this.workOrderId = workOrderId;
     }
 
     private void buildContent() {
@@ -122,32 +101,5 @@ public class WorkOrderLaborModalView extends DialogBase<WorkOrderDetail> {
 
         binder.forField(notesField)
                 .bind(WorkOrderDetail::getNotes, WorkOrderDetail::setNotes);
-    }
-
-    private void saveChanges() {
-
-        try {
-            var validationResult = binder.validate();
-
-            if (validationResult.isOk()) {
-
-                final var orderDetail = new WorkOrderDetail();
-                binder.writeBeanIfValid(orderDetail);
-
-                final var entity = isEdit ? workOrderDetailService.updateOrderDetail(workOrderDetailEntity.getOrderId(), workOrderDetailEntity.getId(), orderDetail, tenant)
-                        : workOrderDetailService.addOrderDetail(tenant, workOrderId, orderDetail);
-
-                if (nonNull(onSaveEvent)) {
-
-                    onSaveEvent.accept(WorkOrderDetailTransformer.toWeb(entity));
-                }
-
-                close();
-            }
-
-        } catch (Exception exception) {
-            LOGGER.error("Error saving work order labor", exception);
-            showErrorNotification(exception.getMessage());
-        }
     }
 }

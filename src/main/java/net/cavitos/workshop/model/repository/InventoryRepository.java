@@ -59,4 +59,6 @@ public interface InventoryRepository extends CrudRepository<InventoryEntity, Str
                 order by inventory.operationDate desc
             """)
     Page<InventoryEntity> findLatestUnitPriceByProductIdAndTenant(String productId, String tenant, Pageable pageable);
+
+    Optional<InventoryEntity> findByWorkOrderDetailEntityIdAndTenant(String workOrderDetailId, String tenant);
 }

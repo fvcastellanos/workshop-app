@@ -918,19 +918,6 @@ USING btree
 );
 -- ddl-end --
 
--- object: workshop.application_configuration | type: TABLE --
--- DROP TABLE IF EXISTS workshop.application_configuration CASCADE;
-CREATE TABLE workshop.application_configuration (
-	tenant character varying(50) NOT NULL,
-	configuration text,
-	created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated timestamp,
-	CONSTRAINT application_configuration_pk PRIMARY KEY (tenant)
-);
--- ddl-end --
-ALTER TABLE workshop.application_configuration OWNER TO workshop;
--- ddl-end --
-
 -- object: fk_car_line_car_brand1 | type: CONSTRAINT --
 -- ALTER TABLE workshop.car_line DROP CONSTRAINT IF EXISTS fk_car_line_car_brand1 CASCADE;
 ALTER TABLE workshop.car_line ADD CONSTRAINT fk_car_line_car_brand1 FOREIGN KEY (car_brand_id)

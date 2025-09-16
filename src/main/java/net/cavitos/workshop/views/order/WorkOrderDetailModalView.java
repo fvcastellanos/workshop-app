@@ -5,15 +5,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.binder.Binder;
 import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
 import net.cavitos.workshop.domain.model.web.common.CommonProduct;
 import net.cavitos.workshop.service.InventoryMovementService;
 import net.cavitos.workshop.service.PriceService;
 import net.cavitos.workshop.service.ProductService;
 import net.cavitos.workshop.service.WorkOrderDetailService;
-import net.cavitos.workshop.transformer.WorkOrderDetailTransformer;
-import net.cavitos.workshop.views.DialogBase;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.factory.ProductDropDownFactory;
 import org.slf4j.Logger;
@@ -25,22 +22,15 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 
-import static java.util.Objects.nonNull;
-
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
+public class WorkOrderDetailModalView extends WorkOrderBaseModal {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkOrderDetailModalView.class);
 
-    private final Binder<WorkOrderDetail> binder;
-
     private final PriceService priceService;
-    private final WorkOrderDetailService workOrderDetailService;
     private final ProductService productService;
     private final InventoryMovementService inventoryMovementService;
-
-    private WorkOrderDetail workOrderDetailEntity;
 
     private NumberField quantityField;
     private ComboBox<CommonProduct> productField;
@@ -48,27 +38,18 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
     private NumberField salePriceField;
     private TextArea notesField;
 
-    private String workOrderId;
-
     public WorkOrderDetailModalView(final WorkOrderDetailService workOrderDetailService,
                                     final ProductService productService,
                                     final PriceService priceService,
                                     final InventoryMovementService inventoryMovementService) {
 
-        super();
+        super(workOrderDetailService);
 
-        this.workOrderDetailService = workOrderDetailService;
         this.productService = productService;
         this.priceService = priceService;
         this.inventoryMovementService = inventoryMovementService;
 
-        this.binder = new Binder<>(WorkOrderDetail.class);
-
         buildContent();
-    }
-
-    public void setWorkOrderId(final String workOrderId) {
-        this.workOrderId = workOrderId;
     }
 
     @Override
@@ -102,6 +83,7 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
         quantityField.setWidth("30%");
         quantityField.setMin(1);
         quantityField.setStep(1);
+        quantityField.addValueChangeListener(event -> updateSalePrice(true));
 
         productField = ProductDropDownFactory.buildProductDropDown("70%");
         productField.addValueChangeListener(event -> retrieveProductUnitPrice());
@@ -113,7 +95,7 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
         unitPriceField = new NumberField("Precio Unitario");
         unitPriceField.setWidth("50%");
         unitPriceField.setMin(0);
-        unitPriceField.addValueChangeListener(event -> updateSalePrice());
+        unitPriceField.addValueChangeListener(event -> updateSalePrice(false));
 
         notesField = new TextArea("Notas");
         notesField.setWidth("100%");
@@ -144,7 +126,6 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
         add(controls, footerLayout);
 
         bindComponents();
-
     }
 
     private void bindComponents() {
@@ -160,6 +141,7 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
 
         binder.forField(unitPriceField)
                 .asRequired("Precio Unitario es requerido")
+                .withValidator(unitPriceField -> unitPriceField > 0, "El precio unitario debe ser mayor que 0")
                 .bind(WorkOrderDetail::getUnitPrice, WorkOrderDetail::setUnitPrice);
 
         binder.forField(salePriceField)
@@ -172,33 +154,6 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
                 .bind(WorkOrderDetail::getNotes, WorkOrderDetail::setNotes);
     }
     
-    private void saveChanges() {
-
-        try {
-
-            var validationResult = binder.validate();
-
-            if (validationResult.isOk()) {
-
-                final var orderDetail = new WorkOrderDetail();
-                binder.writeBeanIfValid(orderDetail);
-
-                final var entity = isEdit ? workOrderDetailService.updateOrderDetail(workOrderDetailEntity.getOrderId(), workOrderDetailEntity.getId(), orderDetail, tenant)
-                        : workOrderDetailService.addOrderDetail(tenant, workOrderId, orderDetail);
-
-                if (nonNull(onSaveEvent)) {
-
-                    onSaveEvent.accept(WorkOrderDetailTransformer.toWeb(entity));
-                }
-
-                close();
-            }
-        } catch (Exception exception) {
-            LOGGER.error("Unable to save work order detail", exception);
-            showErrorNotification(exception.getMessage());
-        }
-    }
-
     private List<CommonProduct> loadProducts() {
 
         return productService.loadProducts(tenant)
@@ -214,13 +169,24 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
                 }).toList();
     }
 
-    private void updateSalePrice() {
+    private void updateSalePrice(boolean mandatory) {
 
         final var unitPrice = unitPriceField.getValue();
         final var quantity = quantityField.getValue();
         final var price = salePriceField.getValue();
 
-        if (unitPrice != null && quantity != null && Objects.isNull(price)) {
+        if (mandatory) {
+
+            if (unitPrice != null && quantity != null) {
+
+                final var salePrice = priceService.calculatePrice(unitPrice * quantity, tenant);
+                salePriceField.setValue(salePrice);
+            }
+
+            return;
+        }
+
+        if (Objects.isNull(price)) {
 
             final var salePrice = priceService.calculatePrice(unitPrice * quantity, tenant);
             salePriceField.setValue(salePrice);
@@ -235,7 +201,7 @@ public class WorkOrderDetailModalView extends DialogBase<WorkOrderDetail> {
 
             final var unitPrice = inventoryMovementService.findLatestUnitPrice(product.getCode(), tenant);
             unitPriceField.setValue(unitPrice);
-            updateSalePrice();
+            updateSalePrice(true);
         }
     }
 }

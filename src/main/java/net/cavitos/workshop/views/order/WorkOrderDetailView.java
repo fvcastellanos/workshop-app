@@ -52,6 +52,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private final WorkOrderDetailService workOrderDetailService;
     private final WorkOrderDetailModalView modalView;
     private final WorkOrderLaborModalView laborModalView;
+    private final OrderDetailDeleteDialog deleteDialog;
 
     private final Grid<WorkOrderDetailEntity> grid;
     private final Grid<WorkOrderDetailEntity> laborGrid;
@@ -74,6 +75,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                                   final WorkOrderDetailService workOrderDetailService,
                                   final WorkOrderDetailModalView modalView,
                                   final WorkOrderLaborModalView laborModalView,
+                                  final OrderDetailDeleteDialog deleteDialog,
                                   final Clock systemClock) {
         super(authenticationContext, databaseUserService);
 
@@ -82,6 +84,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         this.workOrderDetailService = workOrderDetailService;
         this.modalView = modalView;
         this.laborModalView = laborModalView;
+        this.deleteDialog = deleteDialog;
 
         searchTitle = buildSearchTitle("Búsqueda");
 
@@ -206,11 +209,23 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         );
 
         modalView.addOnSaveEvent(entity ->  {
-            performSearch();
-            calculateTotal(); 
+            updateValues();
+        });
+
+        laborModalView.addOnSaveEvent(entity ->  {
+            updateValues();
+        });
+
+        deleteDialog.addOnDeleteEvent(entity ->  {
+            updateValues();
         });
 
         return searchBox;
+    }
+
+    private void updateValues() {
+        performSearch();
+        calculateTotal();
     }
 
     private void fillOrderInformation(final WorkOrderEntity workOrderEntity) {
@@ -300,7 +315,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                     deleteImage.getStyle().set("cursor", "pointer");
                     deleteImage.addClickListener(event -> {
                         LOGGER.info("Delete: {}", workOrderDetailEntity.getId());
-//                        modalView.openDialogForEdit(tenant, workOrderEntity);
+                        deleteDialog.openDialog(tenant, workOrderDetailEntity);
                     });
 
                     layout.add(editImage, deleteImage);
@@ -367,13 +382,16 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                     deleteImage.getStyle().set("cursor", "pointer");
                     deleteImage.addClickListener(event -> {
                         LOGGER.info("Delete: {}", workOrderDetailEntity.getId());
+                        deleteDialog.openDialog(tenant, workOrderDetailEntity);
                     });
 
-            return layout;
+                    layout.add(editImage, deleteImage);
+
+                    return layout;
         })).setHeader("#")
             .setSortable(false)
             .setResizable(false)
-            .setWidth("5%");
+            .setWidth("1%");
 
         grid.addColumn("description")
             .setHeader("Descripción")
@@ -382,8 +400,9 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
             .setWidth("30%");
 
         grid.addColumn("salePrice")
-            .setHeader("Costo")
+            .setHeader("Precio")
             .setSortable(true)
+            .setResizable(true)
             .setWidth("10%");
 
         return grid;
