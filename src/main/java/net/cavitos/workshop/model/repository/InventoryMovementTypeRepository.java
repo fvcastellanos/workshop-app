@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface InventoryMovementTypeRepository extends CrudRepository<InventoryMovementTypeEntity, String> {
@@ -33,4 +34,6 @@ public interface InventoryMovementTypeRepository extends CrudRepository<Inventor
     Optional<InventoryMovementTypeEntity> findByNameAndTenant(String name, String tenant);
 
     Optional<InventoryMovementTypeEntity> findByCodeAndTenant(String code, String tenant);
+
+    List<InventoryMovementTypeEntity> findByActiveAndTenant(int active, String tenant);
 }

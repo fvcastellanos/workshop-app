@@ -15,7 +15,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.ContactEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.ContactService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -52,7 +52,7 @@ public class ContactView extends CRUDLayout {
     private final AddContactModal addContactModal;
 
     public ContactView(final AuthenticationContext authenticationContext,
-                       final DatabaseUserService userDatabaseService,
+                       final DefaultUserService userDatabaseService,
                        final ContactService contactService,
                        final AddContactModal addModelDialog) {
 

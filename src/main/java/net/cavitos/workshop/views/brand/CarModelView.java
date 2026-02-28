@@ -20,7 +20,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.entity.CarLineEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.service.CarLineService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
@@ -57,7 +57,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
     private CarBrandEntity carBrandEntity;
 
     public CarModelView(final AuthenticationContext authenticationContext,
-                        final DatabaseUserService userDatabaseService,
+                        final DefaultUserService userDatabaseService,
                         final CarBrandService carBrandService,
                         final CarLineService carLineService,
                         final AddModelDialog addModelDialog) {

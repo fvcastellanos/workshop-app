@@ -58,8 +58,8 @@ public class InventoryMovementService {
                                         final int page,
                                         final int size) {
 
-        LOGGER.info("Search inventory movements from: {} to: {} for operationType: {} and tenant: {}",
-                initialDate, finalDate, operationType, tenant);
+        LOGGER.info("Search inventory movements from: {} to: {} for operationType: {}, operationCode: {} and tenant: {}",
+                initialDate, finalDate, operationType, operationTypeCode, tenant);
 
         final var pageable = PageRequest.of(page, size);
 
