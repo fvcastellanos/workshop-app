@@ -50,8 +50,6 @@ node {
 
             stage('Build') {
 
-//                 def dataSourceUrl = "jdbc:postgresql://${ipAddress}:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"
-
                 withEnv(["DATASOURCE_URL=jdbc:postgresql://${ipAddress}:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"]) {
 
                     docker.image(mavenImageName)
