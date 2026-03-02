@@ -71,7 +71,7 @@ node {
             }
 
             stage('Quality Gate') {
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: 3, unit: 'MINUTES') {
                     def qg = waitForQualityGate()
                     if (qg.status != 'OK') {
                         error "SonarQube quality gate failed: ${qg.status}"
