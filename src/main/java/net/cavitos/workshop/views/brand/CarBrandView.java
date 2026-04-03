@@ -174,7 +174,7 @@ public class CarBrandView extends CRUDLayout {
                     viewImage.getStyle().set("cursor", "pointer");
                     viewImage.addClickListener(event -> {
                         LOGGER.info("Models for Brand: {}", carBrandEntity.getName());
-                        UI.getCurrent().navigate("car-models/%s".formatted(carBrandEntity.getId()));
+                        UI.getCurrent().navigate("car-lines/%s".formatted(carBrandEntity.getId()));
                     });
 
                     layout.add(editImage, viewImage);

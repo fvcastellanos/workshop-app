@@ -39,8 +39,8 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildStatusSel
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildTextSearchField;
 
 @RolesAllowed({ "ROLE_user" })
-@PageTitle("Modelos de Vehículos")
-@Route(value = "car-models", layout = MainLayout.class)
+@PageTitle("Líneas de Vehículos")
+@Route(value = "car-lines", layout = MainLayout.class)
 public class CarModelView extends CRUDLayout implements HasUrlParameter<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarModelView.class);
@@ -85,7 +85,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
         });
         btnSearch.setWidth("min-content");
 
-        final var btnAdd = new Button("Agregar Modelo", event -> {
+        final var btnAdd = new Button("Agregar Línea", event -> {
 
             addModelDialog.openDialogForNew(tenant, carBrandEntity);
         });
