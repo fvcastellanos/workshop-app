@@ -3,7 +3,7 @@ node {
     def mavenImageName = 'maven:3.9-eclipse-temurin-21'
 
     withCredentials([
-        string(credentialsId: 'JenkinsHL', variable: 'GH_TOKEN'),
+        string(credentialsId: 'github-credentials', variable: 'GH_TOKEN'),
     ]) {
 
         try {

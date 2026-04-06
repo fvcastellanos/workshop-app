@@ -36,6 +36,9 @@ public class InitialInventoryView extends CRUDLayout {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(InitialInventoryView.class);
 
+    private final static String INITIAL_DEFAULT_DATE = "2001-01-01";
+    private final static String FINAL_DEFAULT_DATE = "2100-01-01";
+
     private final InitialInventoryModalView modalView;
     private final InitialInventoryDeleteDialog deleteDialog;
 
@@ -69,7 +72,8 @@ public class InitialInventoryView extends CRUDLayout {
         add(
                 buildSearchTitle("Búsqueda"),
                 buildSearchBox(),
-                grid
+                grid,
+                paginator
         );
 
         search();
@@ -79,13 +83,13 @@ public class InitialInventoryView extends CRUDLayout {
     protected Page<InventoryEntity> performSearch() {
 
         final var iDate = nonNull(initialDate.getValue()) ? zonedDateTimeFactory.buildInstantFromLocalDate(initialDate.getValue())
-                : zonedDateTimeFactory.buildInstantFrom("2001-01-01");
+                : zonedDateTimeFactory.buildInstantFrom(INITIAL_DEFAULT_DATE);
 
         final var fDAte = nonNull(finalDate.getValue()) ? zonedDateTimeFactory.buildInstantFromLocalDate(finalDate.getValue())
-                : zonedDateTimeFactory.buildInstantFrom("2100-01-01");
+                : zonedDateTimeFactory.buildInstantFrom(FINAL_DEFAULT_DATE);
 
         final var result = inventoryMovementService.search("%", initialMovementCode, iDate, fDAte, tenant,
-                0, Integer.MAX_VALUE);
+                pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 

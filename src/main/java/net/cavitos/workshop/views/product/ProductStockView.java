@@ -61,7 +61,8 @@ public class ProductStockView extends CRUDLayout {
         add(
                 ComponentFactory.buildSearchTitle("Búsqueda"),
                 buildSearchBox(),
-                grid
+                grid,
+                paginator
         );
 
         performSearch();
@@ -73,7 +74,13 @@ public class ProductStockView extends CRUDLayout {
         final var text = searchTextField.getValue();
         final var category = categoryType.getValue();
 
-        final var result = productService.getProductStock(text, category.getValue(), tenant, 0, Integer.MAX_VALUE);
+        final var result = productService.getProductStock(
+                text,
+                category.getValue(),
+                tenant,
+                pagination.getPage(),
+                pagination.getSize()
+        );
 
         grid.setItems(result.getContent());
 
