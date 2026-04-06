@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.InvoiceService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -51,11 +51,11 @@ public class ProviderInvoiceView extends CRUDLayout {
     private Select<TypeOption> invoiceStatus;
 
     protected ProviderInvoiceView(final AuthenticationContext authenticationContext,
-                                  final DatabaseUserService databaseUserService,
+                                  final DefaultUserService defaultUserService,
                                   final InvoiceService invoiceService,
                                   final Clock systemClock,
                                   final ProviderInvoiceModalView modalView) {
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.invoiceService = invoiceService;
         this.systemClock = systemClock;

@@ -15,7 +15,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InventoryEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.InventoryMovementService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -49,13 +49,13 @@ public class InitialInventoryView extends CRUDLayout {
     private DatePicker finalDate;
 
     protected InitialInventoryView(final AuthenticationContext authenticationContext,
-                                   final DatabaseUserService databaseUserService,
+                                   final DefaultUserService defaultUserService,
                                    final ZonedDateTimeFactory zonedDateTimeFactory,
                                    final InventoryMovementService inventoryMovementService,
                                    @Value("${initial.inventory.movement-type.code:MI-01}") final String initialInventoryCode,
                                    final InitialInventoryModalView modalView,
                                    final InitialInventoryDeleteDialog deleteDialog) {
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.zonedDateTimeFactory = zonedDateTimeFactory;
         this.inventoryMovementService = inventoryMovementService;

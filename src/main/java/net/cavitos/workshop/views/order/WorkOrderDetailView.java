@@ -20,7 +20,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.entity.WorkOrderEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.WorkOrderDetailService;
 import net.cavitos.workshop.service.WorkOrderService;
 import net.cavitos.workshop.transformer.WorkOrderDetailTransformer;
@@ -70,14 +70,14 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private TextField workOrderTotal;
 
     protected WorkOrderDetailView(final AuthenticationContext authenticationContext,
-                                  final DatabaseUserService databaseUserService,
+                                  final DefaultUserService defaultUserService,
                                   final WorkOrderService workOrderService,
                                   final WorkOrderDetailService workOrderDetailService,
                                   final WorkOrderDetailModalView modalView,
                                   final WorkOrderLaborModalView laborModalView,
                                   final OrderDetailDeleteDialog deleteDialog,
                                   final Clock systemClock) {
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.systemClock = systemClock;
         this.workOrderService = workOrderService;

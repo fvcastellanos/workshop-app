@@ -5,15 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import static java.util.Objects.isNull;
 
 public class ZonedDateTimeFactory {
-
-    private static final Clock UTC_CLOCK = Clock.systemUTC();
 
     private final Clock systemClock;
 
@@ -58,20 +54,8 @@ public class ZonedDateTimeFactory {
                 .toInstant();
     }
 
-    public Instant getUTCNow() {
-
-        return Instant.now(UTC_CLOCK);
-    }
-
     public Instant getSystemNow() {
 
         return Instant.now(systemClock);
-    }
-
-    public ZoneOffset getZoneOffset(final LocalDateTime localDateTime) {
-
-        return systemClock.getZone()
-                .getRules()
-                .getOffset(localDateTime);
     }
 }

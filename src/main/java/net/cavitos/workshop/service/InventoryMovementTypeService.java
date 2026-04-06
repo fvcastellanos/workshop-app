@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
 
@@ -45,6 +46,13 @@ public class InventoryMovementTypeService {
         final var pageable = PageRequest.of(page, size);
 
         return inventoryMovementTypeRepository.search(active, type, "%" + text + "%", tenant, pageable);
+    }
+
+    public List<InventoryMovementTypeEntity> findActive(final String tenant) {
+
+        LOGGER.info("Find active inventory movement types for tenant: {}", tenant);
+
+        return inventoryMovementTypeRepository.findByActiveAndTenant(1, tenant);
     }
 
     public InventoryMovementTypeEntity getById(final String id,

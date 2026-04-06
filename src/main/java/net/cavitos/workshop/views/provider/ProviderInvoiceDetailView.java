@@ -18,7 +18,7 @@ import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.domain.model.web.InvoiceDetail;
 import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.InvoiceDetailService;
 import net.cavitos.workshop.service.InvoiceService;
 import net.cavitos.workshop.transformer.InvoiceDetailTransformer;
@@ -67,13 +67,13 @@ public class ProviderInvoiceDetailView extends CRUDLayout implements HasUrlParam
     private InvoiceEntity invoiceEntity;
 
     protected ProviderInvoiceDetailView(final AuthenticationContext authenticationContext,
-                                        final DatabaseUserService databaseUserService,
+                                        final DefaultUserService defaultUserService,
                                         final InvoiceService invoiceService,
                                         final InvoiceDetailService invoiceDetailService,
                                         final Clock systemClock,
                                         final ProviderInvoiceDetailModalView modalView,
                                         final ProviderInvoiceDeleteDialog deleteDialog) {
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.invoiceService = invoiceService;
         this.invoiceDetailService = invoiceDetailService;

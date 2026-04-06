@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootTest
 @ComponentScan(basePackages = "net.cavitos.workshop")
-class WorkShopApplicationTests {
+class WorkShopApplicationIT {
 
 	@Test
 	void contextLoads() {

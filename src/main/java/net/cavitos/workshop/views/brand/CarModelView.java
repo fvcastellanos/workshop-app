@@ -20,7 +20,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
 import net.cavitos.workshop.model.entity.CarLineEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.service.CarLineService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
@@ -39,8 +39,8 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildStatusSel
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildTextSearchField;
 
 @RolesAllowed({ "ROLE_user" })
-@PageTitle("Modelos de Vehículos")
-@Route(value = "car-models", layout = MainLayout.class)
+@PageTitle("Líneas de Vehículos")
+@Route(value = "car-lines", layout = MainLayout.class)
 public class CarModelView extends CRUDLayout implements HasUrlParameter<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarModelView.class);
@@ -57,7 +57,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
     private CarBrandEntity carBrandEntity;
 
     public CarModelView(final AuthenticationContext authenticationContext,
-                        final DatabaseUserService userDatabaseService,
+                        final DefaultUserService userDatabaseService,
                         final CarBrandService carBrandService,
                         final CarLineService carLineService,
                         final AddModelDialog addModelDialog) {
@@ -85,7 +85,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
         });
         btnSearch.setWidth("min-content");
 
-        final var btnAdd = new Button("Agregar Modelo", event -> {
+        final var btnAdd = new Button("Agregar Línea", event -> {
 
             addModelDialog.openDialogForNew(tenant, carBrandEntity);
         });

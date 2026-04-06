@@ -32,7 +32,8 @@ node {
 
             stage('Prepare Data Services') {
                 sh 'docker compose -f ./docker/services.yaml up -d'
-                sh '''                    
+                sh '''
+                    sleep 10
                     max_attempts=10
                     attempt=1
                     while ! docker exec postgres pg_isready -U $DB_CREDENTIALS_USR -d $DB_NAME; do
@@ -49,9 +50,7 @@ node {
 
             stage('Build') {
 
-                def dataSourceUrl = "jdbc:postgresql://${ipAddress}:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"
-
-                withEnv(["DATASOURCE_URL=${dataSourceUrl}"]) {
+                withEnv(["DATASOURCE_URL=jdbc:postgresql://${ipAddress}:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"]) {
 
                     docker.image(mavenImageName)
                         .inside {
@@ -64,13 +63,13 @@ node {
                 withSonarQubeEnv() {
                     docker.image(mavenImageName)
                     .inside {
-                        sh "mvn clean package sonar:sonar -Dsonar.projectKey=workshop-app -Dsonar.projectName='Workshop Application' -DskipTests"
+                        sh "mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=workshop-app -Dsonar.projectName='Workshop Application' -DskipTests"
                     }
                 }
             }
 
             stage('Quality Gate') {
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES') {
                     def qg = waitForQualityGate()
                     if (qg.status != 'OK') {
                         error "SonarQube quality gate failed: ${qg.status}"
