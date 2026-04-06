@@ -34,10 +34,10 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTit
 @Route(value = "inventory/initial", layout = MainLayout.class)
 public class InitialInventoryView extends CRUDLayout {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(InitialInventoryView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitialInventoryView.class);
 
-    private final static String INITIAL_DEFAULT_DATE = "2001-01-01";
-    private final static String FINAL_DEFAULT_DATE = "2100-01-01";
+    private static final String INITIAL_DEFAULT_DATE = "2001-01-01";
+    private static final String FINAL_DEFAULT_DATE = "2100-01-01";
 
     private final InitialInventoryModalView modalView;
     private final InitialInventoryDeleteDialog deleteDialog;
