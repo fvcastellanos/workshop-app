@@ -63,13 +63,13 @@ node {
                 withSonarQubeEnv() {
                     docker.image(mavenImageName)
                     .inside {
-                        sh "mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=workshop-app -Dsonar.projectName='Workshop Application' -DskipTests"
+                        sh "mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=workshop-app -Dsonar.projectName='Workshop Application' -DskipTests"
                     }
                 }
             }
 
             stage('Quality Gate') {
-                timeout(time: 3, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES') {
                     def qg = waitForQualityGate()
                     if (qg.status != 'OK') {
                         error "SonarQube quality gate failed: ${qg.status}"
