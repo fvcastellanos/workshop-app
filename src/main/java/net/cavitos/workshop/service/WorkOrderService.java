@@ -1,6 +1,7 @@
 package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.model.web.WorkOrder;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.CarLineEntity;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.entity.WorkOrderEntity;
@@ -10,17 +11,13 @@ import net.cavitos.workshop.model.repository.ContactRepository;
 import net.cavitos.workshop.model.repository.WorkOrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-
 import static net.cavitos.workshop.domain.model.status.WorkOrderStatus.IN_PROGRESS;
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
-import static net.cavitos.workshop.factory.DateTimeFactory.buildInstantFrom;
 
 @Service
 public class WorkOrderService {
@@ -30,14 +27,17 @@ public class WorkOrderService {
     private final WorkOrderRepository workOrderRepository;
     private final CarLineRepository carLineRepository;
     private final ContactRepository contactRepository;
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
 
     public WorkOrderService(final WorkOrderRepository workOrderRepository,
                             final CarLineRepository carLineRepository,
-                            final ContactRepository contactRepository) {
+                            final ContactRepository contactRepository,
+                            final ZonedDateTimeFactory zonedDateTimeFactory) {
 
         this.workOrderRepository = workOrderRepository;
         this.carLineRepository = carLineRepository;
         this.contactRepository = contactRepository;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
     public Page<WorkOrderEntity> search(final String tenant,
@@ -77,12 +77,14 @@ public class WorkOrderService {
         final var carLineEntity = getCarLine(tenant, workOrder);
         final var contactEntity = getContact(tenant, workOrder);
 
+        final var orderDate = zonedDateTimeFactory.buildInstantFrom(workOrder.getOrderDate());
+
         final var entity = WorkOrderEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .carLineEntity(carLineEntity)
                 .contactEntity(contactEntity)
                 .status(IN_PROGRESS.value())
-                .orderDate(buildInstantFrom(workOrder.getOrderDate()))
+                .orderDate(orderDate)
                 .odometerMeasurement(workOrder.getOdometerMeasurement())
                 .odometerValue(workOrder.getOdometerValue())
                 .gasAmount(workOrder.getGasAmount())
@@ -90,8 +92,8 @@ public class WorkOrderService {
                 .notes(workOrder.getNotes())
                 .tenant(tenant)
                 .plateNumber(workOrder.getPlateNumber())
-                .created(Instant.now())
-                .updated(Instant.now())
+                .created(zonedDateTimeFactory.getSystemNow())
+                .updated(zonedDateTimeFactory.getSystemNow())
                 .build();
 
         workOrderRepository.save(entity);
@@ -123,7 +125,7 @@ public class WorkOrderService {
         entity.setOdometerValue(workOrder.getOdometerValue());
         entity.setStatus(workOrder.getStatus());
         entity.setPlateNumber(workOrder.getPlateNumber());
-        entity.setUpdated(Instant.now());
+        entity.setUpdated(zonedDateTimeFactory.getSystemNow());
 
         workOrderRepository.save(entity);
 

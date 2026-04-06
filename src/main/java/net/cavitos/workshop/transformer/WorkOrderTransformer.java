@@ -3,24 +3,30 @@ package net.cavitos.workshop.transformer;
 import net.cavitos.workshop.domain.model.web.WorkOrder;
 import net.cavitos.workshop.domain.model.web.common.CommonCarLine;
 import net.cavitos.workshop.domain.model.web.common.CommonContact;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.CarLineEntity;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.entity.WorkOrderEntity;
+import org.springframework.stereotype.Service;
 
 import static java.util.Objects.nonNull;
-import static net.cavitos.workshop.factory.DateTimeFactory.buildStringFromInstant;
 
+@Service
 public final class WorkOrderTransformer {
 
-    private WorkOrderTransformer() {
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
+    public WorkOrderTransformer(final ZonedDateTimeFactory zonedDateTimeFactory) {
+
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
-    public static WorkOrder toWeb(WorkOrderEntity entity) {
+    public WorkOrder toWeb(WorkOrderEntity entity) {
 
         final var workOrder = new WorkOrder();
         workOrder.setNumber(entity.getNumber());
         workOrder.setStatus(entity.getStatus());
-        workOrder.setOrderDate(buildStringFromInstant(entity.getOrderDate()));
+        workOrder.setOrderDate(zonedDateTimeFactory.buildStringFromInstant(entity.getOrderDate()));
         workOrder.setOdometerMeasurement(entity.getOdometerMeasurement());
         workOrder.setOdometerValue(entity.getOdometerValue());
         workOrder.setGasAmount(entity.getGasAmount());
@@ -40,7 +46,7 @@ public final class WorkOrderTransformer {
         return workOrder;
     }
 
-    public static CommonContact buildWorkOrderContact(final ContactEntity contactEntity) {
+    public CommonContact buildWorkOrderContact(final ContactEntity contactEntity) {
 
         final var contact = new CommonContact();
         contact.setId(contactEntity.getId());
@@ -51,7 +57,7 @@ public final class WorkOrderTransformer {
         return contact;
     }
 
-    public static CommonCarLine buildWorkOrderCarLine(final CarLineEntity entity) {
+    public CommonCarLine buildWorkOrderCarLine(final CarLineEntity entity) {
 
         final var carLine = new CommonCarLine();
         carLine.setId(entity.getId());

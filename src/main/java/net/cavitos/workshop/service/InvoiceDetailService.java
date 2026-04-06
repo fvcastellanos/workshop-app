@@ -4,6 +4,7 @@ import net.cavitos.workshop.domain.model.web.InvoiceDetail;
 import net.cavitos.workshop.domain.model.web.common.CommonProduct;
 import net.cavitos.workshop.event.model.EventType;
 import net.cavitos.workshop.event.model.InvoiceDetailEvent;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
 import net.cavitos.workshop.model.entity.ProductEntity;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
-import static net.cavitos.workshop.factory.DateTimeFactory.getUTCNow;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 @Service
 public class InvoiceDetailService {
@@ -95,9 +96,8 @@ public class InvoiceDetailService {
                 .unitPrice(invoiceDetail.getUnitPrice())
                 .discountAmount(invoiceDetail.getDiscountAmount())
                 .tenant(tenant)
-                .created(getUTCNow())
+                .created(invoiceEntity.getInvoiceDate())
                 .build();
-
 
         invoiceDetailRepository.save(entity);
 
@@ -173,6 +173,20 @@ public class InvoiceDetailService {
         invoiceDetailRepository.delete(invoiceDetailEntity);
 
         applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.DELETE, invoiceDetailEntity));
+    }
+
+    @Transactional
+    public void updateInvoiceDate(final InvoiceEntity invoiceEntity) {
+
+        final var details = invoiceDetailRepository.getInvoiceDetails(invoiceEntity.getId());
+
+        emptyIfNull(details).forEach(invoiceDetailEntity -> {
+
+            invoiceDetailEntity.setCreated(invoiceEntity.getInvoiceDate());
+            invoiceDetailRepository.save(invoiceDetailEntity);
+
+            applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.UPDATE, invoiceDetailEntity));
+        });
     }
 
     // --------------------------------------------------------------------------------------------------------
