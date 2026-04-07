@@ -72,6 +72,7 @@ public abstract class DeleteDialog<T> extends Dialog {
         final var leftSpan = new Span(icon);
         leftSpan.setWidth("20%");
         leftSpan.getStyle().setTextAlign(Style.TextAlign.CENTER);
+        leftSpan.getStyle().setPaddingRight("1em");
 
         final var rightSpan = new Span(dialogText);
         rightSpan.setWidth("80%");

@@ -12,7 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.sequence.model.entity.SequenceEntity;
 import net.cavitos.workshop.sequence.service.SequenceService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
@@ -39,10 +39,10 @@ public class SequenceView extends CRUDLayout {
 
 
     public SequenceView(final AuthenticationContext authenticationContext,
-                        final DatabaseUserService databaseUserService,
+                        final DefaultUserService defaultUserService,
                         final SequenceService sequenceService,
                         final SequenceModalView modalView) {
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.sequenceService = sequenceService;
         this.modalView = modalView;
@@ -52,7 +52,8 @@ public class SequenceView extends CRUDLayout {
         add(
                 ComponentFactory.buildSearchTitle("Búsqueda"),
                 buildSearchBox(),
-                grid
+                grid,
+                paginator
         );
 
         modalView.addOnSaveEvent(entity -> search());
@@ -65,7 +66,7 @@ public class SequenceView extends CRUDLayout {
 
         final var text = searchTextField.getValue();
 
-        final var result = sequenceService.search(text, getUserTenant(), DEFAULT_PAGE, DEFAULT_SIZE);
+        final var result = sequenceService.search(text, getUserTenant(), pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 

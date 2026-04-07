@@ -2,6 +2,9 @@ package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.model.web.Invoice;
 import net.cavitos.workshop.domain.model.web.common.CommonContact;
+import net.cavitos.workshop.event.model.EventType;
+import net.cavitos.workshop.event.model.InvoiceEvent;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
@@ -9,14 +12,13 @@ import net.cavitos.workshop.model.repository.ContactRepository;
 import net.cavitos.workshop.model.repository.InvoiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
-import static net.cavitos.workshop.factory.DateTimeFactory.buildInstantFrom;
-import static net.cavitos.workshop.factory.DateTimeFactory.getUTCNow;
 
 @Service
 public class InvoiceService {
@@ -25,12 +27,19 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final ContactRepository contactRepository;
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public InvoiceService(final InvoiceRepository invoiceRepository,
-                          final ContactRepository contactRepository) {
+                          final ContactRepository contactRepository,
+                          final ZonedDateTimeFactory zonedDateTimeFactory,
+                          final ApplicationEventPublisher applicationEventPublisher) {
 
         this.invoiceRepository = invoiceRepository;
         this.contactRepository = contactRepository;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public Page<InvoiceEntity> search(final String tenant,
@@ -66,8 +75,8 @@ public class InvoiceService {
 
         final var contactEntity = findContactEntity(tenant, contact);
 
-        final var invoiceDate = buildInstantFrom(invoice.getInvoiceDate());
-        final var effectiveDate = buildInstantFrom(invoice.getEffectiveDate());
+        final var invoiceDate = zonedDateTimeFactory.buildInstantFrom(invoice.getInvoiceDate());
+        final var effectiveDate = zonedDateTimeFactory.buildInstantFrom(invoice.getEffectiveDate());
 
         var entity = InvoiceEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
@@ -80,8 +89,8 @@ public class InvoiceService {
                 .tenant(tenant)
                 .invoiceDate(invoiceDate)
                 .effectiveDate(effectiveDate)
-                .created(getUTCNow())
-                .updated(getUTCNow())
+                .created(zonedDateTimeFactory.getSystemNow())
+                .updated(zonedDateTimeFactory.getSystemNow())
                 .build();
 
         invoiceRepository.save(entity);
@@ -110,15 +119,17 @@ public class InvoiceService {
 
         entity.setNumber(invoice.getNumber());
         entity.setSuffix(invoice.getSuffix());
-        entity.setInvoiceDate(buildInstantFrom(invoice.getInvoiceDate()));
-        entity.setEffectiveDate(buildInstantFrom(invoice.getEffectiveDate()));
+        entity.setInvoiceDate(zonedDateTimeFactory.buildInstantFrom(invoice.getInvoiceDate()));
+        entity.setEffectiveDate(zonedDateTimeFactory.buildInstantFrom(invoice.getEffectiveDate()));
         entity.setImageUrl(invoice.getImageUrl());
         entity.setStatus(invoice.getStatus());
         entity.setType(invoice.getType());
         entity.setContactEntity(contactEntity);
-        entity.setUpdated(getUTCNow());
+        entity.setUpdated(zonedDateTimeFactory.getSystemNow());
 
         invoiceRepository.save(entity);
+
+        publishInvoiceUpdateEvent(entity);
 
         return entity;
     }
@@ -143,5 +154,15 @@ public class InvoiceService {
 
             throw createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Invoice already exists");
         }
+    }
+
+    private void publishInvoiceUpdateEvent(final InvoiceEntity invoiceEntity) {
+
+        final var event = InvoiceEvent.builder()
+                .eventType(EventType.UPDATE)
+                .invoiceEntity(invoiceEntity)
+                .build();
+
+        applicationEventPublisher.publishEvent(event);
     }
 }

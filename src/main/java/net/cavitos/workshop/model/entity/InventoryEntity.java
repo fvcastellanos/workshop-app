@@ -39,6 +39,10 @@ public class InventoryEntity {
     @JoinColumn(name = "operation_type_id")
     private InventoryMovementTypeEntity inventoryMovementTypeEntity;
 
+    @OneToOne
+    @JoinColumn(name = "work_order_detail_id")
+    private WorkOrderDetailEntity workOrderDetailEntity;
+
     @NotNull
     @Column(name = "operation_date")
     private Instant operationDate;

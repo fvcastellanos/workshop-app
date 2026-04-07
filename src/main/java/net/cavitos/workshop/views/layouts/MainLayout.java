@@ -21,6 +21,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import net.cavitos.workshop.domain.exception.AuthenticationException;
 import net.cavitos.workshop.resource.ImageLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 @Layout
 public class MainLayout  extends AppLayout {
@@ -104,14 +107,27 @@ public class MainLayout  extends AppLayout {
                 createNavigationItemWithSubItems("Movimientos", null, "img/icons/movement-arrows-svgrepo-com.svg",
                         createNavigationItem("Facturas Proveedores", "provider-invoices", "img/icons/invoice-bill-svgrepo-com.svg")
                 ),
-                createNavigationItemWithSubItems("Inventario", null, "img/icons/inventory-logistics-warehouse-svgrepo-com.svg",
-                        createNavigationItem("Inicial", "inventory/initial", "img/icons/entry-point-svgrepo-com.svg"),
-                        createNavigationItem("Movimientos", "inventory-adjustments", "img/icons/arrows-rotate-clockwise-svgrepo-com.svg"),
-                        createNavigationItem("Existencias", "stock", "img/icons/inventory-svgrepo-com.svg")
-                ),
+                buildInventoryMenu(),
                 createNavigationItemWithSubItems("Configuración", null, "img/icons/settings-svgrepo-com.svg",
                         createNavigationItem("Secuencias", "sequences", "img/icons/numbered-list-svgrepo-com.svg")
-                )
+                ),
+                createNavigationItem("Acerca de ...", "about", "img/icons/about-svgrepo-com.svg")
+        );
+    }
+
+    private SideNavItem buildInventoryMenu() {
+
+        if (getRoles().contains("admin")) {
+            return createNavigationItemWithSubItems("Inventario", null, "img/icons/inventory-logistics-warehouse-svgrepo-com.svg",
+                    createNavigationItem("Inicial", "inventory/initial", "img/icons/entry-point-svgrepo-com.svg"),
+                    createNavigationItem("Movimientos", "inventory", "img/icons/arrows-rotate-clockwise-svgrepo-com.svg"),
+                    createNavigationItem("Existencias", "stock", "img/icons/inventory-svgrepo-com.svg")
+            );
+        }
+
+        return createNavigationItemWithSubItems("Inventario", null, "img/icons/inventory-logistics-warehouse-svgrepo-com.svg",
+                createNavigationItem("Inicial", "inventory/initial", "img/icons/entry-point-svgrepo-com.svg"),
+                createNavigationItem("Existencias", "stock", "img/icons/inventory-svgrepo-com.svg")
         );
     }
 
@@ -202,5 +218,18 @@ public class MainLayout  extends AppLayout {
         return MenuConfiguration.getPageHeader(getContent())
                 .orElse("");
     }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getRoles() {
+
+        final var authenticatedUser = authenticationContext.getAuthenticatedUser(DefaultOidcUser.class)
+                .orElseThrow(() -> new AuthenticationException("User not authenticated"));
+
+        final var attributes = authenticatedUser.getAttributes();
+
+        final var roles = (List<String>) attributes.get("net.cavitos.app.roles");
+        return emptyIfNull(roles);
+    }
+
 
 }

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>net.cavitos.workshop</groupId>
 	<artifactId>workshop-app</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 	<name>WorkShopERP</name>
 	<scm>
 		<connection>scm:git:https://github.com/fvcastellanos/workshop-app.git</connection>
@@ -27,6 +27,14 @@
 		<okta-spring-boot-starter.version>3.0.7</okta-spring-boot-starter.version>
 		<postgresql-connector-j.version>42.7.5</postgresql-connector-j.version>
 		<vaadin.version>24.5.2</vaadin.version>
+		<!-- SonarQube exclusions -->
+		<sonar.exclusions>
+			src/main/frontend/**
+		</sonar.exclusions>
+		<sonar.coverage.exclusions>
+			src/main/java/net/cavitos/workshop/views/**,
+			src/main/frontend/**
+		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -158,15 +166,31 @@
 				</configuration>
 			</plugin>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>3.1.1</version>
-            </plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>2.18.0</version>
 			</plugin>
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>9.0.2</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <useNativeGitViaCommandLine>true</useNativeGitViaCommandLine>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 

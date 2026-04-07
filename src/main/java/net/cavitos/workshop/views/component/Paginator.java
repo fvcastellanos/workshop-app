@@ -27,7 +27,7 @@ public class Paginator extends VerticalLayout {
 
         final var pageSizeComboBox = new ComboBox<Integer>();
         pageSizeComboBox.setWidth("100px");
-        pageSizeComboBox.setItems(25, 50, 100, 200, 500);
+        pageSizeComboBox.setItems(10, 25, 50, 100, 200, 500);
         pageSizeComboBox.setValue(this.pagination.getSize());
 
         pageSizeComboBox.addValueChangeListener(event -> {
@@ -38,9 +38,12 @@ public class Paginator extends VerticalLayout {
             updatePageText();
         });
 
+        final var currentPageValueText = buildCurrentPageText(
+                this.pagination.getPage() + 1,
+                this.pagination.getTotalPages()
+        );
 
-        this.currentPageText = new Text(CURRENT_PAGE.formatted(this.pagination.getPage() + 1,
-                this.pagination.getTotalPages()));
+        this.currentPageText = new Text(currentPageValueText);
         final var span = new Span(this.currentPageText);
         span.setClassName("paginator-text");
 
@@ -86,7 +89,12 @@ public class Paginator extends VerticalLayout {
 
     private void updatePageText() {
         final var currentPage = pagination.getPage() + 1;
-        this.currentPageText.setText(CURRENT_PAGE.formatted(currentPage, pagination.getTotalPages()));
+        this.currentPageText.setText(buildCurrentPageText(currentPage, pagination.getTotalPages()));
+    }
+
+    private String buildCurrentPageText(final int currentPage, final int totalPages) {
+
+        return CURRENT_PAGE.formatted(currentPage, totalPages == 0 ? 1 : totalPages);
     }
 
 }

@@ -1,6 +1,10 @@
 package net.cavitos.workshop.service;
 
 import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
+import net.cavitos.workshop.event.model.EventType;
+import net.cavitos.workshop.event.model.WorkOrderDetailEvent;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
+import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.ProductRepository;
@@ -8,11 +12,12 @@ import net.cavitos.workshop.model.repository.WorkOrderDetailRepository;
 import net.cavitos.workshop.model.repository.WorkOrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
 
@@ -27,13 +32,22 @@ public class WorkOrderDetailService {
 
     private final ProductRepository productRepository;
 
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+
     public WorkOrderDetailService(final WorkOrderRepository workOrderRepository,
                                   final WorkOrderDetailRepository workOrderDetailRepository,
-                                  final ProductRepository productRepository) {
+                                  final ProductRepository productRepository,
+                                  final ZonedDateTimeFactory zonedDateTimeFactory,
+                                  final ApplicationEventPublisher applicationEventPublisher) {
 
         this.workOrderRepository = workOrderRepository;
         this.workOrderDetailRepository = workOrderDetailRepository;
         this.productRepository = productRepository;
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public List<WorkOrderDetailEntity> getOrderDetails(final String tenant, final String orderId) {
@@ -54,20 +68,34 @@ public class WorkOrderDetailService {
         final var workOrderEntity = workOrderRepository.findByIdAndTenant(workOrderId, tenant)
                 .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Work Order not found for tenant"));
 
-        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
-                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+//        final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+//                .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+
+        ProductEntity productEntity = null;
+        if (Objects.nonNull(product)) {
+
+            productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+                    .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+        }
 
         final var entity = WorkOrderDetailEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .workOrderEntity(workOrderEntity)
                 .productEntity(productEntity)
+                .description(workOrderDetail.getDescription())
+                .notes(workOrderDetail.getNotes())
                 .quantity(workOrderDetail.getQuantity())
                 .unitPrice(workOrderDetail.getUnitPrice())
-                .created(Instant.now())
+                .salePrice(workOrderDetail.getSalePrice())
+                .created(zonedDateTimeFactory.getSystemNow())
                 .tenant(tenant)
                 .build();
 
-        return workOrderDetailRepository.save(entity);
+        workOrderDetailRepository.save(entity);
+
+        publishWorkOrderDetailEvent(entity, EventType.ADD);
+
+        return entity;
     }
 
     public void deleteOrderDetail(final String workOrderId, final String workOrderDetailId, final String tenant) {
@@ -86,5 +114,50 @@ public class WorkOrderDetailService {
         }
 
         workOrderDetailRepository.delete(workOrderDetailEntity);
+
+        publishWorkOrderDetailEvent(workOrderDetailEntity, EventType.DELETE);
+    }
+
+    public WorkOrderDetailEntity updateOrderDetail(final String workOrderId, final String workOrderDetailId, final WorkOrderDetail workOrderDetail, final String tenant) {
+
+        LOGGER.info("update custom order detail for order_id={} and tenant={}", workOrderId, tenant);
+
+        final var workOrderDetailEntity = workOrderDetailRepository.findByIdAndTenant(workOrderDetailId, tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Work Order Detail not found for tenant"));
+
+        final var workOrderEntity = workOrderRepository.findByIdAndTenant(workOrderId, tenant)
+                .orElseThrow(() -> createBusinessException(HttpStatus.NOT_FOUND, "Work Order not found for tenant"));                
+
+        final var product = workOrderDetail.getProduct();
+
+        if (Objects.nonNull(product)) {
+            final var productEntity = productRepository.findByCodeEqualsIgnoreCaseAndTenant(product.getCode(), tenant)
+                    .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
+
+            workOrderDetailEntity.setProductEntity(productEntity);
+        }
+
+        workOrderDetailEntity.setWorkOrderEntity(workOrderEntity);
+        workOrderDetailEntity.setDescription(workOrderDetail.getDescription());
+        workOrderDetailEntity.setNotes(workOrderDetail.getNotes());
+        workOrderDetailEntity.setQuantity(workOrderDetail.getQuantity());
+        workOrderDetailEntity.setUnitPrice(workOrderDetail.getUnitPrice());
+        workOrderDetailEntity.setSalePrice(workOrderDetail.getSalePrice());
+
+        workOrderDetailRepository.save(workOrderDetailEntity);
+
+        publishWorkOrderDetailEvent(workOrderDetailEntity, EventType.UPDATE);
+
+        return workOrderDetailEntity;
+    }
+
+    private void publishWorkOrderDetailEvent(WorkOrderDetailEntity entity, EventType eventType) {
+
+        final var event = WorkOrderDetailEvent.builder()
+                .eventType(eventType)
+                .workOrderDetailEntity(entity)
+                .build();
+
+        applicationEventPublisher.publishEvent(event);
     }
 }

@@ -6,6 +6,8 @@ import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.generator.TimeBasedGenerator;
 import net.cavitos.workshop.model.repository.WorkOrderDetailRepository;
+import net.cavitos.workshop.service.PriceService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -21,11 +23,14 @@ public class WorkOrderInvoiceDetailListener {
 
     private final WorkOrderDetailRepository workOrderDetailRepository;
     private final ZonedDateTimeFactory zonedDateTimeFactory;
+    private final PriceService priceService;
 
     public WorkOrderInvoiceDetailListener(final WorkOrderDetailRepository workOrderDetailRepository,
-                                          final ZonedDateTimeFactory zonedDateTimeFactory) {
+                                          final ZonedDateTimeFactory zonedDateTimeFactory,
+                                          final PriceService priceService) {
         this.workOrderDetailRepository = workOrderDetailRepository;
         this.zonedDateTimeFactory = zonedDateTimeFactory;
+        this.priceService = priceService;
     }
 
     @EventListener(InvoiceDetailEvent.class)
@@ -81,6 +86,8 @@ public class WorkOrderInvoiceDetailListener {
                 return;
             }
 
+            final var salePrice = priceService.calculatePrice(invoiceDetailEntity.getQuantity() * invoiceDetailEntity.getUnitPrice(), tenant);
+
             final var detail = WorkOrderDetailEntity.builder()
                     .id(TimeBasedGenerator.generateTimeBasedId())
                     .invoiceDetailEntity(invoiceDetailEntity)
@@ -88,6 +95,7 @@ public class WorkOrderInvoiceDetailListener {
                     .workOrderEntity(workOrderEntity)
                     .quantity(invoiceDetailEntity.getQuantity())
                     .unitPrice(invoiceDetailEntity.getUnitPrice())
+                    .salePrice(salePrice)
                     .tenant(tenant)
                     .created(zonedDateTimeFactory.getSystemNow())
                     .build();

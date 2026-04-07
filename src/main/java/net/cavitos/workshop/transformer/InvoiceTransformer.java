@@ -2,18 +2,24 @@ package net.cavitos.workshop.transformer;
 
 import net.cavitos.workshop.domain.model.web.Invoice;
 import net.cavitos.workshop.domain.model.web.common.CommonContact;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.ContactEntity;
 import net.cavitos.workshop.model.entity.InvoiceEntity;
+import org.springframework.stereotype.Service;
 
 import static java.util.Objects.nonNull;
-import static net.cavitos.workshop.factory.DateTimeFactory.buildStringFromInstant;
 
+@Service
 public final class InvoiceTransformer {
 
-    private InvoiceTransformer() {
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
+    public InvoiceTransformer(final ZonedDateTimeFactory zonedDateTimeFactory) {
+
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
-    public static Invoice toWeb(final InvoiceEntity entity) {
+    public Invoice toWeb(final InvoiceEntity entity) {
 
         final var invoice = new Invoice();
         invoice.setType(entity.getType());
@@ -21,8 +27,8 @@ public final class InvoiceTransformer {
         invoice.setNumber(entity.getNumber());
         invoice.setStatus(entity.getStatus());
         invoice.setImageUrl(entity.getImageUrl());
-        invoice.setInvoiceDate(buildStringFromInstant(entity.getInvoiceDate()));
-        invoice.setEffectiveDate(buildStringFromInstant(entity.getEffectiveDate()));
+        invoice.setInvoiceDate(zonedDateTimeFactory.buildStringFromInstant(entity.getInvoiceDate()));
+        invoice.setEffectiveDate(zonedDateTimeFactory.buildStringFromInstant(entity.getEffectiveDate()));
 
         if (nonNull(entity.getContactEntity())) {
 
