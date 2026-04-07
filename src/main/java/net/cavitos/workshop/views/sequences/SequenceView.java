@@ -52,7 +52,8 @@ public class SequenceView extends CRUDLayout {
         add(
                 ComponentFactory.buildSearchTitle("Búsqueda"),
                 buildSearchBox(),
-                grid
+                grid,
+                paginator
         );
 
         modalView.addOnSaveEvent(entity -> search());
@@ -65,7 +66,7 @@ public class SequenceView extends CRUDLayout {
 
         final var text = searchTextField.getValue();
 
-        final var result = sequenceService.search(text, getUserTenant(), DEFAULT_PAGE, DEFAULT_SIZE);
+        final var result = sequenceService.search(text, getUserTenant(), pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 
