@@ -11,7 +11,7 @@ public class V8__AddConfigurationTable  extends FlywayMigration {
         final var jdbcTemplate = getJdbcTemplate(context);
 
         jdbcTemplate.execute("""
-                CREATE TABLE workshop.configuration (
+                CREATE TABLE configuration (
                     id character varying(50) NOT NULL,
                     key character varying(100) NOT NULL,
                     value text,
@@ -21,7 +21,7 @@ public class V8__AddConfigurationTable  extends FlywayMigration {
                     CONSTRAINT application_configuration_pk PRIMARY KEY (id)
                 );
 
-                ALTER TABLE workshop.configuration \
+                ALTER TABLE configuration \
                 ADD CONSTRAINT uq_configuration_key UNIQUE (key, tenant);
             """);
     }
