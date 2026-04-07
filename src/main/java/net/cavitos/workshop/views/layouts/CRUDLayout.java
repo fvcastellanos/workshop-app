@@ -65,7 +65,7 @@ public abstract class CRUDLayout extends VerticalLayout {
         return Pagination.builder()
                 .size(DEFAULT_SIZE)
                 .page(DEFAULT_PAGE)
-                .totalPages(0)
+                .totalPages(1)
                 .totalElements(0)
                 .build();
     }

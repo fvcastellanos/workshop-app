@@ -105,9 +105,12 @@ public class CarBrandView extends CRUDLayout {
 
         searchBox.add(searchBody, searchFooter);
 
-        add(h3);
-        add(searchBox);
-        add(grid);
+        add(
+                h3,
+                searchBox,
+                grid,
+                paginator
+        );
 
         addModal.addOnSaveEvent(entity -> performSearch());
         performSearch();
@@ -143,7 +146,7 @@ public class CarBrandView extends CRUDLayout {
 
         final var status = searchStatus.getValue();
         final var result = carBrandService.getAllByTenant(tenant, status.getValue(), searchText.getValue(),
-                DEFAULT_PAGE, DEFAULT_SIZE);
+                pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 

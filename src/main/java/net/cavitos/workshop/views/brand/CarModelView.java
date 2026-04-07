@@ -112,9 +112,12 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
             performSearch();
         });
 
-        add(searchTitle);
-        add(searchBox);
-        add(grid);
+        add(
+                searchTitle,
+                searchBox,
+                grid,
+                paginator
+        );
     }
 
     @Override
@@ -131,7 +134,7 @@ public class CarModelView extends CRUDLayout implements HasUrlParameter<String> 
 
         final var status = searchStatus.getValue();
         final var result = carLineService.findAll(tenant, carBrandEntity.getId(), status.getValue(),
-                searchText.getValue(), DEFAULT_PAGE, DEFAULT_SIZE);
+                searchText.getValue(), pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 

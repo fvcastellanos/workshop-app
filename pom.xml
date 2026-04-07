@@ -27,6 +27,14 @@
 		<okta-spring-boot-starter.version>3.0.7</okta-spring-boot-starter.version>
 		<postgresql-connector-j.version>42.7.5</postgresql-connector-j.version>
 		<vaadin.version>24.5.2</vaadin.version>
+		<!-- SonarQube exclusions -->
+		<sonar.exclusions>
+			src/main/frontend/**
+		</sonar.exclusions>
+		<sonar.coverage.exclusions>
+			src/main/java/net/cavitos/workshop/views/**,
+			src/main/frontend/**
+		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>

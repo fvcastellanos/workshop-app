@@ -72,9 +72,12 @@ public class ProductView extends CRUDLayout {
 
         this.addModelDialog = addModelDialog;
 
-        add(buildSearchTitle("Búsqueda"));
-        add(buildSearchBox());
-        add(grid);
+        add(
+                buildSearchTitle("Búsqueda"),
+                buildSearchBox(),
+                grid,
+                paginator
+        );
 
         addModelDialog.addOnSaveEvent(productEntity -> performSearch());
 
@@ -234,7 +237,7 @@ public class ProductView extends CRUDLayout {
         final var category = categoryType.getValue();
 
         final var result = productService.search(tenant, type.getValue(), category.getValue(), searchText.getValue(), status.getValue(),
-                DEFAULT_PAGE, DEFAULT_SIZE);
+                pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 

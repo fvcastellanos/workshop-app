@@ -27,7 +27,7 @@ public class Paginator extends VerticalLayout {
 
         final var pageSizeComboBox = new ComboBox<Integer>();
         pageSizeComboBox.setWidth("100px");
-        pageSizeComboBox.setItems(25, 50, 100, 200, 500);
+        pageSizeComboBox.setItems(10, 25, 50, 100, 200, 500);
         pageSizeComboBox.setValue(this.pagination.getSize());
 
         pageSizeComboBox.addValueChangeListener(event -> {
