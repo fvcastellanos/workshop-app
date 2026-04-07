@@ -63,7 +63,10 @@ node {
                 withSonarQubeEnv() {
                     docker.image(mavenImageName)
                     .inside {
-                        sh "mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=workshop-app -Dsonar.projectName='Workshop Application' -DskipTests"
+                        sh """mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                            -Dsonar.projectKey=workshop-app \
+                            -Dsonar.projectName='Workshop Application' \
+                            -DskipTests"""
                     }
                 }
             }
