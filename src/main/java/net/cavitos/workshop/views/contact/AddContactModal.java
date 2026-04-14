@@ -110,7 +110,7 @@ public class AddContactModal extends DialogBase<ContactEntity> {
         binder.forField(nameField)
                 .asRequired("El nombre es requerido")
                 .withValidator(name -> name.length() >= 2, "Longitud mínima 2 caracteres")
-                .withValidator(name -> name.length() <= 50, "Longitud máxima 50 caracteres")
+                .withValidator(name -> name.length() <= 150, "Longitud máxima 150 caracteres")
                 .bind(Contact::getName, Contact::setName);
 
         binder.forField(contactField)
