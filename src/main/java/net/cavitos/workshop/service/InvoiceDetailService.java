@@ -101,7 +101,7 @@ public class InvoiceDetailService {
 
         invoiceDetailRepository.save(entity);
 
-        applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.ADD, entity));
+        applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.ADD, "", entity));
 
         return entity;
     }
@@ -157,7 +157,7 @@ public class InvoiceDetailService {
 
         invoiceDetailRepository.save(invoiceDetailEntity);
 
-        applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.UPDATE, invoiceDetailEntity));
+        applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.UPDATE, invoiceDetailId, invoiceDetailEntity));
 
         return invoiceDetailEntity;
     }
@@ -172,7 +172,7 @@ public class InvoiceDetailService {
 
         invoiceDetailRepository.delete(invoiceDetailEntity);
 
-        applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.DELETE, invoiceDetailEntity));
+        applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.DELETE, invoiceDetailId, invoiceDetailEntity));
     }
 
     @Transactional
@@ -185,7 +185,7 @@ public class InvoiceDetailService {
             invoiceDetailEntity.setCreated(invoiceEntity.getInvoiceDate());
             invoiceDetailRepository.save(invoiceDetailEntity);
 
-            applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.UPDATE, invoiceDetailEntity));
+            applicationEventPublisher.publishEvent(buildInvoiceDetailEventFor(EventType.UPDATE, "", invoiceDetailEntity));
         });
     }
 
@@ -204,10 +204,12 @@ public class InvoiceDetailService {
     }
 
     private InvoiceDetailEvent buildInvoiceDetailEventFor(final EventType eventType,
+                                                          final String previousInvoiceDetailId,
                                                           final InvoiceDetailEntity entity) {
 
         return InvoiceDetailEvent.builder()
                 .eventType(eventType)
+                .previousInvoiceDetailId(previousInvoiceDetailId)
                 .invoiceDetailEntity(entity)
                 .build();
     }

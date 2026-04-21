@@ -44,23 +44,22 @@ public class WorkOrderInvoiceDetailListener {
 
         switch (eventType) {
             case ADD -> addWorkOrderDetailFor(invoiceDetailEntity);
-            case UPDATE -> updateWorkOrderDetailFor(invoiceDetailEntity);
-            case DELETE -> deleteWorkOrderDetailFor(invoiceDetailEntity);
+            case UPDATE -> updateWorkOrderDetailFor(invoiceDetailEvent.getPreviousInvoiceDetailId(), invoiceDetailEntity);
+            case DELETE -> deleteWorkOrderDetailFor(invoiceDetailEvent.getPreviousInvoiceDetailId(), invoiceDetailEntity);
         }
     }
 
     // --------------------------------------------------------------------------------------------------------
 
     @Transactional
-    void deleteWorkOrderDetailFor(final InvoiceDetailEntity invoiceDetailEntity) {
+    void deleteWorkOrderDetailFor(final String previousInvoiceDetailId, final InvoiceDetailEntity invoiceDetailEntity) {
 
-        final var productEntity = invoiceDetailEntity.getProductEntity();
         final var tenant = invoiceDetailEntity.getTenant();
 
-        workOrderDetailRepository.findDetailByInvoiceDetail(invoiceDetailEntity.getId(), productEntity.getId(), tenant)
+        workOrderDetailRepository.findByInvoiceDetailIdAndTenant(previousInvoiceDetailId, tenant)
                 .ifPresent(workOrderDetailEntity -> {
 
-                    LOGGER.info("work_order_detail={} found, deleting it for tenant={}", workOrderDetailEntity, tenant);
+                    LOGGER.info("work_order_detail_id={} found, deleting it for tenant={}", workOrderDetailEntity.getId(), tenant);
                     workOrderDetailRepository.delete(workOrderDetailEntity);
                 });
     }
@@ -74,17 +73,6 @@ public class WorkOrderInvoiceDetailListener {
 
         if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
             LOGGER.info("Adding a new work order detail for work_order_number={} and tenant={}", workOrderEntity.getNumber(), tenant);
-
-            final var detailHolder = workOrderDetailRepository.findDetailByWorkOrder(workOrderEntity.getId(),
-                    productEntity.getId(), tenant);
-
-            if (detailHolder.isPresent()) {
-
-                LOGGER.error("Work order detail already found for work_order_number={} and tenant={}",
-                        workOrderEntity.getNumber(), tenant);
-
-                return;
-            }
 
             final var salePrice = priceService.calculatePrice(invoiceDetailEntity.getQuantity() * invoiceDetailEntity.getUnitPrice(), tenant);
 
@@ -109,9 +97,9 @@ public class WorkOrderInvoiceDetailListener {
     }
 
     @Transactional
-    void updateWorkOrderDetailFor(final InvoiceDetailEntity invoiceDetailEntity) {
+    void updateWorkOrderDetailFor(final String previousInvoiceDetailId, final InvoiceDetailEntity invoiceDetailEntity) {
 
-        deleteWorkOrderDetailFor(invoiceDetailEntity);
+        deleteWorkOrderDetailFor(previousInvoiceDetailId, invoiceDetailEntity);
         addWorkOrderDetailFor(invoiceDetailEntity);
     }
 }
