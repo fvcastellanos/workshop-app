@@ -65,8 +65,7 @@ node {
                     .inside {
                         sh """mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                             -Dsonar.projectKey=workshop-app \
-                            -Dsonar.projectName='Workshop Application' \
-                            -DskipTests"""
+                            -Dsonar.projectName='Workshop Application'"""
                     }
                 }
             }

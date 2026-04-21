@@ -218,11 +218,12 @@ class InvoiceDetailServiceTest {
         verify(applicationEventPublisher, times(2)).publishEvent(eventCaptor.capture());
 
         List<InvoiceDetailEvent> events = eventCaptor.getAllValues();
-        assertThat(events).hasSize(2);
-        assertThat(events).allSatisfy(event -> {
-            assertThat(event.getEventType()).isEqualTo(EventType.UPDATE);
-            assertThat(event.getPreviousInvoiceDetailId()).isEmpty();
-        });
+        assertThat(events).hasSize(2)
+            .allSatisfy(event -> {
+                assertThat(event.getEventType()).isEqualTo(EventType.UPDATE);
+                assertThat(event.getPreviousInvoiceDetailId()).isEmpty();
+            });
+
         assertThat(events)
                 .extracting(InvoiceDetailEvent::getInvoiceDetailEntity)
                 .containsExactlyInAnyOrder(detailOne, detailTwo);
