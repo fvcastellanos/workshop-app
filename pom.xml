@@ -23,18 +23,26 @@
 		<flyway.version>11.3.1</flyway.version>
 		<failsafe.version>3.3.1</failsafe.version>
 		<java.version>21</java.version>
+		<jacoco.plugin.version>0.8.12</jacoco.plugin.version>
 		<ksuid.version>1.1.3</ksuid.version>
+		<maven.failsafe.plugin.version>3.2.5</maven.failsafe.plugin.version>
+		<maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
 		<okta-spring-boot-starter.version>3.0.7</okta-spring-boot-starter.version>
 		<postgresql-connector-j.version>42.7.5</postgresql-connector-j.version>
-		<vaadin.version>24.5.2</vaadin.version>
+		<!-- SonarQube configuration -->
+		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<!-- SonarQube exclusions -->
 		<sonar.exclusions>
 			src/main/frontend/**
+			src/main/java/db/**
 		</sonar.exclusions>
 		<sonar.coverage.exclusions>
 			src/main/java/net/cavitos/workshop/views/**,
 			src/main/frontend/**
+			src/main/java/db/**
 		</sonar.coverage.exclusions>
+		<vaadin.version>24.5.2</vaadin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -191,6 +199,76 @@
                     <useNativeGitViaCommandLine>true</useNativeGitViaCommandLine>
                 </configuration>
             </plugin>
+			<!-- Unit test runner -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.plugin.version}</version>
+				<configuration>
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!-- Integration test runner -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven.failsafe.plugin.version}</version>
+				<configuration>
+					<includes>
+						<include>**/*IT.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Code coverage -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.plugin.version}</version>
+				<executions>
+					<!-- Prepare agent for unit tests -->
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- Generate coverage report after unit tests -->
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<!-- Prepare agent for integration tests -->
+					<execution>
+						<id>prepare-agent-integration</id>
+						<goals>
+							<goal>prepare-agent-integration</goal>
+						</goals>
+					</execution>
+					<!-- Generate merged report after integration tests -->
+					<execution>
+						<id>report-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report-integration</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
