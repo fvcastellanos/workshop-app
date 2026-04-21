@@ -61,11 +61,13 @@ node {
             
             stage('SonarQube Analysis') {
                 withSonarQubeEnv() {
-                    docker.image(mavenImageName)
-                    .inside {
-                        sh """mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                            -Dsonar.projectKey=workshop-app \
-                            -Dsonar.projectName='Workshop Application'"""
+                    withEnv(["DATASOURCE_URL=jdbc:postgresql://${ipAddress}:5432/${DB_NAME}?user=${DB_CREDENTIALS_USR}&password=${DB_CREDENTIALS_PSW}&currentSchema=${DB_SCHEMA}"]) {
+                        docker.image(mavenImageName)
+                            .inside {
+                                sh """mvn clean test verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                                    -Dsonar.projectKey=workshop-app \
+                                    -Dsonar.projectName='Workshop Application'"""
+                            }
                     }
                 }
             }
