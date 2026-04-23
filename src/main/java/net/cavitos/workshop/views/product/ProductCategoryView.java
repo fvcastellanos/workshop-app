@@ -15,7 +15,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.ProductCategoryEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.ProductCategoryService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -48,11 +48,11 @@ public class ProductCategoryView extends CRUDLayout {
     private Select<Status> searchStatus;
 
     public ProductCategoryView(final AuthenticationContext authenticationContext,
-                               final DatabaseUserService databaseUserService,
+                               final DefaultUserService defaultUserService,
                                final ProductCategoryService productCategoryService,
                                final ProductCategoryModalView modalView) {
 
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.productCategoryService = productCategoryService;
         this.modalView = modalView;

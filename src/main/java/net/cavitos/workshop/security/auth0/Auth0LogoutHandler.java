@@ -43,9 +43,17 @@ public class Auth0LogoutHandler extends VerticalLayout implements LogoutHandler 
 
             authentication.setAuthenticated(false);
 
-            final var baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .build()
-                    .toUriString();
+            var baseUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .build();
+
+            if ("http".equalsIgnoreCase(baseUri.getScheme()) && !"localhost".equalsIgnoreCase(baseUri.getHost())) {
+
+                baseUri = ServletUriComponentsBuilder.fromCurrentRequest()
+                        .scheme("https")
+                        .build();
+            }
+
+            final var baseUrl = baseUri.toUriString();
 
             final var redirectUrl = "%sv2/logout?client_id=%s&returnTo=%s"
                     .formatted(issuer, clientId, baseUrl);

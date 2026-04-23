@@ -14,7 +14,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.ProductStockEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.ProductCategoryService;
 import net.cavitos.workshop.service.ProductService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
@@ -45,11 +45,11 @@ public class ProductStockView extends CRUDLayout {
     private Select<TypeOption> categoryType;
 
     public ProductStockView(final AuthenticationContext authenticationContext,
-                            final DatabaseUserService databaseUserService,
+                            final DefaultUserService defaultUserService,
                             final ProductCategoryService productCategoryService,
                             final ProductService productService) {
 
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.productCategoryService = productCategoryService;
         this.productService = productService;
@@ -61,7 +61,8 @@ public class ProductStockView extends CRUDLayout {
         add(
                 ComponentFactory.buildSearchTitle("Búsqueda"),
                 buildSearchBox(),
-                grid
+                grid,
+                paginator
         );
 
         performSearch();
@@ -73,7 +74,13 @@ public class ProductStockView extends CRUDLayout {
         final var text = searchTextField.getValue();
         final var category = categoryType.getValue();
 
-        final var result = productService.getProductStock(text, category.getValue(), tenant, 0, Integer.MAX_VALUE);
+        final var result = productService.getProductStock(
+                text,
+                category.getValue(),
+                tenant,
+                pagination.getPage(),
+                pagination.getSize()
+        );
 
         grid.setItems(result.getContent());
 

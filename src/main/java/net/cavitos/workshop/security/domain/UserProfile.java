@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Builder
 @ToString
@@ -15,4 +17,5 @@ public class UserProfile {
     private String userId;
     private String provider;
     private String username;
+    private List<String> roles;
 }

@@ -4,8 +4,8 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchBod
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchBox;
 import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTitle;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -32,7 +32,7 @@ public class AboutView extends VerticalLayout{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AboutView.class);
 
-    private static final String GIT_PROPERTIE_FILE = "git.properties";
+    private static final String GIT_PROPERTIES_FILE = "git.properties";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -114,14 +114,16 @@ public class AboutView extends VerticalLayout{
 
     private Properties loadGitProperties() {
 
-        final var rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        final var gitConfigPath = "%s%s".formatted(rootPath, GIT_PROPERTIE_FILE);
-
         final var gitProps = new Properties();
-        try {
 
-            gitProps.load(new FileInputStream(gitConfigPath));
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(GIT_PROPERTIES_FILE)) {
 
+            if (inputStream == null) {
+                LOGGER.warn("git.properties not found on classpath");
+                return gitProps;
+            }
+
+            gitProps.load(inputStream);
             return gitProps;
 
         } catch (IOException exception) {

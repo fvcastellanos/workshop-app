@@ -15,7 +15,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InventoryEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.InventoryMovementService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -34,7 +34,10 @@ import static net.cavitos.workshop.views.factory.ComponentFactory.buildSearchTit
 @Route(value = "inventory/initial", layout = MainLayout.class)
 public class InitialInventoryView extends CRUDLayout {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(InitialInventoryView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitialInventoryView.class);
+
+    private static final String INITIAL_DEFAULT_DATE = "2001-01-01";
+    private static final String FINAL_DEFAULT_DATE = "2100-01-01";
 
     private final InitialInventoryModalView modalView;
     private final InitialInventoryDeleteDialog deleteDialog;
@@ -49,13 +52,13 @@ public class InitialInventoryView extends CRUDLayout {
     private DatePicker finalDate;
 
     protected InitialInventoryView(final AuthenticationContext authenticationContext,
-                                   final DatabaseUserService databaseUserService,
+                                   final DefaultUserService defaultUserService,
                                    final ZonedDateTimeFactory zonedDateTimeFactory,
                                    final InventoryMovementService inventoryMovementService,
                                    @Value("${initial.inventory.movement-type.code:MI-01}") final String initialInventoryCode,
                                    final InitialInventoryModalView modalView,
                                    final InitialInventoryDeleteDialog deleteDialog) {
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.zonedDateTimeFactory = zonedDateTimeFactory;
         this.inventoryMovementService = inventoryMovementService;
@@ -69,7 +72,8 @@ public class InitialInventoryView extends CRUDLayout {
         add(
                 buildSearchTitle("Búsqueda"),
                 buildSearchBox(),
-                grid
+                grid,
+                paginator
         );
 
         search();
@@ -79,13 +83,13 @@ public class InitialInventoryView extends CRUDLayout {
     protected Page<InventoryEntity> performSearch() {
 
         final var iDate = nonNull(initialDate.getValue()) ? zonedDateTimeFactory.buildInstantFromLocalDate(initialDate.getValue())
-                : zonedDateTimeFactory.buildInstantFrom("2001-01-01");
+                : zonedDateTimeFactory.buildInstantFrom(INITIAL_DEFAULT_DATE);
 
         final var fDAte = nonNull(finalDate.getValue()) ? zonedDateTimeFactory.buildInstantFromLocalDate(finalDate.getValue())
-                : zonedDateTimeFactory.buildInstantFrom("2100-01-01");
+                : zonedDateTimeFactory.buildInstantFrom(FINAL_DEFAULT_DATE);
 
         final var result = inventoryMovementService.search("%", initialMovementCode, iDate, fDAte, tenant,
-                0, Integer.MAX_VALUE);
+                pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 

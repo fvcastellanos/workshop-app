@@ -4,7 +4,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.views.component.Paginator;
 import net.cavitos.workshop.views.model.Pagination;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public abstract class CRUDLayout extends VerticalLayout {
     protected static final int DEFAULT_SIZE = 25;
 
     private final transient AuthenticationContext authenticationContext;
-    private final DatabaseUserService databaseUserService;
+    private final DefaultUserService defaultUserService;
 
     protected final String tenant;
 
@@ -29,9 +29,9 @@ public abstract class CRUDLayout extends VerticalLayout {
     protected Paginator paginator;
 
     protected CRUDLayout(final AuthenticationContext authenticationContext,
-                         final DatabaseUserService databaseUserService) {
+                         final DefaultUserService defaultUserService) {
         this.authenticationContext = authenticationContext;
-        this.databaseUserService = databaseUserService;
+        this.defaultUserService = defaultUserService;
         this.tenant = getUserTenant();
         this.pagination = buildDefaultPagination();
         this.paginator = new Paginator(this.pagination, pg -> search());
@@ -56,7 +56,7 @@ public abstract class CRUDLayout extends VerticalLayout {
 
         logger.info("Get tenant for user: {}", principalName);
 
-        final var userProfile = databaseUserService.getUserProfile(principalName);
+        final var userProfile = defaultUserService.getUserProfile(principalName);
         return userProfile.getTenant();
     }
 

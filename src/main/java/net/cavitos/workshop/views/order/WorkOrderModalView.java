@@ -45,6 +45,7 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
     private final WorkOrderService workOrderService;
     private final CarLineService carLineService;
     private final ContactService contactService;
+    private final WorkOrderTransformer workOrderTransformer;
 
     private final Binder<WorkOrder> binder;
 
@@ -63,12 +64,14 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
 
     public WorkOrderModalView(final WorkOrderService workOrderService,
                               final CarLineService carLineService,
-                              final ContactService contactService) {
+                              final ContactService contactService,
+                              final WorkOrderTransformer workOrderTransformer) {
         super();
 
         this.workOrderService = workOrderService;
         this.carLineService = carLineService;
         this.contactService = contactService;
+        this.workOrderTransformer = workOrderTransformer;
 
         this.binder = new Binder<>(WorkOrder.class);
 
@@ -94,7 +97,7 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
 
         if (isEdit) {
             workOrderEntity = entity;
-            binder.readBean(WorkOrderTransformer.toWeb(entity));
+            binder.readBean(workOrderTransformer.toWeb(entity));
         }
 
         open();
@@ -203,7 +206,7 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
 
             return result.getContent()
                     .stream()
-                    .map(WorkOrderTransformer::buildWorkOrderCarLine)
+                    .map(workOrderTransformer::buildWorkOrderCarLine)
                     .toList();
 
         } catch (final Exception exception) {
@@ -220,7 +223,7 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
 
             return result.getContent()
                     .stream()
-                    .map(WorkOrderTransformer::buildWorkOrderContact)
+                    .map(workOrderTransformer::buildWorkOrderContact)
                     .toList();
 
         } catch (final Exception exception) {

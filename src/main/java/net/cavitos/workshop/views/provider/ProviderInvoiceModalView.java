@@ -38,6 +38,8 @@ public class ProviderInvoiceModalView extends DialogBase<InvoiceEntity> {
 
     private final InvoiceService invoiceService;
     private final ContactService contactService;
+    private final InvoiceTransformer invoiceTransformer;
+    private final WorkOrderTransformer workOrderTransformer;
     private final Binder<Invoice> binder;
 
     private TextField invoiceNumber;
@@ -49,11 +51,15 @@ public class ProviderInvoiceModalView extends DialogBase<InvoiceEntity> {
     private InvoiceEntity invoiceEntity;
 
     public ProviderInvoiceModalView(final InvoiceService invoiceService,
-                                    final ContactService contactService) {
+                                    final ContactService contactService,
+                                    final InvoiceTransformer invoiceTransformer,
+                                    final WorkOrderTransformer workOrderTransformer) {
         super();
 
         this.invoiceService = invoiceService;
         this.contactService = contactService;
+        this.invoiceTransformer = invoiceTransformer;
+        this.workOrderTransformer = workOrderTransformer;
 
         binder = new Binder<>(Invoice.class);
 
@@ -76,7 +82,7 @@ public class ProviderInvoiceModalView extends DialogBase<InvoiceEntity> {
 
         if (isEdit) {
             invoiceEntity = entity;
-            binder.readBean(InvoiceTransformer.toWeb(entity));
+            binder.readBean(invoiceTransformer.toWeb(entity));
         }
 
         open();
@@ -177,7 +183,7 @@ public class ProviderInvoiceModalView extends DialogBase<InvoiceEntity> {
 
             return result.getContent()
                     .stream()
-                    .map(WorkOrderTransformer::buildWorkOrderContact)
+                    .map(workOrderTransformer::buildWorkOrderContact)
                     .toList();
 
         } catch (final Exception exception) {

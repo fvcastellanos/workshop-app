@@ -15,7 +15,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.InventoryMovementTypeEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.InventoryMovementTypeService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -53,11 +53,11 @@ public class MovementTypeView extends CRUDLayout {
     private TextField searchText;
 
     public MovementTypeView(final AuthenticationContext authenticationContext,
-                            final DatabaseUserService databaseUserService,
+                            final DefaultUserService defaultUserService,
                             final InventoryMovementTypeService movementTypeService,
                             final MovementTypeModalView modalView) {
 
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
 
         this.movementTypeService = movementTypeService;
 

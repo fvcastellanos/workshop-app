@@ -18,7 +18,7 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.RolesAllowed;
 import net.cavitos.workshop.model.entity.CarBrandEntity;
-import net.cavitos.workshop.security.service.DatabaseUserService;
+import net.cavitos.workshop.security.service.DefaultUserService;
 import net.cavitos.workshop.service.CarBrandService;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.layouts.CRUDLayout;
@@ -43,11 +43,11 @@ public class CarBrandView extends CRUDLayout {
     private final AddModal addModal;
 
     public CarBrandView(final AuthenticationContext authenticationContext,
-                        final DatabaseUserService databaseUserService,
+                        final DefaultUserService defaultUserService,
                         final CarBrandService carBrandService,
                         final AddModal addModal) {
 
-        super(authenticationContext, databaseUserService);
+        super(authenticationContext, defaultUserService);
         this.carBrandService = carBrandService;
         this.addModal = addModal;
 
@@ -105,9 +105,12 @@ public class CarBrandView extends CRUDLayout {
 
         searchBox.add(searchBody, searchFooter);
 
-        add(h3);
-        add(searchBox);
-        add(grid);
+        add(
+                h3,
+                searchBox,
+                grid,
+                paginator
+        );
 
         addModal.addOnSaveEvent(entity -> performSearch());
         performSearch();
@@ -143,7 +146,7 @@ public class CarBrandView extends CRUDLayout {
 
         final var status = searchStatus.getValue();
         final var result = carBrandService.getAllByTenant(tenant, status.getValue(), searchText.getValue(),
-                DEFAULT_PAGE, DEFAULT_SIZE);
+                pagination.getPage(), pagination.getSize());
 
         grid.setItems(result.getContent());
 
@@ -174,7 +177,7 @@ public class CarBrandView extends CRUDLayout {
                     viewImage.getStyle().set("cursor", "pointer");
                     viewImage.addClickListener(event -> {
                         LOGGER.info("Models for Brand: {}", carBrandEntity.getName());
-                        UI.getCurrent().navigate("car-models/%s".formatted(carBrandEntity.getId()));
+                        UI.getCurrent().navigate("car-lines/%s".formatted(carBrandEntity.getId()));
                     });
 
                     layout.add(editImage, viewImage);
