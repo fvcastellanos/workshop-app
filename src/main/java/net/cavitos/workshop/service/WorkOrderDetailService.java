@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Objects.isNull;
 import static net.cavitos.workshop.factory.BusinessExceptionFactory.createBusinessException;
 
 @Service
@@ -78,6 +79,9 @@ public class WorkOrderDetailService {
                     .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product code not found"));
         }
 
+        final var operationDate = isNull(workOrderDetail.getOperationDate()) ? workOrderEntity.getOrderDate()
+                : zonedDateTimeFactory.buildInstantFrom(workOrderDetail.getOperationDate());
+
         final var entity = WorkOrderDetailEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .workOrderEntity(workOrderEntity)
@@ -87,6 +91,7 @@ public class WorkOrderDetailService {
                 .quantity(workOrderDetail.getQuantity())
                 .unitPrice(workOrderDetail.getUnitPrice())
                 .salePrice(workOrderDetail.getSalePrice())
+                .operationDate(operationDate)
                 .created(zonedDateTimeFactory.getSystemNow())
                 .tenant(tenant)
                 .build();
@@ -137,12 +142,16 @@ public class WorkOrderDetailService {
             workOrderDetailEntity.setProductEntity(productEntity);
         }
 
+        final var operationDate = isNull(workOrderDetail.getOperationDate()) ? workOrderEntity.getOrderDate()
+                : zonedDateTimeFactory.buildInstantFrom(workOrderDetail.getOperationDate());
+
         workOrderDetailEntity.setWorkOrderEntity(workOrderEntity);
         workOrderDetailEntity.setDescription(workOrderDetail.getDescription());
         workOrderDetailEntity.setNotes(workOrderDetail.getNotes());
         workOrderDetailEntity.setQuantity(workOrderDetail.getQuantity());
         workOrderDetailEntity.setUnitPrice(workOrderDetail.getUnitPrice());
         workOrderDetailEntity.setSalePrice(workOrderDetail.getSalePrice());
+        workOrderDetailEntity.setOperationDate(operationDate);
 
         workOrderDetailRepository.save(workOrderDetailEntity);
 

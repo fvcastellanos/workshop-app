@@ -6,6 +6,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
 import net.cavitos.workshop.service.WorkOrderDetailService;
+import net.cavitos.workshop.transformer.WorkOrderDetailTransformer;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,10 @@ public class WorkOrderLaborModalView extends WorkOrderBaseModal {
     private NumberField salePriceField;
     private TextArea notesField;
 
-    public WorkOrderLaborModalView(final WorkOrderDetailService workOrderDetailService) {
+    public WorkOrderLaborModalView(final WorkOrderDetailService workOrderDetailService,
+                                   final WorkOrderDetailTransformer workOrderDetailTransformer) {
 
-        super(workOrderDetailService);
+        super(workOrderDetailService, workOrderDetailTransformer);
         buildContent();
     }
 

@@ -92,6 +92,8 @@ public class WorkOrderService {
                 .notes(workOrder.getNotes())
                 .tenant(tenant)
                 .plateNumber(workOrder.getPlateNumber())
+                .color(workOrder.getColor())
+                .makeYear(workOrder.getMakeYear())
                 .created(zonedDateTimeFactory.getSystemNow())
                 .updated(zonedDateTimeFactory.getSystemNow())
                 .build();
@@ -125,6 +127,8 @@ public class WorkOrderService {
         entity.setOdometerValue(workOrder.getOdometerValue());
         entity.setStatus(workOrder.getStatus());
         entity.setPlateNumber(workOrder.getPlateNumber());
+        entity.setMakeYear(workOrder.getMakeYear());
+        entity.setColor(workOrder.getColor());
         entity.setUpdated(zonedDateTimeFactory.getSystemNow());
 
         workOrderRepository.save(entity);

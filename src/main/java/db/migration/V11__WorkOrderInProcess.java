@@ -2,7 +2,7 @@ package db.migration;
 
 import org.flywaydb.core.api.migration.Context;
 
-public class V10__WorkOrderInProcess extends FlywayMigration {
+public class V11__WorkOrderInProcess extends FlywayMigration {
 
     @Override
     public void migrate(Context context) throws Exception {

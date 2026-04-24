@@ -60,6 +60,8 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
     private Select<TypeOption> status;
     private ComboBox<CommonCarLine> carModel;
     private ComboBox<CommonContact> contact;
+    private TextField color;
+    private IntegerField yearMake;
     private TextArea notes;
 
     public WorkOrderModalView(final WorkOrderService workOrderService,
@@ -153,9 +155,15 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
         notes = new TextArea("Notas");
         notes.setWidth("100%");
 
-        carModel = ComponentFactory.buildComboBox("Modelo", "100%", CommonCarLine::getName);
+        carModel = ComponentFactory.buildComboBox("Línea", "100%", CommonCarLine::getName);
 
         contact = ComponentFactory.buildComboBox("Contacto", "100%", CommonContact::getName);
+
+        yearMake = new IntegerField("Modelo");
+        yearMake.setWidth("100%");
+
+        color = new TextField("Color");
+        color.setWidth("100%");
 
         final var contentLayout = new VerticalLayout(
                 workOrderNumber,
@@ -166,6 +174,8 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
                 odometerValue,
                 fuelLevel,
                 carModel,
+                yearMake,
+                color,
                 contact,
                 notes
         );
@@ -270,6 +280,16 @@ public class WorkOrderModalView extends DialogBase<WorkOrderEntity> {
         binder.forField(carModel)
                 .asRequired("El modelo del vehículo es requerido")
                 .bind(WorkOrder::getCarLine, WorkOrder::setCarLine);
+
+        binder.forField(yearMake)
+                .asRequired("El año del vehículo es requerido")
+                .withValidator(year -> year >= 1900, "El año debe ser mayor o igual a 1900")
+                .withValidator(year -> year <= 2100, "El año debe ser menor o igual a 2100")
+                .bind(WorkOrder::getMakeYear, WorkOrder::setMakeYear);
+
+        binder.forField(color)
+                .asRequired("El modelo del vehículo es requerido")
+                .bind(WorkOrder::getColor, WorkOrder::setColor);
 
         binder.forField(contact)
                 .asRequired("El contacto es requerido")

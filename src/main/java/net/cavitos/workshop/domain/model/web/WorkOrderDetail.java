@@ -10,6 +10,8 @@ import lombok.Setter;
 import lombok.ToString;
 import net.cavitos.workshop.domain.model.web.common.CommonProduct;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @ToString
@@ -43,4 +45,6 @@ public class WorkOrderDetail {
 
     @NotNull
     private double salePrice;
+
+    private String operationDate;
 }

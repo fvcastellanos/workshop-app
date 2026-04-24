@@ -1,5 +1,6 @@
 package net.cavitos.workshop.views.order;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -53,6 +54,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private final WorkOrderDetailModalView modalView;
     private final WorkOrderLaborModalView laborModalView;
     private final OrderDetailDeleteDialog deleteDialog;
+    private final WorkOrderDetailTransformer workOrderDetailTransformer;
 
     private final Grid<WorkOrderDetailEntity> grid;
     private final Grid<WorkOrderDetailEntity> laborGrid;
@@ -76,12 +78,14 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                                   final WorkOrderDetailModalView modalView,
                                   final WorkOrderLaborModalView laborModalView,
                                   final OrderDetailDeleteDialog deleteDialog,
+                                  final WorkOrderDetailTransformer workOrderDetailTransformer,
                                   final Clock systemClock) {
         super(authenticationContext, defaultUserService);
 
         this.systemClock = systemClock;
         this.workOrderService = workOrderService;
         this.workOrderDetailService = workOrderDetailService;
+        this.workOrderDetailTransformer = workOrderDetailTransformer;
         this.modalView = modalView;
         this.laborModalView = laborModalView;
         this.deleteDialog = deleteDialog;
@@ -306,7 +310,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", workOrderDetailEntity.getId());
-                        modalView.openDialogForEdit(tenant, WorkOrderDetailTransformer.toWeb(workOrderDetailEntity));
+                        modalView.openDialogForEdit(tenant, workOrderDetailTransformer.toWeb(workOrderDetailEntity));
                     });
 
                     final var deleteImage = new Image("img/icons/trash-can-svgrepo-com.svg", "Eliminar");
@@ -326,6 +330,18 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
           .setResizable(false)
           .setWidth("5%");
 
+        grid.addColumn(new ComponentRenderer<>(workOrderDetailEntity -> {
+
+                    final var date = LocalDate.ofInstant(workOrderDetailEntity.getOperationDate(), systemClock.getZone())
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                    return new Text(date);
+                }))
+            .setHeader("Fecha Operación")
+            .setSortable(true)
+            .setResizable(true)
+            .setWidth("8%");
+
         grid.addColumn("quantity")
             .setHeader("Cantidad")
             .setSortable(true)
@@ -342,7 +358,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
             .setHeader("Producto")
             .setSortable(true)
             .setResizable(true)
-            .setWidth("30%");
+            .setWidth("22%");
 
         grid.addColumn("unitPrice")
             .setHeader("Costo")
@@ -373,7 +389,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
                     editImage.getStyle().set("cursor", "pointer");
                     editImage.addClickListener(event -> {
                         LOGGER.info("Edit: {}", workOrderDetailEntity.getId());
-                        laborModalView.openDialogForEdit(tenant, WorkOrderDetailTransformer.toWeb(workOrderDetailEntity));
+                        laborModalView.openDialogForEdit(tenant, workOrderDetailTransformer.toWeb(workOrderDetailEntity));
                     });
 
                     final var deleteImage = new Image("img/icons/trash-can-svgrepo-com.svg", "Eliminar");
