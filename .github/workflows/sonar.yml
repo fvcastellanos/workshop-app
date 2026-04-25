@@ -13,7 +13,21 @@ jobs:
   build:
     name: Static Code Analyze
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: workshop
+          POSTGRES_DB: workshop
+          POSTGRES_PASSWORD: test
 
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +49,17 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..10}; do
+            pg_isready -h localhost -p 5432 -U workshop && break
+            sleep 2
+          done
+
+      - name: Create custom schema
+        run: |
+          PGPASSWORD=test psql -h localhost -U workshop -d workshop -c "CREATE SCHEMA IF NOT EXISTS workshop;"
+          PGPASSWORD=test psql -h localhost -U workshop -d workshop -c "ALTER SCHEMA workshop OWNER TO workshop;"          
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
