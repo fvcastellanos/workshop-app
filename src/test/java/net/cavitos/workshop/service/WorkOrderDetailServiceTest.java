@@ -28,7 +28,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -122,7 +121,7 @@ class WorkOrderDetailServiceTest {
 
         assertThatCode(() -> service.addOrderDetail(TENANT, "order-1", workOrderDetail)).doesNotThrowAnyException();
 
-        verify(productRepository, never()).findByCodeEqualsIgnoreCaseAndTenant(eq("PROD-1"), eq(TENANT));
+        verify(productRepository, never()).findByCodeEqualsIgnoreCaseAndTenant("PROD-1", TENANT);
         ArgumentCaptor<WorkOrderDetailEntity> entityCaptor = ArgumentCaptor.forClass(WorkOrderDetailEntity.class);
         verify(workOrderDetailRepository).save(entityCaptor.capture());
         assertThat(entityCaptor.getValue().getProductEntity()).isNull();

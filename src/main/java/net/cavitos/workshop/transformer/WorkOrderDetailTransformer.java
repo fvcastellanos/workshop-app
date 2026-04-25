@@ -6,12 +6,13 @@ import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
 @Component
-public class WorkOrderDetailTransformer {
+public class WorkOrderDetailTransformer implements Serializable {
 
     private final ZonedDateTimeFactory zonedDateTimeFactory;
 
