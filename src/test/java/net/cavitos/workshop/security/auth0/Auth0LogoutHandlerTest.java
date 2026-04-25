@@ -1,6 +1,7 @@
 package net.cavitos.workshop.security.auth0;
 
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,13 +53,16 @@ class Auth0LogoutHandlerTest {
 
     @Test
     void logout_whenHttpSchemeAndNonLocalhostHost_shouldRedirectUsingHttpsScheme() {
-        setUpRequestContext("http", "example.com", 80, "/");
+
+        final var request = setUpRequestContext("http", "example.com", 80, "/");
+
         final var response = new MockHttpServletResponse();
         when(authenticationContext.getPrincipalName()).thenReturn(Optional.of(PRINCIPAL_NAME));
 
-        handler.logout(null, response, authentication);
+        handler.logout(request, response, authentication);
 
         verify(authentication).setAuthenticated(false);
+
         assertThat(response.getRedirectedUrl())
                 .contains(ISSUER + "v2/logout")
                 .contains("client_id=" + CLIENT_ID)
@@ -67,11 +71,12 @@ class Auth0LogoutHandlerTest {
 
     @Test
     void logout_whenHttpSchemeAndLocalhostHost_shouldKeepHttpScheme() {
-        setUpRequestContext("http", "localhost", 8080, "/");
+
+        final var request = setUpRequestContext("http", "localhost", 8080, "/");
         final var response = new MockHttpServletResponse();
         when(authenticationContext.getPrincipalName()).thenReturn(Optional.of(PRINCIPAL_NAME));
 
-        handler.logout(null, response, authentication);
+        handler.logout(request, response, authentication);
 
         verify(authentication).setAuthenticated(false);
         assertThat(response.getRedirectedUrl())
@@ -82,11 +87,11 @@ class Auth0LogoutHandlerTest {
 
     @Test
     void logout_whenHttpsScheme_shouldNotChangeScheme() {
-        setUpRequestContext("https", "example.com", 443, "/");
+        final var request = setUpRequestContext("https", "example.com", 443, "/");
         final var response = new MockHttpServletResponse();
         when(authenticationContext.getPrincipalName()).thenReturn(Optional.of(PRINCIPAL_NAME));
 
-        handler.logout(null, response, authentication);
+        handler.logout(request, response, authentication);
 
         verify(authentication).setAuthenticated(false);
         assertThat(response.getRedirectedUrl())
@@ -97,11 +102,11 @@ class Auth0LogoutHandlerTest {
 
     @Test
     void logout_whenPrincipalNameNotPresent_shouldFallbackToAnonymousAndStillRedirect() {
-        setUpRequestContext("https", "example.com", 443, "/");
+        final var request = setUpRequestContext("https", "example.com", 443, "/");
         final var response = new MockHttpServletResponse();
         when(authenticationContext.getPrincipalName()).thenReturn(Optional.empty());
 
-        handler.logout(null, response, authentication);
+        handler.logout(request, response, authentication);
 
         assertThat(response.getRedirectedUrl())
                 .isNotNull()
@@ -111,11 +116,11 @@ class Auth0LogoutHandlerTest {
 
     @Test
     void logout_shouldBuildRedirectUrlWithIssuerClientIdAndReturnTo() {
-        setUpRequestContext("https", "example.com", 443, "");
+        final var request = setUpRequestContext("https", "example.com", 443, "");
         final var response = new MockHttpServletResponse();
         when(authenticationContext.getPrincipalName()).thenReturn(Optional.of(PRINCIPAL_NAME));
 
-        handler.logout(null, response, authentication);
+        handler.logout(request, response, authentication);
 
         assertThat(response.getRedirectedUrl())
                 .isEqualTo(ISSUER + "v2/logout?client_id=" + CLIENT_ID + "&returnTo=https://example.com");
@@ -123,13 +128,17 @@ class Auth0LogoutHandlerTest {
 
     @Test
     void logout_whenSendRedirectThrowsIOException_shouldWrapInRuntimeException() throws IOException {
-        setUpRequestContext("https", "example.com", 443, "/");
+        final var request = setUpRequestContext("https", "example.com", 443, "/");
+
         final var mockResponse = mock(HttpServletResponse.class);
         final var ioException = new IOException("Network error");
-        when(authenticationContext.getPrincipalName()).thenReturn(Optional.of(PRINCIPAL_NAME));
-        doThrow(ioException).when(mockResponse).sendRedirect(anyString());
 
-        assertThatThrownBy(() -> handler.logout(null, mockResponse, authentication))
+        when(authenticationContext.getPrincipalName()).thenReturn(Optional.of(PRINCIPAL_NAME));
+
+        doThrow(ioException)
+                .when(mockResponse).sendRedirect(anyString());
+
+        assertThatThrownBy(() -> handler.logout(request, mockResponse, authentication))
                 .isInstanceOf(RuntimeException.class)
                 .hasCause(ioException);
     }
@@ -138,8 +147,11 @@ class Auth0LogoutHandlerTest {
     // Helpers
     // -----------------------------------------------------------------------
 
-    private void setUpRequestContext(final String scheme, final String host,
-                                     final int port, final String requestUri) {
+    private HttpServletRequest setUpRequestContext(final String scheme,
+                                                   final String host,
+                                                   final int port,
+                                                   final String requestUri) {
+
         final var request = new MockHttpServletRequest();
         request.setScheme(scheme);
         request.setServerName(host);
@@ -147,6 +159,8 @@ class Auth0LogoutHandlerTest {
         request.setContextPath("");
         request.setRequestURI(requestUri);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        return request;
     }
 }
 
