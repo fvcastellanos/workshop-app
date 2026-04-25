@@ -30,6 +30,7 @@ import net.cavitos.workshop.views.layouts.CRUDLayout;
 import net.cavitos.workshop.views.layouts.MainLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,10 +55,11 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private final WorkOrderDetailModalView modalView;
     private final WorkOrderLaborModalView laborModalView;
     private final OrderDetailDeleteDialog deleteDialog;
-    private final WorkOrderDetailTransformer workOrderDetailTransformer;
 
     private final Grid<WorkOrderDetailEntity> grid;
     private final Grid<WorkOrderDetailEntity> laborGrid;
+
+    private WorkOrderDetailTransformer workOrderDetailTransformer;
 
     private WorkOrderEntity workOrderEntity;
 

@@ -20,7 +20,8 @@ public abstract class WorkOrderBaseModal extends DialogBase<WorkOrderDetail> {
     protected final Binder<WorkOrderDetail> binder;
 
     protected final WorkOrderDetailService workOrderDetailService;
-    protected final WorkOrderDetailTransformer workOrderDetailTransformer;
+
+    protected WorkOrderDetailTransformer workOrderDetailTransformer;
 
     protected WorkOrderBaseModal(final WorkOrderDetailService workOrderDetailService,
                                  final WorkOrderDetailTransformer workOrderDetailTransformer) {

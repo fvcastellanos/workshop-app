@@ -90,14 +90,4 @@ public class WorkOrderDetailInventoryProcessor {
         LOGGER.info("No inventory update for work order detail id={} because it has no product associated",
                 workOrderDetailEntity.getId());
     }
-
-    @Transactional
-    void updateInventoryFor(final WorkOrderDetailEntity workOrderDetailEntity) {
-
-        LOGGER.info("Updating inventory movements for work order detail id={} for tenant={}",
-                workOrderDetailEntity.getId(), workOrderDetailEntity.getTenant());
-
-        deleteInventoryFor(workOrderDetailEntity);
-        addInventoryFor(workOrderDetailEntity);
-    }
 }

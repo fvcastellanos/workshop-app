@@ -59,7 +59,7 @@ public class WorkOrderDetailInventoryListener {
         LOGGER.info("Updating inventory movements for work order detail id={} for tenant={}",
                 workOrderDetailEntity.getId(), workOrderDetailEntity.getTenant());
 
-        deleteInventoryFor(workOrderDetailEntity);
-        addInventoryFor(workOrderDetailEntity);
+        workOrderDetailInventoryProcessor.deleteInventoryFor(workOrderDetailEntity);
+        workOrderDetailInventoryProcessor.addInventoryFor(workOrderDetailEntity);
     }
 }

@@ -72,7 +72,7 @@ class WorkOrderDetailInventoryProcessorTest {
 
         assertThatCode(() -> processor.deleteInventoryFor(detailEntity)).doesNotThrowAnyException();
 
-        verify(inventoryMovementService, never()).delete(eq("inventory-1"), eq(TENANT));
+        verify(inventoryMovementService, never()).delete("inventory-1", TENANT);
     }
 
     @Test
@@ -116,25 +116,6 @@ class WorkOrderDetailInventoryProcessorTest {
         assertThatCode(() -> processor.addInventoryFor(detailEntity)).doesNotThrowAnyException();
 
         verify(inventoryMovementService, never()).add(eq(TENANT), any(InventoryMovement.class));
-    }
-
-    @Test
-    void updateInventoryForDeletesThenAdds() {
-
-        WorkOrderDetailEntity detailEntity = buildWorkOrderDetailEntity();
-        Properties properties = new Properties();
-
-        when(inventoryMovementService.findByWorkOrderDetailId(detailEntity.getId(), TENANT))
-                .thenReturn(Optional.empty());
-        when(configurationService.getConfiguration(TENANT)).thenReturn(properties);
-        when(zonedDateTimeFactory.buildStringFromInstant(detailEntity.getOperationDate()))
-                .thenReturn("2026-04-23");
-
-        assertThatCode(() -> processor.updateInventoryFor(detailEntity)).doesNotThrowAnyException();
-
-        InOrder inOrder = inOrder(inventoryMovementService);
-        inOrder.verify(inventoryMovementService).findByWorkOrderDetailId(detailEntity.getId(), TENANT);
-        inOrder.verify(inventoryMovementService).add(eq(TENANT), any(InventoryMovement.class));
     }
 
     private WorkOrderDetailEntity buildWorkOrderDetailEntity() {
