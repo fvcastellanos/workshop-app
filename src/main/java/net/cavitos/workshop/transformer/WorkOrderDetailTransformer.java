@@ -2,18 +2,26 @@ package net.cavitos.workshop.transformer;
 
 import net.cavitos.workshop.domain.model.web.WorkOrderDetail;
 import net.cavitos.workshop.domain.model.web.common.CommonProduct;
+import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
+import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
-public class WorkOrderDetailTransformer {
+@Component
+public class WorkOrderDetailTransformer implements Serializable {
 
-    private WorkOrderDetailTransformer() {
+    private final ZonedDateTimeFactory zonedDateTimeFactory;
+
+    public WorkOrderDetailTransformer(final ZonedDateTimeFactory zonedDateTimeFactory) {
+
+        this.zonedDateTimeFactory = zonedDateTimeFactory;
     }
 
-    public static WorkOrderDetail toWeb(final WorkOrderDetailEntity entity) {
+    public WorkOrderDetail toWeb(final WorkOrderDetailEntity entity) {
 
         final var workOrderEntity = entity.getWorkOrderEntity();
         final var productEntity = entity.getProductEntity();
@@ -27,6 +35,10 @@ public class WorkOrderDetailTransformer {
         detail.setSalePrice(entity.getSalePrice());
         detail.setDescription(entity.getDescription());
         detail.setNotes(entity.getNotes());
+
+        if (nonNull(entity.getOperationDate())) {
+            detail.setOperationDate(zonedDateTimeFactory.buildStringFromInstant(entity.getOperationDate()));
+        }
 
         if (nonNull(invoiceDetailEntity)) {
             detail.setInvoiceDetailId(invoiceDetailEntity.getId());

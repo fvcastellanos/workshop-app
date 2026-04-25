@@ -66,6 +66,15 @@ public class WorkOrderEntity {
 
     private String notes;
 
+    @Size(max = 50)
+    private String color;
+
+    @Column(name = "make_year")
+    private int makeYear;
+
+    @Column(name = "close_date")
+    private Instant closeDate;
+
     @NotNull
     @CreatedDate
     private Instant created;

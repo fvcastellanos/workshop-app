@@ -32,6 +32,8 @@ public final class WorkOrderTransformer {
         workOrder.setGasAmount(entity.getGasAmount());
         workOrder.setNotes(entity.getNotes());
         workOrder.setPlateNumber(entity.getPlateNumber());
+        workOrder.setColor(entity.getColor());
+        workOrder.setMakeYear(entity.getMakeYear());
 
         if (nonNull(entity.getContactEntity())) {
 

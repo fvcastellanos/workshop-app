@@ -20,6 +20,8 @@ public class WorkOrder {
     private double gasAmount;
     private String notes;
     private String plateNumber;
+    private String color;
+    private int makeYear;
     private String orderDate;
     private CommonCarLine carLine;
     private CommonContact contact;

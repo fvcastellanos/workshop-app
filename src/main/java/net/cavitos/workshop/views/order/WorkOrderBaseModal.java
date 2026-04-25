@@ -20,13 +20,16 @@ public abstract class WorkOrderBaseModal extends DialogBase<WorkOrderDetail> {
     protected final Binder<WorkOrderDetail> binder;
 
     protected final WorkOrderDetailService workOrderDetailService;
+    protected final WorkOrderDetailTransformer workOrderDetailTransformer;
 
-    protected WorkOrderBaseModal(final WorkOrderDetailService workOrderDetailService) {
+    protected WorkOrderBaseModal(final WorkOrderDetailService workOrderDetailService,
+                                 final WorkOrderDetailTransformer workOrderDetailTransformer) {
 
         super();
 
         this.binder = new Binder<>(WorkOrderDetail.class);
         this.workOrderDetailService = workOrderDetailService;
+        this.workOrderDetailTransformer = workOrderDetailTransformer;
     }
 
     public void setWorkOrderId(final String workOrderId) {
@@ -48,7 +51,7 @@ public abstract class WorkOrderBaseModal extends DialogBase<WorkOrderDetail> {
                         : workOrderDetailService.addOrderDetail(tenant, workOrderId, orderDetail);
 
                 if (nonNull(onSaveEvent)) {
-                    onSaveEvent.accept(WorkOrderDetailTransformer.toWeb(entity));
+                    onSaveEvent.accept(workOrderDetailTransformer.toWeb(entity));
                 }
 
                 close();

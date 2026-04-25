@@ -1,6 +1,7 @@
 package net.cavitos.workshop.views.order;
 
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -11,8 +12,10 @@ import net.cavitos.workshop.service.InventoryMovementService;
 import net.cavitos.workshop.service.PriceService;
 import net.cavitos.workshop.service.ProductService;
 import net.cavitos.workshop.service.WorkOrderDetailService;
+import net.cavitos.workshop.transformer.WorkOrderDetailTransformer;
 import net.cavitos.workshop.views.factory.ComponentFactory;
 import net.cavitos.workshop.views.factory.ProductDropDownFactory;
+import net.cavitos.workshop.views.model.transformer.DateTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -36,14 +39,16 @@ public class WorkOrderDetailModalView extends WorkOrderBaseModal {
     private ComboBox<CommonProduct> productField;
     private NumberField unitPriceField;
     private NumberField salePriceField;
+    private DatePicker operationDateField;
     private TextArea notesField;
 
     public WorkOrderDetailModalView(final WorkOrderDetailService workOrderDetailService,
                                     final ProductService productService,
                                     final PriceService priceService,
-                                    final InventoryMovementService inventoryMovementService) {
+                                    final InventoryMovementService inventoryMovementService,
+                                    final WorkOrderDetailTransformer workOrderDetailTransformer) {
 
-        super(workOrderDetailService);
+        super(workOrderDetailService, workOrderDetailTransformer);
 
         this.productService = productService;
         this.priceService = priceService;
@@ -89,13 +94,15 @@ public class WorkOrderDetailModalView extends WorkOrderBaseModal {
         productField.addValueChangeListener(event -> retrieveProductUnitPrice());
 
         salePriceField = new NumberField("Precio de Venta");
-        salePriceField.setWidth("50%");
+        salePriceField.setWidth("35%");
         salePriceField.setMin(0);
 
         unitPriceField = new NumberField("Precio Unitario");
-        unitPriceField.setWidth("50%");
+        unitPriceField.setWidth("35%");
         unitPriceField.setMin(0);
         unitPriceField.addValueChangeListener(event -> updateSalePrice(false));
+
+        operationDateField = ComponentFactory.buildDatePicker("Fecha de Operación", "30%");
 
         notesField = new TextArea("Notas");
         notesField.setWidth("100%");
@@ -107,6 +114,7 @@ public class WorkOrderDetailModalView extends WorkOrderBaseModal {
         row1.setWidth("100%");
 
         final var row2 = new HorizontalLayout(
+            operationDateField,
             unitPriceField,
             salePriceField
         );
@@ -149,6 +157,10 @@ public class WorkOrderDetailModalView extends WorkOrderBaseModal {
                 .withValidator(salePriceField -> salePriceField >= (quantityField.getValue() * unitPriceField.getValue()),
                         "El precio venta debe ser mayor que el costo unitario" )
                 .bind(WorkOrderDetail::getSalePrice, WorkOrderDetail::setSalePrice);
+
+        binder.forField(operationDateField)
+                .withConverter(DateTransformer::toDomain, DateTransformer::toView)
+                .bind(WorkOrderDetail::getOperationDate, WorkOrderDetail::setOperationDate);
 
         binder.forField(notesField)
                 .bind(WorkOrderDetail::getNotes, WorkOrderDetail::setNotes);
