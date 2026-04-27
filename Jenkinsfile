@@ -22,7 +22,7 @@ node {
 
                 checkout scm: scmGit(
                     branches: [[name: '$BRANCH_NAME']], 
-                    extensions: [], 
+                    extensions: [[$class: 'CleanBeforeCheckout']],
                     userRemoteConfigs: [[
                         credentialsId: 'github-credentials', 
                         url: repositoryUrl

@@ -1,0 +1,94 @@
+name: GitFlow Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (ex: 1.2.0).'
+        required: true
+        default: ''
+      next_dev_version:
+        description: 'Next dev. version (ex: 1.3.0-SNAPSHOT).'
+        required: true
+        default: ''
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Required for push y tag
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0   # To have full history for versioning
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Read current version from pom.xml
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "develop current version: $CURRENT_VERSION"
+
+      - name: Determinar versiones de release y próximo desarrollo
+        id: versions
+        run: |
+          CURRENT="${{ steps.current_version.outputs.current_version }}"
+          RELEASE="${{ github.event.inputs.release_version }}"
+          NEXT_DEV="${{ github.event.inputs.next_dev_version }}"
+
+          echo "release_version=$RELEASE" >> $GITHUB_OUTPUT
+          echo "next_dev_version=$NEXT_DEV" >> $GITHUB_OUTPUT
+          echo "release_branch=release/$RELEASE" >> $GITHUB_OUTPUT
+
+          echo "Release version: $RELEASE"
+          echo "Next release version: $NEXT_DEV"
+
+      - name: Create release branch
+        run: |
+          git checkout -b ${{ steps.versions.outputs.release_branch }}
+          git push origin ${{ steps.versions.outputs.release_branch }}
+
+      - name: Update pom.xml with release version
+        run: |
+          mvn versions:set -DnewVersion=${{ steps.versions.outputs.release_version }} -DgenerateBackupPoms=false
+          mvn versions:commit
+          git commit -am "chore: prepare release ${{ steps.versions.outputs.release_version }}"
+          git push origin ${{ steps.versions.outputs.release_branch }}
+
+      - name: Create tag
+        run: |
+          git tag -a v${{ steps.versions.outputs.release_version }} -m "Release ${{ steps.versions.outputs.release_version }}"
+          git push origin v${{ steps.versions.outputs.release_version }}
+
+      - name: Merge release branch into main
+        run: |
+          git checkout main
+          git pull origin main
+          git merge --no-ff ${{ steps.versions.outputs.release_branch }} -m "Merge release ${{ steps.versions.outputs.release_version }} into main"
+          git push origin main
+
+      - name: Merge release branch back into develop
+        run: |
+          git checkout develop
+          git pull origin develop
+          git merge --no-ff main -m "Merge main into develop after release ${{ steps.versions.outputs.release_version }}"
+
+          # Set next SNAPSHOT version
+          mvn versions:set -DnewVersion=${{ steps.versions.outputs.next_dev_version }} -DgenerateBackupPoms=false
+          mvn versions:commit
+          git commit -am "chore: set next development version ${{ steps.versions.outputs.next_dev_version }}"
+          git push origin develop
+
+      - name: Drop release branch
+        run: |
+          git branch -d ${{ steps.versions.outputs.release_branch }}
+          git push origin --delete ${{ steps.versions.outputs.release_branch }} || echo "Release branch already deleted"

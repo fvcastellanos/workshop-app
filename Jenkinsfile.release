@@ -1,20 +1,36 @@
 node {
+
     def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
     def mavenImageName = 'maven:3.9-eclipse-temurin-21'
+    def mainBranch = 'main'
+    def developBranch = 'develop'
 
     withCredentials([
-        string(credentialsId: 'github-credentials', variable: 'GH_TOKEN'),
+        string(credentialsId: 'github-credentials', 'GH_TOKEN')
     ]) {
 
-        try {
+        properties([
+            parameters([
+                string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to release'),
+                string(name: 'NEXT_DEV_VERSION', defaultValue: '', description: 'Next dev version')
+            ])
+        ])
 
-            def nextDevelopmentVersion = ''
-            def releaseVersion = ''
+        try {
+            stage('Validate Parameters') {
+                if (!params.RELEASE_VERSION?.trim()) {
+                    error "RELEASE_VERSION is required"
+                }
+                if (!params.NEXT_DEV_VERSION?.trim()) {
+                    error "NEXT_DEV_VERSION is required"
+                }
+            }
 
             stage('Checkout') {
+
                 checkout scm: scmGit(
-                    branches: [[name: 'develop']],
-                    extensions: [],
+                    branches: [[name: developBranch]],
+                    extensions: [[$class: 'CleanBeforeCheckout']],
                     userRemoteConfigs: [[
                         credentialsId: 'github-credentials',
                         url: repositoryUrl
@@ -22,95 +38,85 @@ node {
                 )
             }
 
-            stage('Determine Release Version') {
-
-                def pomVersion = ''
-
-                docker.image(mavenImageName)
-                    .inside {
-                        pomVersion = sh(
-                            script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout',
-                            returnStdout: true
-                        ).trim()            
-                        echo "Current POM version: ${pomVersion}"
-                    }
-
-
-                // Remove -SNAPSHOT suffix
-                releaseVersion = pomVersion.replaceAll(/-SNAPSHOT$/, '')
-
-                // Split version into parts
-                def (major, minor) = releaseVersion.tokenize('.')
-
-                // Get version strategy from parameter (default to 'Minor')
-                def strategy = params.VERSION_STRATEGY ?: 'Minor'
-
-                switch(strategy) {
-                    case 'Major':
-                        major = (major.toInteger() + 1).toString()
-                        minor = '0'
-                    break
-                    case 'Minor':
-                        minor = (minor.toInteger() + 1).toString()
-                    break
-                    default:
-                        error "Unknown VERSION_STRATEGY: ${strategy}"
-                }
-
-                nextDevelopmentVersion = [major, minor].join('.') + '-SNAPSHOT'
-                echo "Current development version: ${pomVersion}"
-                echo "Release version: ${releaseVersion}"
-                echo "Next development version (${strategy}): ${nextDevelopmentVersion}"
+            stage('Create Release Branch') {
+                def releaseBranch = "release/${params.RELEASE_VERSION}"
+                sh "git checkout -b ${releaseBranch}"
+                sh "git push origin ${releaseBranch}"
             }
 
-            stage('Merge to Main and Tag Release') {
-                
-                // Configure Git user if needed
-                sh 'git config user.email "ci-bot@example.com"'
-                sh 'git config user.name "CI Bot"'
+            stage('Set nex release version') {
 
-                // Create release branch
-                sh "git checkout -b release/${releaseVersion}"
+                def releaseVersion = params.RELEASE_VERSION
+                def releaseBranch = "release/${releaseVersion}"
 
                 docker.image(mavenImageName)
                     .inside {
-                        sh "mvn versions:set -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false"
+                        sh """
+                            mvn versions:set -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false
+                            mvn versions:commit
+                        """
                     }
 
-                // Commit changes
-                sh 'git add pom.xml'
-                sh 'git commit -m "Release version ${releaseVersion}"'
-
-                // Checkout main branch and merge changes
-                sh 'git checkout main'
-                sh "git merge release/${releaseVersion}"
-
-                // Push changes to main
-                sh "git remote set-url origin https://${GH_TOKEN}@github.com/fvcastellanos/workshop-app.git"
-                sh 'git push origin main'
-
-                // Create and push tag
-                sh "git tag v${releaseVersion}"
-                sh "git push origin v${releaseVersion}"
-
-                // Delete release branch
-                sh "git branch -d release/${releaseVersion}"
+                    // Change commit author to CI bot
+                    sh """
+                        git commit -am "chore: prepare release ${releaseVersion}"
+                        git push origin ${releaseBranch}
+                    """
             }
 
-            stage('Set next development version') {
+            stage('Create tag') {
+                def releaseVersion = params.RELEASE_VERSION
 
-                sh 'git checkout develop'
+                sh """
+                    git tag -a v${releaseVersion} -m "Release ${releaseVersion}"
+                    git push origin v${releaseVersion}
+                """
+            }
+
+            stage('Merge to main') {
+                def releaseVersion = params.RELEASE_VERSION
+                def releaseBranch = "release/${releaseVersion}"
+
+                sh """
+                    git checkout ${mainBranch}
+                    git pull origin ${mainBranch}
+                    git merge --no-ff ${releaseBranch} -m "Merge release ${releaseVersion} into ${mainBranch}"
+                    git push origin ${mainBranch}
+                """
+            }
+
+            stage('Update develop with tag and next SNAPSHOT version') {
+                def releaseVersion = params.RELEASE_VERSION
+                def nextDevVersion = params.NEXT_DEV_VERSION
+
+                sh """
+                    git checkout ${developBranch}
+                    git pull origin ${developBranch}
+                    git merge --no-ff ${mainBranch} -m "Merge main into develop after release ${releaseVersion}"
+                """
 
                 docker.image(mavenImageName)
                     .inside {
-                        sh "mvn versions:set -DnewVersion=${nextDevelopmentVersion} -DgenerateBackupPoms=false"
+                        sh """
+                            mvn versions:set -DnewVersion=${nextDevVersion} -DgenerateBackupPoms=false
+                            mvn versions:commit
+                        """
                     }
 
-                // Commit changes
-                sh 'git add pom.xml'
-                sh "git commit -m 'Set next development version to ${nextDevelopmentVersion}'"
+                sh """
+                    git commit -am "chore: set next development version ${nextDevVersion}"
+                    git push origin ${developBranch}
+                """
+            }
 
-                sh 'git push origin develop'
+            stage('Clean release branch') {
+                def releaseVersion = params.RELEASE_VERSION
+                def releaseBranch = "release/${releaseVersion}"
+
+                sh """
+                    git branch -d ${releaseBranch}
+                    git push origin --delete ${releaseBranch}
+                """
             }
 
         } catch (Exception exception) {
@@ -118,14 +124,9 @@ node {
             currentBuild.result = 'FAILURE'
             throw exception
         } finally {
-
-            echo 'Cleaning up...'
-            sh 'rm -rf ./*'
-            sh 'rm -rf .git .gitattributes .github .gitignore .mvn'
-
             // Cleanup: remove Docker image if it was pulled
             sh "docker rmi -f ${mavenImageName}"
         }
-    }
 
+    }
 }
