@@ -9,5 +9,6 @@ import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
 public class InvoiceDetailEvent {
 
     private EventType eventType;
+    private String previousInvoiceDetailId;
     private InvoiceDetailEntity invoiceDetailEntity;
 }

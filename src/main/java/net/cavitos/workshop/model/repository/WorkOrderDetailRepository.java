@@ -45,4 +45,11 @@ public interface WorkOrderDetailRepository extends CrudRepository<WorkOrderDetai
            """)
     List<WorkOrderDetailEntity> getOrderDetails(String orderId);
 
+    @Query("""
+            select orderDetail from WorkOrderDetailEntity orderDetail
+            where orderDetail.invoiceDetailEntity.id = :invoiceDetailId
+            and tenant = :tenant
+        """)
+    Optional<WorkOrderDetailEntity> findByInvoiceDetailIdAndTenant(String invoiceDetailId, String tenant);
+
 }

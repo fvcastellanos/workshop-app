@@ -36,7 +36,7 @@ public class ContactEntity {
     private String code;
 
     @NotEmpty
-    @Size(max = 50)
+    @Size(max = 150)
     private String name;
 
     @Size(max = 150)

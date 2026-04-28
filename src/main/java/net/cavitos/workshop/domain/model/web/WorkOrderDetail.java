@@ -43,4 +43,6 @@ public class WorkOrderDetail {
 
     @NotNull
     private double salePrice;
+
+    private String operationDate;
 }

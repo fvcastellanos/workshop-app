@@ -54,6 +54,9 @@ public class WorkOrderDetailEntity {
     @Column(name = "sale_price")
     private double salePrice;
 
+    @Column(name = "operation_date")
+    private Instant operationDate;
+
     @NotEmpty
     @Size(max = 50)
     private String tenant;

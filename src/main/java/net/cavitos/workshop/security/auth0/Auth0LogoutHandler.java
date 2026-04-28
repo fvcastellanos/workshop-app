@@ -35,13 +35,15 @@ public class Auth0LogoutHandler extends VerticalLayout implements LogoutHandler 
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
         try {
-
             final var principalName = authenticationContext.getPrincipalName()
                             .orElse("anonymous");
 
             LOGGER.info("Login out User: {}", principalName);
 
             authentication.setAuthenticated(false);
+
+            request.getHeaderNames().asIterator()
+                    .forEachRemaining(headerName -> LOGGER.info("Header: {}={}", headerName, request.getHeader(headerName)));
 
             var baseUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .build();
