@@ -5,16 +5,16 @@ node {
     def mainBranch = 'main'
     def developBranch = 'develop'
 
+    properties([
+        parameters([
+            string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to release'),
+            string(name: 'NEXT_DEV_VERSION', defaultValue: '', description: 'Next dev version')
+        ])
+    ])
+
     withCredentials([
         string(credentialsId: 'github-credentials', 'GH_TOKEN')
     ]) {
-
-        properties([
-            parameters([
-                string(name: 'RELEASE_VERSION', defaultValue: '', description: 'Version to release'),
-                string(name: 'NEXT_DEV_VERSION', defaultValue: '', description: 'Next dev version')
-            ])
-        ])
 
         try {
             stage('Validate Parameters') {
