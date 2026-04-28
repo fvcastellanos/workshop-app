@@ -61,6 +61,6 @@ class ContactTransformerTest {
         Assertions.assertThat(result.getDescription()).isNull();
         Assertions.assertThat(result.getContact()).isNull();
         Assertions.assertThat(result.getTaxId()).isNull();
-        Assertions.assertThat(result.getActive()).isEqualTo(0);
+        Assertions.assertThat(result.getActive()).isZero();
     }
 }
