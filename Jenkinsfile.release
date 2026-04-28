@@ -117,18 +117,16 @@ node {
                         git push origin --delete ${env.releaseBranch}
                     """
                 }
-
-            } catch (Exception exception) {
-                echo "An error occurred: ${exception.getMessage()}"
-                currentBuild.result = 'FAILURE'
-                throw exception
-            } finally {
-
-                sh "git branch -D ${env.releaseBranch}"
-
-                // Cleanup: remove Docker image if it was pulled
-                sh "docker rmi -f ${mavenImageName}"
-            }
-
         }
+    } catch (Exception exception) {
+        echo "An error occurred: ${exception.getMessage()}"
+        currentBuild.result = 'FAILURE'
+        throw exception
+    } finally {
+
+        sh "git branch -D ${env.releaseBranch}"
+
+        // Cleanup: remove Docker image if it was pulled
+        sh "docker rmi -f ${mavenImageName}"
+    }
 }
