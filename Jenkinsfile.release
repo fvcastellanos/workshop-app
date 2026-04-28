@@ -12,19 +12,20 @@ node {
         ])
     ])
 
+    stage('Validate Parameters') {
+        if (!params.RELEASE_VERSION?.trim()) {
+            error "RELEASE_VERSION is required"
+        }
+        if (!params.NEXT_DEV_VERSION?.trim()) {
+            error "NEXT_DEV_VERSION is required"
+        }
+    }
+
     withCredentials([
         string(credentialsId: 'github-credentials', 'GH_TOKEN')
     ]) {
 
         try {
-            stage('Validate Parameters') {
-                if (!params.RELEASE_VERSION?.trim()) {
-                    error "RELEASE_VERSION is required"
-                }
-                if (!params.NEXT_DEV_VERSION?.trim()) {
-                    error "NEXT_DEV_VERSION is required"
-                }
-            }
 
             stage('Checkout') {
 
