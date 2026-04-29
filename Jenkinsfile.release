@@ -13,10 +13,8 @@ def developBranch = 'develop'
 
 node {
     try {
-        withCredentials([usernamePassword(
-            credentialsId: 'github-credentials',
-            usernameVariable: 'GIT_USER',
-            passwordVariable: 'GIT_PASS'
+        withCredentials([string(
+            credentialsId: 'JenkinsHL', variable: 'AUTH_TOKEN'
         )]) {
 
                 stage('Validate Parameters') {
@@ -28,6 +26,7 @@ node {
                     }
 
                     env.releaseVersion = params.RELEASE_VERSION
+                    env.nextDevVersion = params.NEXT_DEV_VERSION
                     env.releaseBranch = "release/${releaseVersion}"
                 }
 
@@ -44,17 +43,14 @@ node {
                 }
 
                 stage('Create Release Branch') {
-                    withCredentials([
-                        usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')
-                    ]) {
-                        sh """
-                            git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/fvcastellanos/workshop-app.git
-                            git config user.email 'ci-bot@example.com'
-                            git config user.name 'CI Bot'
-                            git checkout -b ${env.releaseBranch}
-                            git push origin ${env.releaseBranch}
-                        """
-                    }
+                    sh """
+                        echo ${AUTH_TOKEN} | gh auth login --with-token
+                        gh auth setup-git
+                        git config user.email 'ci-bot@example.com'
+                        git config user.name 'CI Bot'
+                        git checkout -b ${env.releaseBranch}
+                        git push origin ${env.releaseBranch}
+                    """
                 }
 
                 stage('Set nex release version') {
@@ -124,9 +120,12 @@ node {
         throw exception
     } finally {
 
-        sh "git branch -D ${env.releaseBranch}"
+        sh """
+            git checkout ${developBranch} || true
+            git branch -D ${env.releaseBranch} || true
+        """
 
         // Cleanup: remove Docker image if it was pulled
-        sh "docker rmi -f ${mavenImageName}"
+        sh "docker rmi -f ${mavenImageName} || true"
     }
 }
