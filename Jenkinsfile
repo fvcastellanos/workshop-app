@@ -1,5 +1,11 @@
 node {
 
+    if (env.BRANCH_NAME?.startsWith('release') {
+        echo "Skipping execution for release branch: ${env.BRANCH_NAME}"
+        currentBuild.result = 'NO_BUILT'
+        return
+    }
+
     def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
     def mavenImageName = 'maven:3.9-eclipse-temurin-21'
     def postgresImageName = 'postgres:17'
