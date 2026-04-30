@@ -12,6 +12,8 @@ def developBranch = 'develop'
 
 
 node {
+    deleteDir()
+
     try {
         withCredentials([string(
             credentialsId: 'JenkinsHL', variable: 'AUTH_TOKEN'
