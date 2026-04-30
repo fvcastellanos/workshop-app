@@ -1,6 +1,6 @@
 node {
 
-    if (env.BRANCH_NAME?.startsWith('release') {
+    if (env.BRANCH_NAME?.startsWith('release')) {
         echo "Skipping execution for release branch: ${env.BRANCH_NAME}"
         currentBuild.result = 'NO_BUILT'
         return
