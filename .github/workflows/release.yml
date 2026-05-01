@@ -54,6 +54,8 @@ jobs:
 
       - name: Create release branch
         run: |
+          git config user.email 'ci-bot@devcoregt.com'
+          git config user.name 'CI Bot'
           git checkout -b ${{ steps.versions.outputs.release_branch }}
           git push origin ${{ steps.versions.outputs.release_branch }}
 

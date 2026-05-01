@@ -48,7 +48,7 @@ node {
                     sh """
                         echo ${AUTH_TOKEN} | gh auth login --with-token
                         gh auth setup-git
-                        git config user.email 'ci-bot@example.com'
+                        git config user.email 'ci-bot@devcoregt.com'
                         git config user.name 'CI Bot'
                         git checkout -b ${env.releaseBranch}
                         git push origin ${env.releaseBranch}
