@@ -125,6 +125,7 @@ node {
         sh """
             git checkout ${developBranch} || true
             git branch -D ${env.releaseBranch} || true
+            gh auth logout
         """
 
         // Cleanup: remove Docker image if it was pulled

@@ -1,8 +1,9 @@
 node {
+    deleteDir()
 
     if (env.BRANCH_NAME?.startsWith('release')) {
         echo "Skipping execution for release branch: ${env.BRANCH_NAME}"
-        currentBuild.result = 'NO_BUILT'
+        currentBuild.result = 'NOT_BUILT'
         return
     }
 
