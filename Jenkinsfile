@@ -1,4 +1,11 @@
 node {
+    deleteDir()
+
+    if (env.BRANCH_NAME?.startsWith('release')) {
+        echo "Skipping execution for release branch: ${env.BRANCH_NAME}"
+        currentBuild.result = 'NOT_BUILT'
+        return
+    }
 
     def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
     def mavenImageName = 'maven:3.9-eclipse-temurin-21'
@@ -22,7 +29,7 @@ node {
 
                 checkout scm: scmGit(
                     branches: [[name: '$BRANCH_NAME']], 
-                    extensions: [], 
+                    extensions: [[$class: 'CleanBeforeCheckout']],
                     userRemoteConfigs: [[
                         credentialsId: 'github-credentials', 
                         url: repositoryUrl
