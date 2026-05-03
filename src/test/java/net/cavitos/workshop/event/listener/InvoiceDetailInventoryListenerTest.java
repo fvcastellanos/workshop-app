@@ -93,7 +93,7 @@ class InvoiceDetailInventoryListenerTest {
         listener.handleEvent(event);
 
         // Assert
-        ArgumentCaptor<InventoryEntity> captor = ArgumentCaptor.forClass(InventoryEntity.class);
+        final var captor = ArgumentCaptor.forClass(InventoryEntity.class);
         verify(inventoryRepository).save(captor.capture());
 
         final var saved = captor.getValue();
@@ -104,6 +104,7 @@ class InvoiceDetailInventoryListenerTest {
             .hasFieldOrPropertyWithValue("quantity", 2.0)
             .hasFieldOrPropertyWithValue("unitPrice", 10.0)
             .hasFieldOrPropertyWithValue("total", 20.0)
+            .hasFieldOrPropertyWithValue("operationDate", now)
             .hasFieldOrPropertyWithValue("tenant", "tenant-1")
             .hasFieldOrPropertyWithValue("created", now)
             .hasFieldOrPropertyWithValue("updated", now);

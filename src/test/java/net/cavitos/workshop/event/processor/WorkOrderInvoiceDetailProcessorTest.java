@@ -2,6 +2,7 @@ package net.cavitos.workshop.event.processor;
 
 import net.cavitos.workshop.factory.ZonedDateTimeFactory;
 import net.cavitos.workshop.model.entity.InvoiceDetailEntity;
+import net.cavitos.workshop.model.entity.InvoiceEntity;
 import net.cavitos.workshop.model.entity.ProductEntity;
 import net.cavitos.workshop.model.entity.WorkOrderDetailEntity;
 import net.cavitos.workshop.model.entity.WorkOrderEntity;
@@ -73,6 +74,7 @@ class WorkOrderInvoiceDetailProcessorTest {
     void addWorkOrderDetailFor_whenWorkOrderPresent_shouldSaveNewDetail() {
         String tenant = "tenant-1";
         Instant created = Instant.parse("2024-02-10T10:15:30Z");
+        Instant invoiceDate = Instant.parse("2024-02-10T08:00:00Z");
         WorkOrderEntity workOrderEntity = WorkOrderEntity.builder()
                 .id("wo-1")
                 .number("WO-1001")
@@ -84,8 +86,14 @@ class WorkOrderInvoiceDetailProcessorTest {
                 .name("Product P-1")
                 .tenant(tenant)
                 .build();
+        InvoiceEntity invoiceEntity = InvoiceEntity.builder()
+                .id("inv-1")
+                .invoiceDate(invoiceDate)
+                .tenant(tenant)
+                .build();
         InvoiceDetailEntity invoiceDetailEntity = InvoiceDetailEntity.builder()
                 .id("inv-detail-1")
+                .invoiceEntity(invoiceEntity)
                 .workOrderEntity(workOrderEntity)
                 .productEntity(productEntity)
                 .quantity(2)
@@ -102,9 +110,11 @@ class WorkOrderInvoiceDetailProcessorTest {
         verify(workOrderDetailRepository).save(captor.capture());
         WorkOrderDetailEntity saved = captor.getValue();
 
+        assertThat(saved.getId()).isNotNull();
         assertThat(saved.getInvoiceDetailEntity()).isSameAs(invoiceDetailEntity);
         assertThat(saved.getProductEntity()).isSameAs(productEntity);
         assertThat(saved.getWorkOrderEntity()).isSameAs(workOrderEntity);
+        assertThat(saved.getOperationDate()).isEqualTo(invoiceDate);
         assertThat(saved.getQuantity()).isEqualTo(2);
         assertThat(saved.getUnitPrice()).isEqualTo(15.5);
         assertThat(saved.getSalePrice()).isEqualTo(40.0);
