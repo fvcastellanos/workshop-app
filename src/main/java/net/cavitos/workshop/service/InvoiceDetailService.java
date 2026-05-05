@@ -75,7 +75,7 @@ public class InvoiceDetailService {
                     .orElseThrow(() -> createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Work Order Number not found"));
 
         }
-        
+
         final var entity = InvoiceDetailEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .productEntity(productEntity)
