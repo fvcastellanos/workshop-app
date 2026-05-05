@@ -35,17 +35,17 @@
 		<!-- SonarQube exclusions -->
 		<sonar.exclusions>
 			src/main/frontend/**
-			src/main/java/db/**
+			src/main/java/db/**/*
 			src/main/resources/db/migration/**
 			src/main/java/net/cavitos/workshop/views/**
-			src/test/java/**
+			src/test/java/net/cavitos/**
 		</sonar.exclusions>
 		<sonar.coverage.exclusions>
 			src/main/frontend/**
-			src/main/java/db/**
+			src/main/java/db/**/*
 			src/main/resources/db/migration/**
 			src/main/java/net/cavitos/workshop/views/**
-			src/test/java/**
+			src/test/java/net/cavitos/**
 		</sonar.coverage.exclusions>
 		<vaadin.version>24.5.2</vaadin.version>
 	</properties>
