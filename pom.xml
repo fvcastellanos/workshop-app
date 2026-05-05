@@ -36,13 +36,16 @@
 		<sonar.exclusions>
 			src/main/frontend/**
 			src/main/java/db/**
-			**/test/**
+			src/main/resources/db/migration/**
+			src/main/java/net/cavitos/workshop/views/**
+			src/test/java/**
 		</sonar.exclusions>
 		<sonar.coverage.exclusions>
-			src/main/java/net/cavitos/workshop/views/**,
 			src/main/frontend/**
 			src/main/java/db/**
-			**/test/**
+			src/main/resources/db/migration/**
+			src/main/java/net/cavitos/workshop/views/**
+			src/test/java/**
 		</sonar.coverage.exclusions>
 		<vaadin.version>24.5.2</vaadin.version>
 	</properties>
