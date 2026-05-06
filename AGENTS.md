@@ -40,6 +40,11 @@ Spring Boot 3.3.4 + Vaadin 24.5.2 + Java 21. Maven wrapper (`./mvnw`).
 - **Events**: `event/` package with listener/processor pattern for cross-cutting logic (inventory, work orders).
 - **Sequence generation**: Custom sequence module under `sequence/` (separate from DB sequences).
 
+## Code conventions
+
+- Use Java 21 features like type inference, switch statements
+- Add `final` modifier to method parameters and variables which references are not planned to be changed
+
 ## Testing conventions
 
 - Unit tests: `@ExtendWith(MockitoExtension.class)`, AssertJ assertions, `verifyNoMoreInteractions`

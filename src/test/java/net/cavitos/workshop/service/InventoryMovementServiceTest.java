@@ -536,8 +536,9 @@ class InventoryMovementServiceTest {
 
         var result = inventoryMovementService.findByWorkOrderDetailId(workOrderDetailId, TENANT);
 
-        assertThat(result).isPresent();
-        assertThat(result.get()).isSameAs(entity);
+        assertThat(result).isPresent()
+                .hasValue(entity);
+
         verify(inventoryRepository).findByWorkOrderDetailEntityIdAndTenant(workOrderDetailId, TENANT);
         verifyNoMoreInteractions(inventoryRepository);
         verifyNoInteractions(productRepository, inventoryMovementTypeRepository, workOrderDetailRepository, zonedDateTimeFactory);

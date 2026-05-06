@@ -61,6 +61,7 @@ public class InvoiceDetailInventoryListener {
             case ADD -> addInventoryMovement(invoiceDetailEntity);
             case UPDATE -> updateInventoryMovement(invoiceDetailEntity);
             case DELETE -> deleteInventoryMovement(invoiceDetailEntity);
+            default -> LOGGER.warn("Unhandled event type={}", eventType);
         }
     }
 

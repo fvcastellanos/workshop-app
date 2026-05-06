@@ -36,6 +36,7 @@ public class WorkOrderDetailInventoryListener {
              case ADD -> addInventoryFor(workOrderDetailEntity);
              case UPDATE -> updateInventoryFor(workOrderDetailEntity);
              case DELETE -> deleteInventoryFor(workOrderDetailEntity);
+             default -> LOGGER.warn("Unknown event type: {}", eventType);
          }
     }
 

@@ -156,6 +156,29 @@ class InvoiceDetailInventoryListenerTest {
     }
 
     @Test
+    void handleEvent_defaultEventType_shouldLogWarning() {
+
+        // Arrange
+        final var product = ProductEntity.builder().id("prod-5").storable(true).build();
+        final var invoice = InvoiceEntity.builder().invoiceDate(now).build();
+        final var detail = InvoiceDetailEntity.builder()
+                .id("detail-5").productEntity(product).invoiceEntity(invoice)
+                .quantity(1).unitPrice(5.0).discountAmount(0.0).tenant("tenant-5").build();
+        final var event = InvoiceDetailEvent.builder()
+                .eventType(EventType.UNKNOWN)
+                .invoiceDetailEntity(detail)
+                .build();
+
+        // Act
+        listener.handleEvent(event);
+
+        // Assert
+        verifyNoInteractions(inventoryRepository);
+        verifyNoInteractions(inventoryMovementTypeRepository);
+        verifyNoInteractions(zonedDateTimeFactory);
+    }
+
+    @Test
     void handleEvent_updateEvent_shouldDeleteAndAdd() {
         createListener("IN_TYPE", "OUT_TYPE");
         // Arrange

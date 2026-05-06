@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +71,17 @@ class WorkOrderInvoiceDetailListenerTest {
         assertThat(entityCaptor.getValue()).isSameAs(invoiceDetailEntity);
 
         verifyNoMoreInteractions(workOrderInvoiceDetailProcessor);
+    }
+
+    @Test
+    void handleEvent_whenUnknown_shouldNotDelegateToProcessor() {
+
+        final var invoiceDetailEntity = detailEntity("detail-4");
+        final var event = event(EventType.UNKNOWN, "", invoiceDetailEntity);
+
+        listener.handleEvent(event);
+
+        verifyNoInteractions(workOrderInvoiceDetailProcessor);
     }
 
     private static InvoiceDetailEntity detailEntity(String id) {

@@ -34,6 +34,7 @@ public class WorkOrderInvoiceDetailListener {
             case ADD -> addWorkOrderDetailFor(invoiceDetailEntity);
             case UPDATE -> updateWorkOrderDetailFor(invoiceDetailEvent.getPreviousInvoiceDetailId(), invoiceDetailEntity);
             case DELETE -> deleteWorkOrderDetailFor(invoiceDetailEvent.getPreviousInvoiceDetailId(), invoiceDetailEntity);
+            default -> LOGGER.warn("Unknown event type: {}", eventType);
         }
     }
 

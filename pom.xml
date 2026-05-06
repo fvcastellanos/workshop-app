@@ -38,7 +38,6 @@
 			src/main/java/db/migration/**,
 			src/main/resources/db/migration/**,
 			src/main/java/net/cavitos/workshop/views/**,
-			src/test/java/net/cavitos/workshop/**,
 			src/test/java/net/cavitos/workshop/**
 		</sonar.exclusions>
 		<sonar.coverage.exclusions>
@@ -46,7 +45,6 @@
 			src/main/java/db/migration/**,
 			src/main/resources/db/migration/**,
 			src/main/java/net/cavitos/workshop/views/**,
-			src/test/java/net/cavitos/workshop/**,
 			src/test/java/net/cavitos/workshop/**
 		</sonar.coverage.exclusions>
 		<vaadin.version>24.5.2</vaadin.version>
