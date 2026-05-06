@@ -127,6 +127,7 @@ public class InventoryMovementService {
         return inventoryRepository.save(entity);
     }
 
+    @Transactional
     public InventoryEntity update(final String tenant, final String id, final InventoryMovement movement) {
 
         LOGGER.info("Update inventory movement for tenant: {}", tenant);

@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class WorkOrderDetailInventoryListenerTest {
@@ -62,6 +63,17 @@ class WorkOrderDetailInventoryListenerTest {
         InOrder inOrder = inOrder(workOrderDetailInventoryProcessor);
         inOrder.verify(workOrderDetailInventoryProcessor).deleteInventoryFor(detailEntity);
         inOrder.verify(workOrderDetailInventoryProcessor).addInventoryFor(detailEntity);
+    }
+
+    @Test
+    void handleEventWhenUnknownThenNoProcessorInteraction() {
+
+        final var detailEntity = buildWorkOrderDetailEntity();
+        final var event = buildEvent(EventType.UNKNOWN, detailEntity);
+
+        assertThatCode(() -> listener.handleEvent(event)).doesNotThrowAnyException();
+
+        verifyNoInteractions(workOrderDetailInventoryProcessor);
     }
 
     private WorkOrderDetailEvent buildEvent(final EventType eventType, final WorkOrderDetailEntity detailEntity) {

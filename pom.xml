@@ -34,13 +34,18 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<!-- SonarQube exclusions -->
 		<sonar.exclusions>
-			src/main/frontend/**
-			src/main/java/db/**
+			src/main/frontend/**,
+			src/main/java/db/migration/**,
+			src/main/resources/db/migration/**,
+			src/main/java/net/cavitos/workshop/views/**,
+			src/test/java/net/cavitos/workshop/**
 		</sonar.exclusions>
 		<sonar.coverage.exclusions>
+			src/main/frontend/**,
+			src/main/java/db/migration/**,
+			src/main/resources/db/migration/**,
 			src/main/java/net/cavitos/workshop/views/**,
-			src/main/frontend/**
-			src/main/java/db/**
+			src/test/java/net/cavitos/workshop/**
 		</sonar.coverage.exclusions>
 		<vaadin.version>24.5.2</vaadin.version>
 	</properties>

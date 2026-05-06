@@ -76,17 +76,6 @@ public class InvoiceDetailService {
 
         }
 
-        final var invoiceHolder = invoiceDetailRepository.findByInvoiceEntityIdAndProductEntityIdAndTenant(invoiceId,
-                productEntity.getId(), tenant);
-
-        if (invoiceHolder.isPresent()) {
-
-            LOGGER.error("product_id={} already exists for invoice_id={} and tenant={}", productEntity.getId(),
-                    invoiceId, tenant);
-
-            throw createBusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Product already exists");
-        }
-
         final var entity = InvoiceDetailEntity.builder()
                 .id(TimeBasedGenerator.generateTimeBasedId())
                 .productEntity(productEntity)

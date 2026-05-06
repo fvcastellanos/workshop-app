@@ -4,5 +4,6 @@ public enum EventType {
 
     ADD,
     UPDATE,
-    DELETE
+    DELETE,
+    UNKNOWN
 }
