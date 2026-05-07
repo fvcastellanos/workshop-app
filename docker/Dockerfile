@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-21-jammy AS builder
+FROM maven:3.9-eclipse-temurin-25 AS builder
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY . .
 
 RUN mvn clean package -Pproduction -DskipTests
 
-FROM azul/zulu-openjdk:21-jre-latest AS runner
+FROM azul/zulu-openjdk:25-jre-latest AS runner
 
 RUN useradd -m workshop -s /bin/bash && \
     mkdir -p /opt/cavitos/apps && \

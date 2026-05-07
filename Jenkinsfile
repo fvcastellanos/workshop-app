@@ -8,7 +8,7 @@ node {
     }
 
     def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
-    def mavenImageName = 'maven:3.9-eclipse-temurin-21'
+    def mavenImageName = 'maven:3.9-eclipse-temurin-25'
     def postgresImageName = 'postgres:17'
 
     def ipAddress = sh(script: "hostname -i | awk '{print \$1}'", returnStdout: true).trim()

@@ -1,6 +1,6 @@
 package net.cavitos.workshop.security;
 
-import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import net.cavitos.workshop.security.auth0.Auth0AuthoritiesMapper;
 import net.cavitos.workshop.security.auth0.Auth0Configuration;
 import net.cavitos.workshop.security.auth0.Auth0LogoutHandler;
@@ -12,12 +12,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @Import(Auth0Configuration.class)
-public class ApplicationSecurityConfiguration extends VaadinWebSecurity {
+public class ApplicationSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
@@ -29,7 +29,7 @@ public class ApplicationSecurityConfiguration extends VaadinWebSecurity {
                             .permitAll() // GET requests don't need auth
                         .anyRequest().authenticated()
                 );
-               
+
         http.oauth2Login(oAuth2LoginConfigurer -> {
             oAuth2LoginConfigurer.loginPage("/oauth2/authorization/okta");
             oAuth2LoginConfigurer.userInfoEndpoint(config -> config.userAuthoritiesMapper(auth0AuthoritiesMapper));
@@ -37,8 +37,11 @@ public class ApplicationSecurityConfiguration extends VaadinWebSecurity {
 
         http.csrf(AbstractHttpConfigurer::disable);
 
+        final var logoutPathMatcher = PathPatternRequestMatcher.withDefaults()
+                .matcher(HttpMethod.GET, "/logout");
+
         http.logout(logout -> logout.addLogoutHandler(applicationLogoutHandler)
-                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                                .logoutRequestMatcher(logoutPathMatcher)
         );
 
         return http.build();
