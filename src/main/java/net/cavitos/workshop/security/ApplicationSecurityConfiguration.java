@@ -1,6 +1,5 @@
 package net.cavitos.workshop.security;
 
-import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import net.cavitos.workshop.security.auth0.Auth0AuthoritiesMapper;
 import net.cavitos.workshop.security.auth0.Auth0Configuration;
 import net.cavitos.workshop.security.auth0.Auth0LogoutHandler;
