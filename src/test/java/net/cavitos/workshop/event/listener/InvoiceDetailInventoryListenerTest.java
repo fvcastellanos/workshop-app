@@ -93,7 +93,7 @@ class InvoiceDetailInventoryListenerTest {
         listener.handleEvent(event);
 
         // Assert
-        ArgumentCaptor<InventoryEntity> captor = ArgumentCaptor.forClass(InventoryEntity.class);
+        final var captor = ArgumentCaptor.forClass(InventoryEntity.class);
         verify(inventoryRepository).save(captor.capture());
 
         final var saved = captor.getValue();
@@ -104,6 +104,7 @@ class InvoiceDetailInventoryListenerTest {
             .hasFieldOrPropertyWithValue("quantity", 2.0)
             .hasFieldOrPropertyWithValue("unitPrice", 10.0)
             .hasFieldOrPropertyWithValue("total", 20.0)
+            .hasFieldOrPropertyWithValue("operationDate", now)
             .hasFieldOrPropertyWithValue("tenant", "tenant-1")
             .hasFieldOrPropertyWithValue("created", now)
             .hasFieldOrPropertyWithValue("updated", now);
@@ -152,6 +153,29 @@ class InvoiceDetailInventoryListenerTest {
 
         // Assert
         verify(inventoryRepository).deleteAll(Collections.singletonList(movement));
+    }
+
+    @Test
+    void handleEvent_defaultEventType_shouldLogWarning() {
+
+        // Arrange
+        final var product = ProductEntity.builder().id("prod-5").storable(true).build();
+        final var invoice = InvoiceEntity.builder().invoiceDate(now).build();
+        final var detail = InvoiceDetailEntity.builder()
+                .id("detail-5").productEntity(product).invoiceEntity(invoice)
+                .quantity(1).unitPrice(5.0).discountAmount(0.0).tenant("tenant-5").build();
+        final var event = InvoiceDetailEvent.builder()
+                .eventType(EventType.UNKNOWN)
+                .invoiceDetailEntity(detail)
+                .build();
+
+        // Act
+        listener.handleEvent(event);
+
+        // Assert
+        verifyNoInteractions(inventoryRepository);
+        verifyNoInteractions(inventoryMovementTypeRepository);
+        verifyNoInteractions(zonedDateTimeFactory);
     }
 
     @Test

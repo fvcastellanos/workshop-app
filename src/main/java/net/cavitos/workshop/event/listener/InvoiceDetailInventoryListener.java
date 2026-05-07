@@ -61,6 +61,7 @@ public class InvoiceDetailInventoryListener {
             case ADD -> addInventoryMovement(invoiceDetailEntity);
             case UPDATE -> updateInventoryMovement(invoiceDetailEntity);
             case DELETE -> deleteInventoryMovement(invoiceDetailEntity);
+            default -> LOGGER.warn("Unhandled event type={}", eventType);
         }
     }
 
@@ -130,7 +131,7 @@ public class InvoiceDetailInventoryListener {
                         .unitPrice(unitPrice)
                         .total(total)
                         .inventoryMovementTypeEntity(movementOutputTypeEntity)
-                        .operationDate(invoiceEntity.getInvoiceDate())
+                        .operationDate(operationDate)
                         .tenant(tenant)
                         .description(MOVEMENT_DESCRIPTION)
                         .created(zonedDateTimeFactory.getSystemNow())

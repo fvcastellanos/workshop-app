@@ -49,6 +49,7 @@ public class WorkOrderInvoiceDetailProcessor {
 
         final var workOrderEntity = invoiceDetailEntity.getWorkOrderEntity();
         final var productEntity = invoiceDetailEntity.getProductEntity();
+        final var invoiceEntity = invoiceDetailEntity.getInvoiceEntity();
         final var tenant = invoiceDetailEntity.getTenant();
 
         if (nonNull(invoiceDetailEntity.getWorkOrderEntity())) {
@@ -61,6 +62,7 @@ public class WorkOrderInvoiceDetailProcessor {
                     .invoiceDetailEntity(invoiceDetailEntity)
                     .productEntity(productEntity)
                     .workOrderEntity(workOrderEntity)
+                    .operationDate(invoiceEntity.getInvoiceDate())
                     .quantity(invoiceDetailEntity.getQuantity())
                     .unitPrice(invoiceDetailEntity.getUnitPrice())
                     .salePrice(salePrice)

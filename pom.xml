@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>net.cavitos.workshop</groupId>
 	<artifactId>workshop-app</artifactId>
-	<version>0.3</version>
+	<version>0.4</version>
 	<name>WorkShopERP</name>
 	<scm>
 		<connection>scm:git:https://github.com/fvcastellanos/workshop-app.git</connection>
@@ -34,13 +34,18 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<!-- SonarQube exclusions -->
 		<sonar.exclusions>
-			src/main/frontend/**
-			src/main/java/db/**
+			src/main/frontend/**,
+			src/main/java/db/migration/**,
+			src/main/resources/db/migration/**,
+			src/main/java/net/cavitos/workshop/views/**,
+			src/test/java/net/cavitos/workshop/**
 		</sonar.exclusions>
 		<sonar.coverage.exclusions>
+			src/main/frontend/**,
+			src/main/java/db/migration/**,
+			src/main/resources/db/migration/**,
 			src/main/java/net/cavitos/workshop/views/**,
-			src/main/frontend/**
-			src/main/java/db/**
+			src/test/java/net/cavitos/workshop/**
 		</sonar.coverage.exclusions>
 		<vaadin.version>24.5.2</vaadin.version>
 	</properties>
