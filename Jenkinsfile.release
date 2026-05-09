@@ -6,7 +6,7 @@ properties([
 ])
 
 def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
-def mavenImageName = 'maven:3.9-eclipse-temurin-21'
+def mavenImageName = 'maven:3.9-eclipse-temurin-25'
 def mainBranch = 'main'
 def developBranch = 'develop'
 
