@@ -21,7 +21,7 @@ public class WorkOrder {
     private String notes;
     private String plateNumber;
     private String color;
-    private int makeYear;
+    private Integer makeYear;
     private String orderDate;
     private CommonCarLine carLine;
     private CommonContact contact;
