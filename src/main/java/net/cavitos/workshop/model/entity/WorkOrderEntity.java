@@ -81,7 +81,7 @@ public class WorkOrderEntity {
     private String color;
 
     @Column(name = "make_year")
-    private int makeYear;
+    private Integer makeYear;
 
     @Column(name = "close_date")
     private Instant closeDate;

@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -72,6 +73,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
     private TextField status;
     private TextArea notes;
     private TextField workOrderTotal;
+    private IntegerField yearMake;
 
     protected WorkOrderDetailView(final AuthenticationContext authenticationContext,
                                   final DefaultUserService defaultUserService,
@@ -166,11 +168,11 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
         carModel = new TextField("Modelo");
         carModel.setReadOnly(true);
-        carModel.setWidth("30%");
+        carModel.setWidth("25%");
 
         status = new TextField("Estado");
         status.setReadOnly(true);
-        status.setWidth("30%");
+        status.setWidth("25%");
 
         notes = new TextArea("Notas");
         notes.setReadOnly(true);
@@ -179,7 +181,11 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         workOrderTotal = new TextField("Total");
         workOrderTotal.setReadOnly(true);
         workOrderTotal.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        workOrderTotal.setWidth("30%");
+        workOrderTotal.setWidth("25%");
+
+        yearMake = new IntegerField("Modelo");
+        yearMake.setReadOnly(true);
+        yearMake.setWidth("25%");
 
         final var row1 = new HorizontalLayout(
                 orderDate,
@@ -190,6 +196,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
 
         final var row2 = new HorizontalLayout(
                 carModel,
+                yearMake,
                 status,
                 workOrderTotal
         );
@@ -256,6 +263,7 @@ public class WorkOrderDetailView extends CRUDLayout implements HasUrlParameter<S
         };
 
         status.setValue(statusText);
+        yearMake.setValue(workOrderEntity.getMakeYear());
 
         notes.setValue(workOrderEntity.getNotes());
 
