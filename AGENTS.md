@@ -44,6 +44,7 @@ Spring Boot 3.3.4 + Vaadin 24.5.2 + Java 21. Maven wrapper (`./mvnw`).
 
 - Use Java 21 features like type inference, switch statements
 - Add `final` modifier to method parameters and variables which references are not planned to be changed
+- Use explicit imports, avoid using star imports
 
 ## Testing conventions
 
