@@ -6,8 +6,8 @@ properties([
 ])
 
 def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
-def registryUrl = 'https://registry.devcoregt.com'
-def registryImage = "${registryUrl}/workshop-app"
+def registryUrl = 'registry.devcoregt.com'
+def registryImage = "${registryUrl}/apps/workshop-app"
 def dockerfilePath = './docker/Dockerfile'
 
 node {
