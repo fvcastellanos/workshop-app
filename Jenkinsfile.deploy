@@ -35,7 +35,7 @@ node {
 
             stage('Checkout') {
                 checkout scm: scmGit(
-                    branches: [[name: '$BRANCH_NAME']],
+                    branches: [[name: 'feature/WE-63']],
                     extensions: [[$class: 'CleanBeforeCheckout']],
                     userRemoteConfigs: [[
                         credentialsId: 'github-credentials',
