@@ -1,0 +1,66 @@
+replicaCount: 1
+
+image:
+  repository: registry.devcoregt.com/apps/workshop-app
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: 
+  - name: "zot-registry"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+service:
+  type: NodePort
+  port: 8080
+  nodePort: 30082
+
+ingress:
+  enabled: false
+
+httpRoute:
+  enabled: false
+
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+  periodSeconds: 10
+  failureThreshold: 3
+  httpGet:
+    path: /actuator/health
+    port: 8080
+readinessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+  periodSeconds: 10
+  failureThreshold: 3
+  httpGet:
+    path: /actuator/health
+    port: 8080
+
+autoscaling:
+  enabled: false
+
+configmap:
+  enabled: true
+  # Set to true to reference an existing ConfigMap in the cluster instead of creating one
+  useExisting: true
+  existingName: "workshop-app-config"
+  auth0Issuer: ""
+  corsOrigins: ""
+
+secret:
+  enabled: true
+  # Set to true to reference an existing Secret in the cluster instead of creating one
+  useExisting: true
+  existingName: "workshop-app-secrets"
+  datasourceUrl: ""
+  auth0ClientId: ""
+  auth0ClientSecret: ""
