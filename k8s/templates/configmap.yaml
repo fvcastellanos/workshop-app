@@ -1,0 +1,11 @@
+{{- if and .Values.configmap.enabled (not .Values.configmap.useExisting) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "workshop-app.fullname" . }}
+  labels:
+    {{- include "workshop-app.labels" . | nindent 4 }}
+data:
+  AUTH0_ISSUER: {{ .Values.configmap.auth0Issuer | quote }}
+  WORKSHOP_CORS_ORIGINS: {{ .Values.configmap.corsOrigins | quote }}
+{{- end }}

@@ -1,0 +1,79 @@
+properties([
+    parameters([
+        string(name: 'APP_VERSION', defaultValue: '', description: 'Application version to deploy (e.g., 1.2.0)'),
+        string(name: 'DOCKER_TAG', defaultValue: '', description: 'Docker image tag (defaults to APP_VERSION if empty)')
+    ])
+])
+
+def repositoryUrl = 'https://github.com/fvcastellanos/workshop-app.git'
+def registryUrl = 'registry.devcoregt.com'
+def registryImage = "${registryUrl}/apps/workshop-app"
+def dockerfilePath = './docker/Dockerfile'
+
+node {
+    deleteDir()
+
+    try {
+        withCredentials([
+            usernamePassword(credentialsId: 'zot-registry', usernameVariable: 'REGISTRY_USR', passwordVariable: 'REGISTRY_PSW')
+        ]) {
+
+            stage('Validate Parameters') {
+                if (!params.APP_VERSION?.trim()) {
+                    error "APP_VERSION is required"
+                }
+
+                env.appVersion = params.APP_VERSION
+                env.dockerTag = params.DOCKER_TAG?.trim() ?: params.APP_VERSION
+                env.imageName = "${registryImage}:${env.dockerTag}"
+                env.imageNameLatest = "${registryImage}:latest"
+
+                echo "Application version: ${env.appVersion}"
+                echo "Docker tag: ${env.dockerTag}"
+                echo "Image name: ${env.imageName}"
+            }
+
+            stage('Checkout') {
+                checkout scm: scmGit(
+                    branches: [[name: 'feature/WE-63']],
+                    extensions: [[$class: 'CleanBeforeCheckout']],
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-credentials',
+                        url: repositoryUrl
+                    ]]
+                )
+            }
+
+            stage('Build Docker Image') {
+                sh """
+                    docker build \\
+                        --build-arg APP_VERSION=${env.appVersion} \\
+                        --build-arg BUILD_DATE=\$(date -u +'%Y-%m-%dT%H:%M:%SZ') \\
+                        --build-arg GIT_COMMIT=\$(git rev-parse --short HEAD) \\
+                        -f ${dockerfilePath} \\
+                        -t ${env.imageName} \\
+                        -t ${env.imageNameLatest} \\
+                        .
+                """
+            }
+
+            stage('Push to Registry') {
+                sh """
+                    echo ${REGISTRY_PSW} | docker login ${registryUrl} --username ${REGISTRY_USR} --password-stdin
+                    docker push ${env.imageName}
+                    docker push ${env.imageNameLatest}
+                    docker logout ${registryUrl}
+                """
+            }
+        }
+    } catch (Exception exception) {
+        echo "An error occurred: ${exception.getMessage()}"
+        currentBuild.result = 'FAILURE'
+        throw exception
+    } finally {
+        sh """
+            docker logout || true
+            docker rmi -f ${env.imageName} ${env.imageNameLatest} || true
+        """
+    }
+}
