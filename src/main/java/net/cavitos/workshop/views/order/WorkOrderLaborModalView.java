@@ -37,10 +37,12 @@ public class WorkOrderLaborModalView extends WorkOrderBaseModal {
         this.isEdit = isEdit;
         this.tenant = tenant;
 
+        this.binder.refreshFields();
+
         setHeaderTitle(isEdit ? "Modificar Mano de Obra" : "Agregar Mano de Obra");
 
         if (isEdit) {
-
+            LOGGER.info("Loading work order labor detail for order: {}", entity.getOrderId());
             this.workOrderDetailEntity = entity;
             this.binder.readBean(entity);
         }
