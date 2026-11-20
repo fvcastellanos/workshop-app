@@ -1,0 +1,16 @@
+services:
+  workshop-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+
+    environment:
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      AUTH0_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET}
+      AUTH0_ISSUER: ${AUTH0_ISSUER}
+      DATASOURCE_URL: ${DATASOURCE_URL}
+      WORKSHOP_CORS_ORIGINS: ${WORKSHOP_CORS_ORIGINS}
+
+    restart: unless-stopped

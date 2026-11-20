@@ -14,9 +14,10 @@ RUN useradd -m workshop -s /bin/bash && \
     chmod -R 755 /opt/cavitos
 
 COPY --from=builder /app/target/*.jar /opt/cavitos/apps/workshop-app.jar
+COPY docker/entrypoint.sh /opt/cavitos/apps/entrypoint.sh
 
-RUN chown workshop:workshop /opt/cavitos/apps/workshop-app.jar && \
-    chmod 755 /opt/cavitos/apps/workshop-app.jar
+RUN chown workshop:workshop /opt/cavitos/apps/workshop-app.jar /opt/cavitos/apps/entrypoint.sh && \
+    chmod 755 /opt/cavitos/apps/workshop-app.jar /opt/cavitos/apps/entrypoint.sh
 
 WORKDIR /opt/cavitos/apps
 
@@ -24,4 +25,4 @@ USER workshop
 
 EXPOSE 8080
 
-CMD ["java", "-Xms128M", "-Xmx128M", "-jar", "workshop-app.jar"]
+ENTRYPOINT ["/opt/cavitos/apps/entrypoint.sh"]
